@@ -1,0 +1,3 @@
+enum Status { DEFAULT, LOADING, COMPLETED, ERROR }
+
+enum StatusFetch { LOADING, COMPLETED, ERROR }
