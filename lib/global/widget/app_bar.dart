@@ -2,8 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stsj/core/controller/Login_controller.dart';
 import 'package:stsj/global/globalVar.dart';
 import 'package:stsj/router/router_const.dart';

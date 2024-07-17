@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:stsj/core/cleanArc/dashboard_service/pages/dialog_filter.dart';
 import 'package:stsj/router/router_const.dart';
 
-class MenuComponent extends HookWidget {
-  const MenuComponent({super.key});
+class SalesMenuComponent extends HookWidget {
+  const SalesMenuComponent({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -33,16 +33,26 @@ class MenuComponent extends HookWidget {
           ],
         ),
 
-        // Otorisasi
         Column(
           children: [
+            // Otorisasi
             _buildMenuIcon(
               context,
               'assets/images/authorization.png',
               'Otorisasi',
               RoutesConstant.authorizationSPK,
             ),
-            const Text('Otorisasi SPK')
+            const Text('Otorisasi SPK'),
+            // // ~:NEW:~
+            // // Map
+            // _buildMenuIcon(
+            //   context,
+            //   'assets/images/maps.png',
+            //   'Peta',
+            //   RoutesConstant.map,
+            // ),
+            // const Text('Peta'),
+            // // ~:NEW:~
           ],
         ),
 
@@ -55,7 +65,17 @@ class MenuComponent extends HookWidget {
               'Service',
               RoutesConstant.service,
             ),
-            const Text('Service')
+            const Text('Service'),
+            // // ~:NEW:~
+            // // Map
+            // _buildMenuIcon(
+            //   context,
+            //   'assets/images/destination.png',
+            //   'Aktivitas',
+            //   RoutesConstant.salesActivities,
+            // ),
+            // const Text('Aktivitas Sales'),
+            // // ~:NEW:~
           ],
         ),
 
@@ -68,7 +88,17 @@ class MenuComponent extends HookWidget {
               'Dashboard Service',
               RoutesConstant.dashboardService,
             ),
-            const Text('Dashboard Service')
+            const Text('Dashboard Service'),
+            // // ~:NEW:~
+            // // Map
+            // _buildMenuIcon(
+            //   context,
+            //   'assets/images/activity.png',
+            //   'Aktivitas',
+            //   RoutesConstant.managerActivities,
+            // ),
+            // const Text('Aktivitas Manager'),
+            // // ~:NEW:~
           ],
         ),
 
@@ -91,7 +121,11 @@ class MenuComponent extends HookWidget {
   }
 
   Widget _buildMenuIcon(
-      BuildContext context, String imagePath, String tooltip, String route) {
+    BuildContext context,
+    String imagePath,
+    String tooltip,
+    String route,
+  ) {
     final isHovered = ValueNotifier<bool>(false);
     final tooltipNull = ValueNotifier<bool>(false);
 
@@ -106,24 +140,27 @@ class MenuComponent extends HookWidget {
         valueListenable: isHovered,
         builder: (context, hovered, child) {
           return AnimatedContainer(
-              width: 100.0,
-              height: 100.0,
-              duration: Duration(milliseconds: 100),
-              padding: EdgeInsets.all(hovered ? 10.0 : 0.0),
-              child: IconButton(
-                  onPressed: () {
-                    tooltipNull.value = true;
-                    if (tooltip == 'Dashboard Service') {
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext context) => DialogFilter());
-                    } else {
-                      context.goNamed(route);
-                    }
+            width: 100.0,
+            height: 100.0,
+            duration: Duration(milliseconds: 100),
+            padding: EdgeInsets.all(hovered ? 10.0 : 0.0),
+            child: IconButton(
+              onPressed: () {
+                tooltipNull.value = true;
+                if (tooltip == 'Dashboard Service') {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) => DialogFilter(),
+                  );
+                } else {
+                  context.goNamed(route);
+                }
 
-                    // context.goNamed(route);
-                  },
-                  icon: Image.asset(imagePath)));
+                // context.goNamed(route);
+              },
+              icon: Image.asset(imagePath),
+            ),
+          );
         },
       ),
     );

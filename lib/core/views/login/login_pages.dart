@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'package:simple_grid/simple_grid.dart';
 import 'package:stsj/core/controller/Login_controller.dart';
 import 'package:stsj/core/models/AuthModel/Auth_Model.dart';
@@ -51,7 +49,9 @@ class _LoginPagesState extends State<LoginPages> {
     return false;
   }
 
-  void loginHandler(BuildContext context) async {
+  void loginHandler(
+    BuildContext context,
+  ) async {
     // print("LoginHanlder");
     // set laodng
 
@@ -200,11 +200,12 @@ class _LoginPagesState extends State<LoginPages> {
                           SizedBox(height: 5.0),
                           TextFormField(
                             controller: idController,
+                            autofocus: true,
                             inputFormatters: [UppercaseTextInputFormatter()],
                             decoration: InputDecoration(
                                 filled: true, //<-- SEE HERE
                                 fillColor: Colors.white70,
-                                labelText: "UserName", //babel text
+                                labelText: "Username", //babel text
                                 hintText: 'Masukan username perusahaan'
 
                                 // border: OutlineInputBorder(),
@@ -308,7 +309,7 @@ class _LoginPagesState extends State<LoginPages> {
                               ),
                             ),
                     ),
-                    Container(
+                    SizedBox(
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height * 0.095,
                       child: Center(

@@ -9,6 +9,8 @@ import 'package:stsj/core/models/AuthModel/Auth_Model.dart';
 import 'package:stsj/router/router_const.dart';
 
 class HomeMenuComponent extends HookWidget {
+  const HomeMenuComponent({super.key});
+
   @override
   Widget build(BuildContext context) {
     final stsjAuth = useState(false);
@@ -61,56 +63,94 @@ class HomeMenuComponent extends HookWidget {
 
       return null;
     }, []);
-    const double height = 10;
+    // const double height = 10;
+    final homeMenuState = Provider.of<MapState>(context);
 
     return Center(
       child: loadingmenu.value
           ? CircularProgressIndicator()
-          : Container(
-              child: Wrap(
+          : Wrap(
               runSpacing: 30,
               // Atur jarak antara menu ikon di sini
 
               children: [
                 _buildMenuIcon(
-                    'assets/images/stsj.png',
-                    'STSJ',
-                    'SURYA TIMUR SAKTI JATIM',
-                    RoutesConstant.menu,
-                    stsjAuth.value),
+                  'assets/images/stsj.png',
+                  'STSJ',
+                  'SURYA TIMUR SAKTI JATIM',
+                  RoutesConstant.menu,
+                  stsjAuth.value,
+                  homeMenuState,
+                ),
                 _buildMenuIcon(
-                    'assets/images/rssm.png',
-                    'RSSM',
-                    'RODA SAKTI SURYA MEGAH',
-                    RoutesConstant.menu,
-                    rssmAuth.value),
+                  'assets/images/rssm.png',
+                  'RSSM',
+                  'RODA SAKTI SURYA MEGAH',
+                  RoutesConstant.menu,
+                  rssmAuth.value,
+                  homeMenuState,
+                ),
                 _buildMenuIcon(
-                    'assets/images/SAMP.png',
-                    'SAMP',
-                    'SAPTA AJI MANUNGGAL PRIMA',
-                    RoutesConstant.menu,
-                    sampAuth.value),
+                  'assets/images/SAMP.png',
+                  'SAMP',
+                  'SAPTA AJI MANUNGGAL PRIMA',
+                  RoutesConstant.menu,
+                  sampAuth.value,
+                  homeMenuState,
+                ),
                 _buildMenuIcon(
-                    'assets/images/SPAA.png',
-                    'SPAA',
-                    'SURYA PERKASA ANUGRAH ABADI',
-                    RoutesConstant.menu,
-                    spaauth.value),
-                _buildMenuIcon('assets/images/SS.png', 'SS', 'SURYA SEJAHTERA',
-                    RoutesConstant.menu, ssAuth.value),
-                _buildMenuIcon('assets/images/ST.png', 'ST', 'SURYA TERANG',
-                    RoutesConstant.menu, stAuth.value),
-                _buildMenuIcon('assets/images/SP.png', 'SP', 'SURYA PRIMA',
-                    RoutesConstant.menu, spAuth.value),
-                _buildMenuIcon('assets/images/SPr.png', 'SPr', 'SURYA PRATAMA',
-                    RoutesConstant.menu, sprAuth.value),
+                  'assets/images/SPAA.png',
+                  'SPAA',
+                  'SURYA PERKASA ANUGRAH ABADI',
+                  RoutesConstant.menu,
+                  spaauth.value,
+                  homeMenuState,
+                ),
+                _buildMenuIcon(
+                  'assets/images/SS.png',
+                  'SS',
+                  'SURYA SEJAHTERA',
+                  RoutesConstant.menu,
+                  ssAuth.value,
+                  homeMenuState,
+                ),
+                _buildMenuIcon(
+                  'assets/images/ST.png',
+                  'ST',
+                  'SURYA TERANG',
+                  RoutesConstant.menu,
+                  stAuth.value,
+                  homeMenuState,
+                ),
+                _buildMenuIcon(
+                  'assets/images/SP.png',
+                  'SP',
+                  'SURYA PRIMA',
+                  RoutesConstant.menu,
+                  spAuth.value,
+                  homeMenuState,
+                ),
+                _buildMenuIcon(
+                  'assets/images/SPr.png',
+                  'SPr',
+                  'SURYA PRATAMA',
+                  RoutesConstant.menu,
+                  sprAuth.value,
+                  homeMenuState,
+                ),
               ],
-            )),
+            ),
     );
   }
 
-  Widget _buildMenuIcon(String imagePath, String tooltip, String desc,
-      String route, bool shouldShowIcon) {
+  Widget _buildMenuIcon(
+    String imagePath,
+    String tooltip,
+    String desc,
+    String route,
+    bool shouldShowIcon,
+    MapState state,
+  ) {
     final isHovered = ValueNotifier<bool>(false);
 
     if (!shouldShowIcon) {
@@ -130,7 +170,7 @@ class HomeMenuComponent extends HookWidget {
         builder: (context, hovered, child) {
           final loginpt = context.read<PtModel>();
 
-          return Container(
+          return SizedBox(
             width: 200,
             child: Column(
               children: [
@@ -149,6 +189,7 @@ class HomeMenuComponent extends HookWidget {
                       // tooltip: tooltip,
                       onPressed: () {
                         context.goNamed(route);
+                        state.setStaticMenuNotifier('');
                         loginpt.setPT(tooltip);
                       },
                     ),

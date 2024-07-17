@@ -12,6 +12,17 @@ class RoutesConstant {
   static String authorizationSPK = "otorisasiSPK";
   static String otoriasiSPK = "otoriasiSPK";
   static String salesDashboard = "salesDashboard";
+  // ~:NEW:~
+  static String map = 'maps';
+  static String carouselRouteDetails = 'carouselRouteDetails';
+  static String routeDetails = 'routeDetails';
+  static String carouselImageView = 'carouselImageView';
+  static String routeImageView = 'routeImageView';
+  static String salesActivities = 'salesActivities';
+  static String managerActivities = 'managerActivities';
+  static String managerActivitiesInMap = 'managerActivitiesInMap';
+  static String weeklyActivitiesReport = 'weeklyActivitiesReport';
+  // ~:NEW:~
 
   static String dashboardService = "dashboardService";
 

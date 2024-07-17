@@ -14,6 +14,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => LoadingModel()),
         ChangeNotifierProvider(create: (_) => UserIDmodel()),
         ChangeNotifierProvider(create: (_) => PtModel()),
+        ChangeNotifierProvider(create: (_) => MapState()),
       ],
       child: MyApp(),
     ),
@@ -21,7 +22,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override

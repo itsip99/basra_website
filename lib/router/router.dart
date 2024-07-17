@@ -8,8 +8,15 @@ import 'package:stsj/core/cleanArc/dashboard_service/pages/dashboard02.dart';
 import 'package:stsj/core/cleanArc/dashboard_service/pages/dashboard03.dart';
 import 'package:stsj/core/cleanArc/dashboard_service/pages/dashboard04.dart';
 import 'package:stsj/core/cleanArc/dashboard_service/pages/dashboard05.dart';
-import 'package:stsj/core/cleanArc/dashboard_service/pages/dialog_filter.dart';
+import 'package:stsj/core/views/activities/manager_activities.dart';
+import 'package:stsj/core/views/activities/sales_activities.dart';
+import 'package:stsj/core/views/activities/carousel_route_details.dart';
+import 'package:stsj/core/views/activities/image_preview.dart';
+import 'package:stsj/core/views/activities/map.dart';
+import 'package:stsj/core/views/activities/route_details.dart';
+import 'package:stsj/core/views/activities/weekly_activities_report.dart';
 import 'package:stsj/global/globalVar.dart';
+import 'package:stsj/global/widget/open_map.dart';
 
 import 'package:stsj/router/not_found_page.dart';
 import 'package:stsj/router/router_const.dart';
@@ -20,7 +27,6 @@ import 'package:stsj/core/views/home_main_pages.dart';
 import 'package:stsj/core/views/Login/login_pages.dart';
 import 'package:stsj/core/views/Menu/menu_pages.dart';
 import 'package:stsj/core/views/Otorisasi/OtorisasiSPK/OtorisasiSPK.dart';
-import 'package:stsj/core/views/Otorisasi/otorisasi_diskon_pages.dart';
 import 'package:stsj/core/views/Otorisasi/otorisasi_mutasi_pages.dart';
 import 'package:stsj/core/views/Otorisasi/otorisasi_pages.dart';
 import 'package:stsj/core/views/report/report_Mainpages.dart';
@@ -51,130 +57,205 @@ class RouterSettings {
     redirect: redirect,
     routes: <GoRoute>[
       GoRoute(
-          name: RoutesConstant.homepage,
-          path: '/',
-          builder: (context, state) => HomePages(),
-          routes: [
-            GoRoute(
-              name: RoutesConstant.login,
-              path: 'login',
-              pageBuilder: (context, state) {
-                return MaterialPage(child: LoginPages());
-              },
-            ),
-            GoRoute(
-              name: RoutesConstant.account,
-              path: 'account',
-              pageBuilder: (context, state) {
-                return MaterialPage(child: AkunPage());
-              },
-            ),
-            GoRoute(
-              name: RoutesConstant.report,
-              path: 'report',
-              pageBuilder: (context, state) {
-                return MaterialPage(child: ReportPages());
-              },
-            ),
-            GoRoute(
-              name: RoutesConstant.menu,
-              path: 'menu',
-              pageBuilder: (context, state) {
-                return MaterialPage(child: MenuPages());
-              },
-            ),
-            GoRoute(
-              name: RoutesConstant.otorisasiMutasi,
-              path: 'otorisasiMutasi',
-              pageBuilder: (context, state) {
-                return MaterialPage(child: OtorisasiMutasiPages());
-              },
-            ),
-            GoRoute(
-              name: RoutesConstant.otorisasi,
-              path: 'authorization',
-              pageBuilder: (context, state) {
-                return MaterialPage(child: OtoriasiPages());
-              },
-            ),
-            GoRoute(
-              name: RoutesConstant.dashboardService,
-              path: 'dashboardService',
-              pageBuilder: (context, state) {
-                return MaterialPage(child: DashboardServiceMain());
-              },
-            ),
-            GoRoute(
-              name: RoutesConstant.service,
-              path: 'service',
-              pageBuilder: (context, state) {
-                return MaterialPage(child: ServiceInput());
-              },
-            ),
-            GoRoute(
-              name: RoutesConstant.authorizationSPK,
-              path: 'otorisasiSPK',
-              pageBuilder: (context, state) {
-                return MaterialPage(child: OtorisasiSPK());
-              },
-            ),
-            GoRoute(
-              name: RoutesConstant.salesDashboard,
-              path: 'salesDashboard',
-              builder: (context, state) => SalesPages(),
-              routes: [
-                GoRoute(
-                  name: RoutesConstant.salesDashboardkab,
-                  path: 'areakab',
-                  pageBuilder: (context, state) {
-                    return MaterialPage(child: ListKabAreaPages());
-                  },
-                ),
-                GoRoute(
-                  name: RoutesConstant.salesDashboardleasingArea,
-                  path: 'leasingArea',
-                  pageBuilder: (context, state) {
-                    return MaterialPage(child: ListAreaPages());
-                  },
-                ),
-                GoRoute(
-                  name: RoutesConstant.salesDashboardareaGroup,
-                  path: 'areaGroup',
-                  pageBuilder: (context, state) {
-                    return MaterialPage(child: GroupAreaPages());
-                  },
-                ),
-                GoRoute(
-                  name: RoutesConstant.salesDashboardleasingDP,
-                  path: 'leasing-area-dp-category',
-                  pageBuilder: (context, state) {
-                    return MaterialPage(child: DPwithCategoryPages());
-                  },
-                ),
-                GoRoute(
-                  name: RoutesConstant.salesDashboardleasingGroupCC,
-                  path: 'leasingGroupCC',
-                  pageBuilder: (context, state) {
-                    return MaterialPage(child: GroupLeasingCCAreaPages());
-                  },
-                ),
-                GoRoute(
-                  name: RoutesConstant.salesDashboardtipe,
-                  path: 'kategoriTipe',
-                  pageBuilder: (context, state) {
-                    return MaterialPage(child: ListCategoryTotal());
-                  },
-                ),
-                GoRoute(
-                  name: RoutesConstant.salesDashboardtipeDaily,
-                  path: 'kategoriDaily',
-                  pageBuilder: (context, state) {
-                    return MaterialPage(child: ListSTUbyDate());
-                  },
-                ),
-              ],
-            ),
-          ]),
+        name: RoutesConstant.homepage,
+        path: '/',
+        builder: (context, state) => HomePages(),
+        routes: [
+          GoRoute(
+            name: RoutesConstant.login,
+            path: 'login',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: LoginPages());
+            },
+          ),
+          GoRoute(
+            name: RoutesConstant.account,
+            path: 'account',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: AkunPage());
+            },
+          ),
+          GoRoute(
+            name: RoutesConstant.report,
+            path: 'report',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: ReportPages());
+            },
+          ),
+          GoRoute(
+            name: RoutesConstant.menu,
+            path: 'menu',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: MenuPages());
+            },
+          ),
+          GoRoute(
+            name: RoutesConstant.otorisasiMutasi,
+            path: 'otorisasiMutasi',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: OtorisasiMutasiPages());
+            },
+          ),
+          GoRoute(
+            name: RoutesConstant.otorisasi,
+            path: 'authorization',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: OtoriasiPages());
+            },
+          ),
+          GoRoute(
+            name: RoutesConstant.dashboardService,
+            path: 'dashboardService',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: DashboardServiceMain());
+            },
+          ),
+          GoRoute(
+            name: RoutesConstant.service,
+            path: 'service',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: ServiceInput());
+            },
+          ),
+          GoRoute(
+            name: RoutesConstant.authorizationSPK,
+            path: 'otorisasiSPK',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: OtorisasiSPK());
+            },
+          ),
+          GoRoute(
+            name: RoutesConstant.salesDashboard,
+            path: 'salesDashboard',
+            builder: (context, state) => SalesPages(),
+            routes: [
+              GoRoute(
+                name: RoutesConstant.salesDashboardkab,
+                path: 'areakab',
+                pageBuilder: (context, state) {
+                  return MaterialPage(child: ListKabAreaPages());
+                },
+              ),
+              GoRoute(
+                name: RoutesConstant.salesDashboardleasingArea,
+                path: 'leasingArea',
+                pageBuilder: (context, state) {
+                  return MaterialPage(child: ListAreaPages());
+                },
+              ),
+              GoRoute(
+                name: RoutesConstant.salesDashboardareaGroup,
+                path: 'areaGroup',
+                pageBuilder: (context, state) {
+                  return MaterialPage(child: GroupAreaPages());
+                },
+              ),
+              GoRoute(
+                name: RoutesConstant.salesDashboardleasingDP,
+                path: 'leasing-area-dp-category',
+                pageBuilder: (context, state) {
+                  return MaterialPage(child: DPwithCategoryPages());
+                },
+              ),
+              GoRoute(
+                name: RoutesConstant.salesDashboardleasingGroupCC,
+                path: 'leasingGroupCC',
+                pageBuilder: (context, state) {
+                  return MaterialPage(child: GroupLeasingCCAreaPages());
+                },
+              ),
+              GoRoute(
+                name: RoutesConstant.salesDashboardtipe,
+                path: 'kategoriTipe',
+                pageBuilder: (context, state) {
+                  return MaterialPage(child: ListCategoryTotal());
+                },
+              ),
+              GoRoute(
+                name: RoutesConstant.salesDashboardtipeDaily,
+                path: 'kategoriDaily',
+                pageBuilder: (context, state) {
+                  return MaterialPage(child: ListSTUbyDate());
+                },
+              ),
+            ],
+          ),
+          // ~:NEW:~
+          // Maps
+          GoRoute(
+            name: RoutesConstant.map,
+            path: 'map',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: MapPage());
+            },
+            routes: [
+              GoRoute(
+                name: RoutesConstant.carouselRouteDetails,
+                path: 'carouselRouteDetails',
+                pageBuilder: (context, state) {
+                  return MaterialPage(child: CarouselRouteDetailsPage());
+                },
+                routes: [
+                  GoRoute(
+                    name: RoutesConstant.carouselImageView,
+                    path: 'carouselImageView',
+                    pageBuilder: (context, state) {
+                      return MaterialPage(child: ImageView());
+                    },
+                  ),
+                ],
+              ),
+              GoRoute(
+                name: RoutesConstant.routeDetails,
+                path: 'routeDetails',
+                pageBuilder: (context, state) {
+                  return MaterialPage(child: RouteDetailsPage());
+                },
+                routes: [
+                  GoRoute(
+                    name: RoutesConstant.routeImageView,
+                    path: 'routeImageView',
+                    pageBuilder: (context, state) {
+                      return MaterialPage(child: ImageView());
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+          GoRoute(
+            name: RoutesConstant.salesActivities,
+            path: 'salesActivities',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: SalesActivitiesPage());
+            },
+          ),
+          GoRoute(
+            name: RoutesConstant.managerActivities,
+            path: 'managerActivities',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: ManagerActivitiesPage());
+            },
+            routes: [
+              GoRoute(
+                name: RoutesConstant.managerActivitiesInMap,
+                path: 'managerActivitiesInMap',
+                pageBuilder: (context, state) {
+                  return MaterialPage(child: OpenMap());
+                },
+              ),
+            ],
+          ),
+          GoRoute(
+            name: RoutesConstant.weeklyActivitiesReport,
+            path: 'weeklyActivitiesReport',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: WeeklyActivitiesReport());
+            },
+          ),
+          // ~:NEW:~
+        ],
+      ),
     ],
     errorBuilder: (context, state) => const NotFoundScreen(),
   );
