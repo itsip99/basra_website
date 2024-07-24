@@ -12,6 +12,7 @@ class ModelWeeklyReport {
   String employeeName;
   int isActAvailable;
   int isLate;
+  int total;
 
   ModelWeeklyReport({
     required this.province,
@@ -27,6 +28,7 @@ class ModelWeeklyReport {
     required this.employeeName,
     required this.isActAvailable,
     required this.isLate,
+    this.total = 0,
   });
 
   factory ModelWeeklyReport.fromJson(Map<String, dynamic> json) {

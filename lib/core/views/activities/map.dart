@@ -52,7 +52,7 @@ class _MapPageState extends State<MapPage> {
       context: context,
       initialDate: tgl == '' ? DateTime.now() : DateTime.parse(tgl),
       firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+      lastDate: DateTime(DateTime.now().year + 1, 1, 0),
     );
 
     if (picked != null && picked != DateTime.parse(tgl)) {
@@ -453,7 +453,7 @@ class _MapPageState extends State<MapPage> {
                                       MediaQuery.of(context).size.width * 0.01,
                                 ),
                                 child: Text(
-                                  'reset',
+                                  'Reset',
                                   style: GlobalFont.mediumgiantfontR,
                                 ),
                               ),

@@ -3,11 +3,12 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:stsj/core/models/Activities/activity_route.dart';
 import 'package:stsj/core/models/Activities/area.dart';
+import 'package:stsj/core/models/Activities/branch_shop.dart';
 import 'package:stsj/core/models/Activities/manager_activities.dart';
 import 'package:stsj/core/models/Activities/province.dart';
 import 'package:stsj/core/models/Activities/salesman.dart';
 import 'package:stsj/core/models/Activities/salesman_activities.dart';
-import 'package:stsj/core/models/Activities/weekly_activities_report.dart';
+import 'package:stsj/core/models/Activities/weekly_report.dart';
 
 class GlobalAPI {
   static Future<List<ModelActivityRoute>> fetchActivityRoute(
@@ -298,6 +299,48 @@ class GlobalAPI {
     } catch (e) {
       print(e.toString());
       return weeklyReportList;
+    }
+  }
+
+  static Future<List<ModelBranchShop>> fetchBranchShop(
+    String province,
+    String area,
+  ) async {
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/api/SIPSales/BrowseMBranchShop',
+    );
+
+    Map mapWeeklyReport = {
+      "BigArea": province,
+      "SmallArea": area,
+    };
+
+    List<ModelBranchShop> branchShopList = [];
+
+    try {
+      final response =
+          await http.post(url, body: jsonEncode(mapWeeklyReport), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      if (response.statusCode <= 200) {
+        var jsonBranchShop = jsonDecode(response.body);
+        if (jsonBranchShop['code'] == '100' &&
+            jsonBranchShop['msg'] == 'Sukses') {
+          branchShopList = (jsonBranchShop['data'] as List)
+              .map<ModelBranchShop>((list) => ModelBranchShop.fromJson(list))
+              .toList();
+
+          return branchShopList;
+        } else {
+          return branchShopList;
+        }
+      } else {}
+      return branchShopList;
+    } catch (e) {
+      print(e.toString());
+      return branchShopList;
     }
   }
 }

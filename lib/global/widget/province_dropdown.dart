@@ -29,7 +29,7 @@ class _ProvinceDropdownState extends State<ProvinceDropdown> {
   @override
   void initState() {
     value = widget.inputan;
-    // print('List data: ${widget.listData.length}');
+    print('Value: $value');
     super.initState();
   }
 

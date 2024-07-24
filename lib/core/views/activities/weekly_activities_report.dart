@@ -1,17 +1,14 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:stsj/core/cleanArc/dashboard_service/helpers/format.dart';
-import 'package:stsj/core/models/Activities/weekly_activities_report.dart';
 import 'package:stsj/core/providers/Provider.dart';
 import 'package:stsj/global/font.dart';
 import 'package:stsj/global/widget/app_bar.dart';
 import 'package:stsj/global/widget/area_dropdown.dart';
-import 'package:stsj/global/widget/custom_table.dart';
-import 'package:stsj/global/widget/label_table.dart';
+import 'package:stsj/global/widget/weekly_table_report.dart';
 import 'package:stsj/global/widget/province_dropdown.dart';
 import 'package:stsj/router/router_const.dart';
 
@@ -33,26 +30,33 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
   ValueNotifier<String> endDateNotifier = ValueNotifier('');
   ValueNotifier<List<String>> filterDataNotifier = ValueNotifier([]);
 
+  // Set Province (same as Area as the placeholder of the UI)
   void setProvince(String value) {
-    province = value;
+    setState(() {
+      province = value;
+    });
   }
 
+  // Set Area (same as Wilayah as the placeholder of the UI)
   void setArea(String value) {
     area = value;
   }
 
+  // Set Begin Date
   void setBeginDate(String value) {
     setState(() {
       beginDate = value;
     });
   }
 
+  // Set End Date
   void setEndDate(String value) {
     setState(() {
       endDate = value;
     });
   }
 
+  // Start Date Function
   void setBeginDateByGoogle(
     BuildContext context,
     String tgl,
@@ -67,7 +71,7 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
           ? DateTime.now().subtract(Duration(days: 6))
           : DateTime.parse(tgl),
       firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+      lastDate: DateTime(DateTime.now().year + 1, 1, 0),
       selectableDayPredicate: (DateTime day) {
         if (day.weekday == DateTime.sunday) {
           return false;
@@ -95,6 +99,7 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
     }
   }
 
+  // End Date Function
   void setEndDateByGoogle(
     BuildContext context,
     String tgl,
@@ -105,7 +110,7 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
       context: context,
       initialDate: tgl == '' ? DateTime.now() : DateTime.parse(tgl),
       firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+      lastDate: DateTime(DateTime.now().year + 1, 1, 0),
       selectableDayPredicate: (DateTime day) {
         if (day.weekday == DateTime.sunday) {
           return false;
@@ -116,13 +121,22 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
     );
 
     if (picked != null && picked != DateTime.parse(tgl)) {
-      tgl = picked.toString().substring(0, 10);
-      setEndDate(tgl);
+      if (picked.weekday == DateTime.saturday) {
+        tgl = picked.toString().substring(0, 10);
+        setEndDate(tgl);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Day should be set to Saturday'),
+          ),
+        );
+      }
     } else {
       // Nothing happened
     }
   }
 
+  // Get Data from Filter for further data processing
   void getFilterData(
     BuildContext context,
     MapState state,
@@ -157,12 +171,14 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
     });
   }
 
+  // Reset Data from Filter to easily remove all current filter
   void resetData(
     MapState state,
   ) {
-    print('Reset Data');
+    // print('Reset Data');
+    print('Province before: $province');
     setState(() {
-      setProvince('');
+      province = '';
       area = '';
       beginDate = '';
       endDate = '';
@@ -172,6 +188,7 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
       endDateNotifier.value = '';
       filterDataNotifier.value.clear();
     });
+    print('Province after: $province');
   }
 
   @override
@@ -205,6 +222,7 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
+                // Filter text
                 InkWell(
                   onTap: null,
                   child: Container(
@@ -231,6 +249,7 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
                   ),
                 ),
 
+                // Devider
                 SizedBox(width: 10.0),
 
                 // Filter's Expand and Collapse Animation
@@ -241,17 +260,19 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
                       ? Curves.easeInOut
                       : Curves.easeIn,
                   child: SizedBox(
+                    // Note -> used for slide in and slide out animation
+                    // but it didn't work because maybe it's a web based program
                     // width: weeklyReportState.isFilterOpen
                     //     ? MediaQuery.of(context).size.width * 0.5
                     //     : 0.0,
                     height: MediaQuery.of(context).size.height * 0.05,
                     child: Row(
                       children: [
+                        // Area Dropdown
                         Container(
                           width: MediaQuery.of(context).size.width * 0.125,
                           alignment: Alignment.centerLeft,
                           decoration: BoxDecoration(
-                            // border: Border.all(color: Colors.black, width: 1.5),
                             color: Colors.grey[400],
                             borderRadius: BorderRadius.circular(15.0),
                           ),
@@ -263,14 +284,18 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
                           child: ProvinceDropdown(
                             listData: weeklyReportState.provinceList,
                             inputan: province,
-                            hint: 'Provinsi',
+                            hint: 'Area',
                             handle: setProvince,
                           ),
                         ),
+
+                        // Devider
                         SizedBox(width: 10.0),
+
+                        // Wilayah Dropdown
                         ValueListenableBuilder(
                           valueListenable: weeklyReportState.provinceNotifier,
-                          builder: (context, value, child) {
+                          builder: (context, value, _) {
                             return SizedBox(
                               width: MediaQuery.of(context).size.width * 0.125,
                               child: FutureBuilder(
@@ -308,7 +333,7 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
                                       child: AreaDropdown(
                                         listData: snapshot.data!,
                                         inputan: area,
-                                        hint: 'Area',
+                                        hint: 'Wilayah',
                                         handle: setArea,
                                         disable: (value == province &&
                                                 snapshot.data!.length > 2)
@@ -322,12 +347,20 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
                             );
                           },
                         ),
+
+                        // Devider
                         SizedBox(width: 10.0),
+
+                        // Start Date Picker
                         InkWell(
-                          onTap: () => setBeginDateByGoogle(
-                            context,
-                            beginDate,
-                          ),
+                          onTap: () {
+                            filterDataNotifier.value.clear();
+
+                            setBeginDateByGoogle(
+                              context,
+                              beginDate,
+                            );
+                          },
                           child: Container(
                             // width: MediaQuery.of(context).size.width * 0.1,
                             height: MediaQuery.of(context).size.height * 0.05,
@@ -360,17 +393,29 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
                             ),
                           ),
                         ),
+
+                        // Devider
                         SizedBox(width: 10.0),
+
+                        // Dash Text
                         Text(
                           ' - ',
                           style: GlobalFont.giantfontRBold,
                         ),
+
+                        // Devider
                         SizedBox(width: 10.0),
+
+                        // End Date Picker
                         InkWell(
-                          onTap: () => setEndDateByGoogle(
-                            context,
-                            endDate,
-                          ),
+                          onTap: () {
+                            filterDataNotifier.value.clear();
+
+                            setEndDateByGoogle(
+                              context,
+                              endDate,
+                            );
+                          },
                           child: Container(
                             // width: MediaQuery.of(context).size.width * 0.1,
                             height: MediaQuery.of(context).size.height * 0.05,
@@ -402,25 +447,44 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
                             ),
                           ),
                         ),
+
+                        // Devider
                         SizedBox(width: 10.0),
+
+                        // Search Button
                         InkWell(
                           onTap: () {
-                            // getFilterData(
-                            //   context,
-                            //   weeklyReportState,
-                            // );
-                            //
-                            // filterDataNotifier.value
-                            //     .add(weeklyReportState.provinceNotifier.value);
-                            // filterDataNotifier.value
-                            //     .add(weeklyReportState.areaNotifier.value);
-                            // filterDataNotifier.value
-                            //     .add(beginDateNotifier.value);
-                            // filterDataNotifier.value.add(endDateNotifier.value);
-                            //
-                            // print(
-                            //   'Filter Data length: ${filterDataNotifier.value.length}',
-                            // );
+                            print(
+                              'Date Difference in Days: ${DateTime.parse(endDate).difference(DateTime.parse(beginDate)).inDays}',
+                            );
+
+                            if (DateTime.parse(endDate)
+                                    .difference(DateTime.parse(beginDate))
+                                    .inDays ==
+                                5) {
+                              getFilterData(
+                                context,
+                                weeklyReportState,
+                              );
+
+                              filterDataNotifier.value.clear();
+                              filterDataNotifier.value.add(
+                                  weeklyReportState.provinceNotifier.value);
+                              filterDataNotifier.value
+                                  .add(weeklyReportState.areaNotifier.value);
+                              filterDataNotifier.value
+                                  .add(beginDateNotifier.value);
+                              filterDataNotifier.value
+                                  .add(endDateNotifier.value);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Dates must be set with a difference of 5 days',
+                                  ),
+                                ),
+                              );
+                            }
                           },
                           child: Container(
                             // width: MediaQuery.of(context).size.width * 0.03,
@@ -437,7 +501,11 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
                             ),
                           ),
                         ),
+
+                        // Devider
                         SizedBox(width: 10.0),
+
+                        // Reset Button
                         InkWell(
                           onTap: () {
                             resetData(weeklyReportState);
@@ -453,7 +521,7 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
                             ),
                             padding: EdgeInsets.symmetric(horizontal: 15.0),
                             child: Text(
-                              'reset',
+                              'Reset',
                               style: GlobalFont.mediumgiantfontR,
                             ),
                           ),
@@ -477,39 +545,82 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
             // =================================================================
             SizedBox(
               height: MediaQuery.of(context).size.height * 0.82,
-              child: FutureBuilder(
-                future: weeklyReportState.fetchWeeklyReport(
-                  province,
-                  area,
-                  beginDate,
-                  endDate,
-                ),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircularProgressIndicator(),
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.01,
-                        ),
-                        Text(
-                          'Loading...',
-                          style: GlobalFont.mediumgiantfontR,
-                        ),
-                      ],
-                    );
-                  } else if (snapshot.hasError) {
-                    return Center(
-                      child: Text('Error: ${snapshot.error}'),
-                    );
-                  } else if (snapshot.hasData && snapshot.data!.isEmpty) {
-                    return Center(
-                      child: Text('Data not available'),
+              child: ValueListenableBuilder(
+                valueListenable: filterDataNotifier,
+                builder: (context, value, _) {
+                  // print('Data notifier: ${filterDataNotifier.value.length}');
+
+                  if (value.isNotEmpty) {
+                    // Filter Date are not empty
+                    return FutureBuilder(
+                      future: weeklyReportState.fetchWeeklyReport(
+                        province,
+                        area,
+                        beginDate,
+                        endDate,
+                      ),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Container(
+                            width: MediaQuery.of(context).size.width,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              horizontal:
+                                  MediaQuery.of(context).size.width * 0.02,
+                              vertical:
+                                  MediaQuery.of(context).size.height * 0.02,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                CircularProgressIndicator(color: Colors.black),
+                                SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.01,
+                                ),
+                                Text(
+                                  'Loading...',
+                                  style: GlobalFont.mediumgiantfontR,
+                                ),
+                              ],
+                            ),
+                          );
+                        } else if (snapshot.hasError) {
+                          return Center(
+                            child: Text('Error: ${snapshot.error}'),
+                          );
+                        } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+                          return Center(
+                            child: Text('Data not available'),
+                          );
+                        } else {
+                          return Container(
+                            width: MediaQuery.of(context).size.width,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              horizontal:
+                                  MediaQuery.of(context).size.width * 0.02,
+                              vertical:
+                                  MediaQuery.of(context).size.height * 0.02,
+                            ),
+                            child: WeeklyReportTable(),
+                          );
+                        }
+                      },
                     );
                   } else {
+                    // Filter Date are empty
                     return Container(
                       width: MediaQuery.of(context).size.width,
+                      alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20.0),
@@ -518,610 +629,11 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
                         horizontal: MediaQuery.of(context).size.width * 0.02,
                         vertical: MediaQuery.of(context).size.height * 0.02,
                       ),
-                      // child: Column(
-                      //   children: [
-                      //     Row(
-                      //       crossAxisAlignment: CrossAxisAlignment.start,
-                      //       children: [
-                      //         Expanded(
-                      //           child: Table(
-                      //             columnWidths: {
-                      //               0: FlexColumnWidth(
-                      //                 MediaQuery.of(context).size.width *
-                      //                     0.1,
-                      //               ),
-                      //             },
-                      //             children: [
-                      //               TableRow(
-                      //                 children: [
-                      //                   TableCell(
-                      //                     child: Container(
-                      //                       height: MediaQuery.of(context)
-                      //                               .size
-                      //                               .height *
-                      //                           0.076,
-                      //                       alignment: Alignment.center,
-                      //                       decoration: BoxDecoration(
-                      //                         border: Border.all(
-                      //                             color: Colors.black),
-                      //                       ),
-                      //                       child: Text('Nama Dealer'),
-                      //                     ),
-                      //                   ),
-                      //                 ],
-                      //               ),
-                      //             ],
-                      //           ),
-                      //         ),
-                      //         Expanded(
-                      //           flex: 8,
-                      //           child: CustomTable(),
-                      //         ),
-                      //       ],
-                      //     ),
-                      //     ListView(
-                      //       children: snapshot,
-                      //     ),
-                      //   ],
-                      // ),
-                      // child: ListView(
-                      //   children: snapshot.data!.asMap().entries.map((entry) {
-                      //     final ModelWeeklyReport report = entry.value;
-                      //
-                      //     return Text(report.actName);
-                      //   }).toList(),
-                      // ),
-                      child: Table(
-                        columnWidths: const {
-                          0: FixedColumnWidth(50),
-                          1: FixedColumnWidth(150),
-                          2: FixedColumnWidth(100),
-                          3: FixedColumnWidth(100),
-                          4: FixedColumnWidth(100),
-                          5: FixedColumnWidth(150),
-                          6: FixedColumnWidth(150),
-                          7: FixedColumnWidth(200),
-                          8: FixedColumnWidth(50),
-                          9: FixedColumnWidth(50),
-                          10: FixedColumnWidth(50),
-                        },
-                        border: TableBorder.all(),
-                        children: const [
-                          TableRow(children: [
-                            LabelTable(
-                                '', Alignment.center, Colors.red, false, false),
-                            LabelTable('NO TELP', Alignment.center, Colors.red,
-                                true, true),
-                            LabelTable('NAMA', Alignment.center, Colors.red,
-                                true, true),
-                            LabelTable('TANGGAL', Alignment.center, Colors.red,
-                                true, true),
-                            LabelTable('PUKUL', Alignment.center, Colors.red,
-                                true, true),
-                          ]),
-                          // for (var i = 0;
-                          //     i < GlobalVar.listBrowseBooking.length;
-                          //     i++)
-                          //   TableRow(
-                          //     children: [
-                          //       TableCell(
-                          //         verticalAlignment:
-                          //             TableCellVerticalAlignment.middle,
-                          //         child: LabelTable(
-                          //           '${i + 1}',
-                          //           Alignment.center,
-                          //           1,
-                          //         ),
-                          //       ),
-                          //       TableCell(
-                          //         verticalAlignment:
-                          //             TableCellVerticalAlignment.middle,
-                          //         child: LabelTable(
-                          //           '0${GlobalVar.listBrowseBooking[i].uPhoneNo}',
-                          //           Alignment.topLeft,
-                          //           1,
-                          //         ),
-                          //       ),
-                          //       TableCell(
-                          //         verticalAlignment:
-                          //             TableCellVerticalAlignment.middle,
-                          //         child: LabelTable(
-                          //           GlobalVar.listBrowseBooking[i].uName,
-                          //           Alignment.topLeft,
-                          //           1,
-                          //         ),
-                          //       ),
-                          //       TableCell(
-                          //         verticalAlignment:
-                          //             TableCellVerticalAlignment.middle,
-                          //         child: LabelTable(
-                          //           GlobalVar.tglFormat.format(
-                          //             DateTime.parse(
-                          //               GlobalVar.listBrowseBooking[i]
-                          //                   .bookDate,
-                          //             ),
-                          //           ),
-                          //           Alignment.topLeft,
-                          //           1,
-                          //         ),
-                          //       ),
-                          //       TableCell(
-                          //         verticalAlignment:
-                          //             TableCellVerticalAlignment.middle,
-                          //         child: LabelTable(
-                          //           GlobalVar
-                          //               .listBrowseBooking[i].bookTime,
-                          //           Alignment.topLeft,
-                          //           1,
-                          //         ),
-                          //       ),
-                          //       TableCell(
-                          //         verticalAlignment:
-                          //             TableCellVerticalAlignment.middle,
-                          //         child: LabelTable(
-                          //           GlobalVar.listBrowseBooking[i].unitID,
-                          //           Alignment.topLeft,
-                          //           1,
-                          //         ),
-                          //       ),
-                          //       TableCell(
-                          //         verticalAlignment:
-                          //             TableCellVerticalAlignment.middle,
-                          //         child: LabelTable(
-                          //           GlobalVar.listBrowseBooking[i].notes,
-                          //           Alignment.topLeft,
-                          //           1,
-                          //         ),
-                          //       ),
-                          //       TableCell(
-                          //         verticalAlignment:
-                          //             TableCellVerticalAlignment.middle,
-                          //         child: LabelTable(
-                          //           GlobalVar.listBrowseBooking[i].status,
-                          //           Alignment.topLeft,
-                          //           1,
-                          //         ),
-                          //       ),
-                          //       (GlobalVar.listBrowseBooking[i].status ==
-                          //               'MENUNGGU KONFIRMASI')
-                          //           ? TableCell(
-                          //               verticalAlignment:
-                          //                   TableCellVerticalAlignment
-                          //                       .middle,
-                          //               child: IconButton(
-                          //                 onPressed: () {
-                          //                   notifyService(
-                          //                     GlobalVar
-                          //                         .listBrowseBooking[i],
-                          //                     true,
-                          //                   );
-                          //                 },
-                          //                 icon: const Icon(
-                          //                   Icons.check_rounded,
-                          //                   color: Colors.black,
-                          //                 ),
-                          //               ),
-                          //             )
-                          //           : TableCell(
-                          //               verticalAlignment:
-                          //                   TableCellVerticalAlignment
-                          //                       .middle,
-                          //               child: IconButton(
-                          //                 onPressed: null,
-                          //                 disabledColor: Colors.red,
-                          //                 icon: Icon(
-                          //                   Icons.check_rounded,
-                          //                   color: (GlobalVar
-                          //                               .listBrowseBooking[
-                          //                                   i]
-                          //                               .status ==
-                          //                           'TERKONFIRMASI')
-                          //                       ? Colors.red
-                          //                       : Colors.grey,
-                          //                 ),
-                          //               ),
-                          //             ),
-                          //       (GlobalVar.listBrowseBooking[i].status ==
-                          //               'MENUNGGU KONFIRMASI')
-                          //           ? TableCell(
-                          //               verticalAlignment:
-                          //                   TableCellVerticalAlignment
-                          //                       .middle,
-                          //               child: IconButton(
-                          //                 onPressed: () {
-                          //                   notifyService(
-                          //                     GlobalVar
-                          //                         .listBrowseBooking[i],
-                          //                     false,
-                          //                   );
-                          //                 },
-                          //                 icon: const Icon(
-                          //                   Icons.close_rounded,
-                          //                   color: Colors.black,
-                          //                 ),
-                          //               ),
-                          //             )
-                          //           : TableCell(
-                          //               verticalAlignment:
-                          //                   TableCellVerticalAlignment
-                          //                       .middle,
-                          //               child: IconButton(
-                          //                 onPressed: null,
-                          //                 disabledColor: Colors.red,
-                          //                 icon: Icon(
-                          //                   Icons.close_rounded,
-                          //                   color: (GlobalVar
-                          //                               .listBrowseBooking[
-                          //                                   i]
-                          //                               .status ==
-                          //                           'DITOLAK')
-                          //                       ? Colors.red
-                          //                       : Colors.grey,
-                          //                 ),
-                          //               ),
-                          //             ),
-                          //       TableCell(
-                          //         verticalAlignment:
-                          //             TableCellVerticalAlignment.middle,
-                          //         child: IconButton(
-                          //           onPressed: () {
-                          //             redirectToWhatsAppWeb(
-                          //               GlobalVar.listBrowseBooking[i],
-                          //             );
-                          //           },
-                          //           icon: Image(
-                          //             width: MediaQuery.of(context)
-                          //                     .size
-                          //                     .width /
-                          //                 12,
-                          //             height: MediaQuery.of(context)
-                          //                     .size
-                          //                     .height /
-                          //                 12,
-                          //             image: const AssetImage(
-                          //               'assets/images/whatsapp-icons.png',
-                          //             ),
-                          //           ),
-                          //         ),
-                          //       ),
-                          //     ],
-                          //   ),
-                        ],
-                      ),
+                      child: Text('Data not available'),
                     );
                   }
                 },
               ),
-              // child: ValueListenableBuilder(
-              //   valueListenable: filterDataNotifier,
-              //   builder: (context, value, child) {
-              //     if (value.isNotEmpty) {
-              //       return FutureBuilder(
-              //         future: weeklyReportState.fetchWeeklyReport(
-              //           province,
-              //           area,
-              //           beginDate,
-              //           endDate,
-              //         ),
-              //         builder: (context, snapshot) {
-              //           if (snapshot.connectionState ==
-              //               ConnectionState.waiting) {
-              //             return Column(
-              //               mainAxisAlignment: MainAxisAlignment.center,
-              //               children: [
-              //                 CircularProgressIndicator(),
-              //                 SizedBox(
-              //                   height:
-              //                       MediaQuery.of(context).size.height * 0.01,
-              //                 ),
-              //                 Text(
-              //                   'Loading...',
-              //                   style: GlobalFont.mediumgiantfontR,
-              //                 ),
-              //               ],
-              //             );
-              //           } else if (snapshot.hasError) {
-              //             return Center(
-              //               child: Text('Error: ${snapshot.error}'),
-              //             );
-              //           } else if (snapshot.hasData && snapshot.data!.isEmpty) {
-              //             return Center(
-              //               child: Text('Data not available'),
-              //             );
-              //           } else {
-              //             return Container(
-              //               width: MediaQuery.of(context).size.width,
-              //               decoration: BoxDecoration(
-              //                 color: Colors.white,
-              //                 borderRadius: BorderRadius.circular(20.0),
-              //               ),
-              //               padding: EdgeInsets.symmetric(
-              //                 horizontal:
-              //                     MediaQuery.of(context).size.width * 0.02,
-              //                 vertical:
-              //                     MediaQuery.of(context).size.height * 0.02,
-              //               ),
-              //               // child: Column(
-              //               //   children: [
-              //               //     Row(
-              //               //       crossAxisAlignment: CrossAxisAlignment.start,
-              //               //       children: [
-              //               //         Expanded(
-              //               //           child: Table(
-              //               //             columnWidths: {
-              //               //               0: FlexColumnWidth(
-              //               //                 MediaQuery.of(context).size.width *
-              //               //                     0.1,
-              //               //               ),
-              //               //             },
-              //               //             children: [
-              //               //               TableRow(
-              //               //                 children: [
-              //               //                   TableCell(
-              //               //                     child: Container(
-              //               //                       height: MediaQuery.of(context)
-              //               //                               .size
-              //               //                               .height *
-              //               //                           0.076,
-              //               //                       alignment: Alignment.center,
-              //               //                       decoration: BoxDecoration(
-              //               //                         border: Border.all(
-              //               //                             color: Colors.black),
-              //               //                       ),
-              //               //                       child: Text('Nama Dealer'),
-              //               //                     ),
-              //               //                   ),
-              //               //                 ],
-              //               //               ),
-              //               //             ],
-              //               //           ),
-              //               //         ),
-              //               //         Expanded(
-              //               //           flex: 8,
-              //               //           child: CustomTable(),
-              //               //         ),
-              //               //       ],
-              //               //     ),
-              //               //     ListView(
-              //               //       children: snapshot,
-              //               //     ),
-              //               //   ],
-              //               // ),
-              //               // child: ListView(
-              //               //   children: snapshot.data!.asMap().entries.map((entry) {
-              //               //     final ModelWeeklyReport report = entry.value;
-              //               //
-              //               //     return Text(report.actName);
-              //               //   }).toList(),
-              //               // ),
-              //               child: Table(
-              //                 columnWidths: const {
-              //                   0: FixedColumnWidth(50),
-              //                   1: FixedColumnWidth(150),
-              //                   2: FixedColumnWidth(100),
-              //                   3: FixedColumnWidth(100),
-              //                   4: FixedColumnWidth(100),
-              //                   5: FixedColumnWidth(150),
-              //                   6: FixedColumnWidth(150),
-              //                   7: FixedColumnWidth(200),
-              //                   8: FixedColumnWidth(50),
-              //                   9: FixedColumnWidth(50),
-              //                   10: FixedColumnWidth(50),
-              //                 },
-              //                 border: TableBorder.all(),
-              //                 children: const [
-              //                   TableRow(children: [
-              //                     LabelTable('', Alignment.center, 0),
-              //                     LabelTable('NO TELP', Alignment.center, 0),
-              //                     LabelTable('NAMA', Alignment.center, 0),
-              //                     LabelTable('TANGGAL', Alignment.center, 0),
-              //                     LabelTable('PUKUL', Alignment.center, 0),
-              //                     LabelTable(
-              //                         'JENIS MOTOR', Alignment.center, 0),
-              //                     LabelTable('KELUHAN', Alignment.center, 0),
-              //                     LabelTable('STATUS', Alignment.center, 0),
-              //                     LabelTable('', Alignment.center, 0),
-              //                     LabelTable('', Alignment.center, 0),
-              //                     LabelTable('', Alignment.center, 0),
-              //                   ]),
-              //                   // for (var i = 0;
-              //                   //     i < GlobalVar.listBrowseBooking.length;
-              //                   //     i++)
-              //                   //   TableRow(
-              //                   //     children: [
-              //                   //       TableCell(
-              //                   //         verticalAlignment:
-              //                   //             TableCellVerticalAlignment.middle,
-              //                   //         child: LabelTable(
-              //                   //           '${i + 1}',
-              //                   //           Alignment.center,
-              //                   //           1,
-              //                   //         ),
-              //                   //       ),
-              //                   //       TableCell(
-              //                   //         verticalAlignment:
-              //                   //             TableCellVerticalAlignment.middle,
-              //                   //         child: LabelTable(
-              //                   //           '0${GlobalVar.listBrowseBooking[i].uPhoneNo}',
-              //                   //           Alignment.topLeft,
-              //                   //           1,
-              //                   //         ),
-              //                   //       ),
-              //                   //       TableCell(
-              //                   //         verticalAlignment:
-              //                   //             TableCellVerticalAlignment.middle,
-              //                   //         child: LabelTable(
-              //                   //           GlobalVar.listBrowseBooking[i].uName,
-              //                   //           Alignment.topLeft,
-              //                   //           1,
-              //                   //         ),
-              //                   //       ),
-              //                   //       TableCell(
-              //                   //         verticalAlignment:
-              //                   //             TableCellVerticalAlignment.middle,
-              //                   //         child: LabelTable(
-              //                   //           GlobalVar.tglFormat.format(
-              //                   //             DateTime.parse(
-              //                   //               GlobalVar.listBrowseBooking[i]
-              //                   //                   .bookDate,
-              //                   //             ),
-              //                   //           ),
-              //                   //           Alignment.topLeft,
-              //                   //           1,
-              //                   //         ),
-              //                   //       ),
-              //                   //       TableCell(
-              //                   //         verticalAlignment:
-              //                   //             TableCellVerticalAlignment.middle,
-              //                   //         child: LabelTable(
-              //                   //           GlobalVar
-              //                   //               .listBrowseBooking[i].bookTime,
-              //                   //           Alignment.topLeft,
-              //                   //           1,
-              //                   //         ),
-              //                   //       ),
-              //                   //       TableCell(
-              //                   //         verticalAlignment:
-              //                   //             TableCellVerticalAlignment.middle,
-              //                   //         child: LabelTable(
-              //                   //           GlobalVar.listBrowseBooking[i].unitID,
-              //                   //           Alignment.topLeft,
-              //                   //           1,
-              //                   //         ),
-              //                   //       ),
-              //                   //       TableCell(
-              //                   //         verticalAlignment:
-              //                   //             TableCellVerticalAlignment.middle,
-              //                   //         child: LabelTable(
-              //                   //           GlobalVar.listBrowseBooking[i].notes,
-              //                   //           Alignment.topLeft,
-              //                   //           1,
-              //                   //         ),
-              //                   //       ),
-              //                   //       TableCell(
-              //                   //         verticalAlignment:
-              //                   //             TableCellVerticalAlignment.middle,
-              //                   //         child: LabelTable(
-              //                   //           GlobalVar.listBrowseBooking[i].status,
-              //                   //           Alignment.topLeft,
-              //                   //           1,
-              //                   //         ),
-              //                   //       ),
-              //                   //       (GlobalVar.listBrowseBooking[i].status ==
-              //                   //               'MENUNGGU KONFIRMASI')
-              //                   //           ? TableCell(
-              //                   //               verticalAlignment:
-              //                   //                   TableCellVerticalAlignment
-              //                   //                       .middle,
-              //                   //               child: IconButton(
-              //                   //                 onPressed: () {
-              //                   //                   notifyService(
-              //                   //                     GlobalVar
-              //                   //                         .listBrowseBooking[i],
-              //                   //                     true,
-              //                   //                   );
-              //                   //                 },
-              //                   //                 icon: const Icon(
-              //                   //                   Icons.check_rounded,
-              //                   //                   color: Colors.black,
-              //                   //                 ),
-              //                   //               ),
-              //                   //             )
-              //                   //           : TableCell(
-              //                   //               verticalAlignment:
-              //                   //                   TableCellVerticalAlignment
-              //                   //                       .middle,
-              //                   //               child: IconButton(
-              //                   //                 onPressed: null,
-              //                   //                 disabledColor: Colors.red,
-              //                   //                 icon: Icon(
-              //                   //                   Icons.check_rounded,
-              //                   //                   color: (GlobalVar
-              //                   //                               .listBrowseBooking[
-              //                   //                                   i]
-              //                   //                               .status ==
-              //                   //                           'TERKONFIRMASI')
-              //                   //                       ? Colors.red
-              //                   //                       : Colors.grey,
-              //                   //                 ),
-              //                   //               ),
-              //                   //             ),
-              //                   //       (GlobalVar.listBrowseBooking[i].status ==
-              //                   //               'MENUNGGU KONFIRMASI')
-              //                   //           ? TableCell(
-              //                   //               verticalAlignment:
-              //                   //                   TableCellVerticalAlignment
-              //                   //                       .middle,
-              //                   //               child: IconButton(
-              //                   //                 onPressed: () {
-              //                   //                   notifyService(
-              //                   //                     GlobalVar
-              //                   //                         .listBrowseBooking[i],
-              //                   //                     false,
-              //                   //                   );
-              //                   //                 },
-              //                   //                 icon: const Icon(
-              //                   //                   Icons.close_rounded,
-              //                   //                   color: Colors.black,
-              //                   //                 ),
-              //                   //               ),
-              //                   //             )
-              //                   //           : TableCell(
-              //                   //               verticalAlignment:
-              //                   //                   TableCellVerticalAlignment
-              //                   //                       .middle,
-              //                   //               child: IconButton(
-              //                   //                 onPressed: null,
-              //                   //                 disabledColor: Colors.red,
-              //                   //                 icon: Icon(
-              //                   //                   Icons.close_rounded,
-              //                   //                   color: (GlobalVar
-              //                   //                               .listBrowseBooking[
-              //                   //                                   i]
-              //                   //                               .status ==
-              //                   //                           'DITOLAK')
-              //                   //                       ? Colors.red
-              //                   //                       : Colors.grey,
-              //                   //                 ),
-              //                   //               ),
-              //                   //             ),
-              //                   //       TableCell(
-              //                   //         verticalAlignment:
-              //                   //             TableCellVerticalAlignment.middle,
-              //                   //         child: IconButton(
-              //                   //           onPressed: () {
-              //                   //             redirectToWhatsAppWeb(
-              //                   //               GlobalVar.listBrowseBooking[i],
-              //                   //             );
-              //                   //           },
-              //                   //           icon: Image(
-              //                   //             width: MediaQuery.of(context)
-              //                   //                     .size
-              //                   //                     .width /
-              //                   //                 12,
-              //                   //             height: MediaQuery.of(context)
-              //                   //                     .size
-              //                   //                     .height /
-              //                   //                 12,
-              //                   //             image: const AssetImage(
-              //                   //               'assets/images/whatsapp-icons.png',
-              //                   //             ),
-              //                   //           ),
-              //                   //         ),
-              //                   //       ),
-              //                   //     ],
-              //                   //   ),
-              //                 ],
-              //               ),
-              //             );
-              //           }
-              //         },
-              //       );
-              //     } else {
-              //       return Center(child: Text('Data are not available'));
-              //     }
-              //   },
-              // ),
             ),
           ],
         ),

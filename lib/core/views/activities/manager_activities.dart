@@ -61,7 +61,7 @@ class _ManagerActivitiesPageState extends State<ManagerActivitiesPage> {
           ? DateTime.now().subtract(Duration(days: 7))
           : DateTime.parse(tgl),
       firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+      lastDate: DateTime(DateTime.now().year + 1, 1, 0),
     );
 
     if (picked != null && picked != DateTime.parse(tgl)) {
@@ -234,7 +234,7 @@ class _ManagerActivitiesPageState extends State<ManagerActivitiesPage> {
                           child: ProvinceDropdown(
                             listData: managerActivityState.provinceList,
                             inputan: province,
-                            hint: 'Provinsi',
+                            hint: 'Area',
                             handle: setProvince,
                           ),
                         ),
@@ -371,7 +371,7 @@ class _ManagerActivitiesPageState extends State<ManagerActivitiesPage> {
                                       child: AreaDropdown(
                                         listData: snapshot.data!,
                                         inputan: area,
-                                        hint: 'Area',
+                                        hint: 'Wilayah',
                                         handle: setArea,
                                         disable: (value == province &&
                                                 snapshot.data!.length > 2)
@@ -387,10 +387,14 @@ class _ManagerActivitiesPageState extends State<ManagerActivitiesPage> {
                         ),
                         SizedBox(width: 10.0),
                         InkWell(
-                          onTap: () => setDateByGoogle(
-                            context,
-                            date,
-                          ),
+                          onTap: () {
+                            filterDataNotifier.value.clear();
+
+                            setDateByGoogle(
+                              context,
+                              date,
+                            );
+                          },
                           child: Container(
                             // width: MediaQuery.of(context).size.width * 0.1,
                             height: MediaQuery.of(context).size.height * 0.05,
@@ -431,15 +435,16 @@ class _ManagerActivitiesPageState extends State<ManagerActivitiesPage> {
                               managerActivityState,
                             );
 
+                            filterDataNotifier.value.clear();
                             filterDataNotifier.value.add(
                                 managerActivityState.provinceNotifier.value);
                             filterDataNotifier.value
                                 .add(managerActivityState.areaNotifier.value);
                             filterDataNotifier.value.add(dateNotifier.value);
 
-                            print(
-                              'Filter Data length: ${filterDataNotifier.value.length}',
-                            );
+                            // print(
+                            //   'Filter Data length: ${filterDataNotifier.value.length}',
+                            // );
                           },
                           child: Container(
                             // width: MediaQuery.of(context).size.width * 0.03,
@@ -472,7 +477,7 @@ class _ManagerActivitiesPageState extends State<ManagerActivitiesPage> {
                             ),
                             padding: EdgeInsets.symmetric(horizontal: 15.0),
                             child: Text(
-                              'reset',
+                              'Reset',
                               style: GlobalFont.mediumgiantfontR,
                             ),
                           ),
@@ -513,8 +518,29 @@ class _ManagerActivitiesPageState extends State<ManagerActivitiesPage> {
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return Center(
-                            child: CircularProgressIndicator(),
+                          return Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height * 0.82,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                CircularProgressIndicator(
+                                  color: Colors.black,
+                                ),
+                                SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.01,
+                                ),
+                                Text(
+                                  'Loading...',
+                                  style: GlobalFont.mediumgiantfontR,
+                                ),
+                              ],
+                            ),
                           );
                         } else if (snapshot.hasError) {
                           return Container(
@@ -545,7 +571,16 @@ class _ManagerActivitiesPageState extends State<ManagerActivitiesPage> {
                       },
                     );
                   } else {
-                    return Center(child: Text('Data are not available'));
+                    return Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height * 0.82,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      child: Text('Data are not available'),
+                    );
                   }
                 },
               ),

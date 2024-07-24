@@ -97,18 +97,14 @@ class _FourContainerState extends State<FourContainer> {
         }
 
         return Container(
+          width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height * 0.82,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20.0),
           ),
-          padding: EdgeInsets.symmetric(
-            vertical: MediaQuery.of(context).size.width * 0.01,
-            horizontal: MediaQuery.of(context).size.width * 0.01,
-          ),
           margin: EdgeInsets.symmetric(
             vertical: MediaQuery.of(context).size.width * 0.01,
-            horizontal: MediaQuery.of(context).size.width * 0.01,
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -130,12 +126,19 @@ class _FourContainerState extends State<FourContainer> {
                   ],
                 ),
               ),
+
               SizedBox(
                 height: MediaQuery.of(context).size.height * 0.01,
               ),
+
+              // ==============================================================
+              // ====================== FILTER RESULT =========================
+              // ==============================================================
               Row(
                 children: [
+                  // ===========================================================
                   // =================== MORNING BRIEFING ======================
+                  // ===========================================================
                   Expanded(
                     child: Stack(
                       alignment: AlignmentDirectional.topCenter,
@@ -145,7 +148,7 @@ class _FourContainerState extends State<FourContainer> {
                           height: MediaQuery.of(context).size.height * 0.625,
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: Colors.red,
+                              color: Colors.yellow,
                               style: BorderStyle.solid,
                             ),
                             borderRadius: BorderRadius.circular(20.0),
@@ -239,7 +242,7 @@ class _FourContainerState extends State<FourContainer> {
                           width: MediaQuery.of(context).size.width,
                           height: 32.5,
                           decoration: BoxDecoration(
-                            color: Colors.red,
+                            color: Colors.yellow,
                             borderRadius: BorderRadius.circular(12.5),
                           ),
                           margin: EdgeInsets.only(
@@ -269,7 +272,7 @@ class _FourContainerState extends State<FourContainer> {
                                             ),
                                             Icon(
                                               Icons.warning_rounded,
-                                              color: Colors.grey[300],
+                                              color: Colors.red,
                                               size: 25,
                                             ),
                                           ],
@@ -282,7 +285,9 @@ class _FourContainerState extends State<FourContainer> {
                     ),
                   ),
 
+                  // ===========================================================
                   // ===================== VISIT MARKET ========================
+                  // ===========================================================
                   Expanded(
                     child: Stack(
                       alignment: AlignmentDirectional.topCenter,
@@ -417,7 +422,7 @@ class _FourContainerState extends State<FourContainer> {
                                             ),
                                             Icon(
                                               Icons.warning_rounded,
-                                              color: Colors.grey[600],
+                                              color: Colors.red,
                                               size: 25,
                                             ),
                                           ],
@@ -430,7 +435,9 @@ class _FourContainerState extends State<FourContainer> {
                     ),
                   ),
 
+                  // ===========================================================
                   // ================ RECRUITMENT & INTERVIEW ==================
+                  // ===========================================================
                   Expanded(
                     child: Stack(
                       alignment: AlignmentDirectional.topCenter,
@@ -583,7 +590,7 @@ class _FourContainerState extends State<FourContainer> {
                                             ),
                                             Icon(
                                               Icons.warning_rounded,
-                                              color: Colors.grey[600],
+                                              color: Colors.red,
                                               size: 25,
                                             ),
                                           ],
@@ -596,7 +603,9 @@ class _FourContainerState extends State<FourContainer> {
                     ),
                   ),
 
-                  // ===================== DAILY REPORT ========================
+                  // ===========================================================
+                  // ====================== DAILY REPORT =======================
+                  // ===========================================================
                   Expanded(
                     child: Stack(
                       alignment: AlignmentDirectional.topCenter,
@@ -606,7 +615,7 @@ class _FourContainerState extends State<FourContainer> {
                           height: MediaQuery.of(context).size.height * 0.625,
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: Colors.purple,
+                              color: Colors.purple[200]!,
                               style: BorderStyle.solid,
                             ),
                             borderRadius: BorderRadius.circular(20.0),
@@ -700,7 +709,7 @@ class _FourContainerState extends State<FourContainer> {
                           width: MediaQuery.of(context).size.width,
                           height: 32.5,
                           decoration: BoxDecoration(
-                            color: Colors.purple,
+                            color: Colors.purple[200],
                             borderRadius: BorderRadius.circular(12.5),
                           ),
                           margin: EdgeInsets.only(
@@ -730,7 +739,7 @@ class _FourContainerState extends State<FourContainer> {
                                             ),
                                             Icon(
                                               Icons.warning_rounded,
-                                              color: Colors.grey[300],
+                                              color: Colors.red,
                                               size: 25,
                                             ),
                                           ],

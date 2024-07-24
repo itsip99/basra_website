@@ -54,7 +54,7 @@ class _SalesActivitiesPageState extends State<SalesActivitiesPage> {
           ? DateTime.now().subtract(Duration(days: 7))
           : DateTime.parse(tgl),
       firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+      lastDate: DateTime(DateTime.now().year + 1, 1, 0),
     );
 
     if (picked != null && picked != DateTime.parse(tgl)) {
@@ -507,7 +507,7 @@ class _SalesActivitiesPageState extends State<SalesActivitiesPage> {
                             ),
                             padding: EdgeInsets.symmetric(horizontal: 15.0),
                             child: Text(
-                              'reset',
+                              'Reset',
                               style: GlobalFont.mediumgiantfontR,
                             ),
                           ),

@@ -6,13 +6,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stsj/core/models/Activities/activities.dart';
 import 'package:stsj/core/models/Activities/activity_route.dart';
 import 'package:stsj/core/models/Activities/area.dart';
+import 'package:stsj/core/models/Activities/branch_shop.dart';
 import 'package:stsj/core/models/Activities/details_processing.dart';
 import 'package:stsj/core/models/Activities/image.dart';
 import 'package:stsj/core/models/Activities/manager_activities.dart';
 import 'package:stsj/core/models/Activities/province.dart';
 import 'package:stsj/core/models/Activities/salesman.dart';
 import 'package:stsj/core/models/Activities/salesman_activities.dart';
-import 'package:stsj/core/models/Activities/weekly_activities_report.dart';
+import 'package:stsj/core/models/Activities/weekly_report.dart';
+import 'package:stsj/core/models/Activities/weekly_report_type.dart';
 import 'package:stsj/global/api.dart';
 import 'package:stsj/router/router_const.dart';
 
@@ -475,24 +477,117 @@ class MapState with ChangeNotifier {
   // ==================================================================
   // ======================== Weekly Report ===========================
   // ==================================================================
+
+  List<ModelWeeklyReportType> weeklyReportTypeList = [];
+
+  List<ModelWeeklyReportType> get getWeeklyReportTypeList =>
+      weeklyReportTypeList;
+
   List<ModelWeeklyReport> weeklyReportList = [];
 
   List<ModelWeeklyReport> get getWeeklyReportList => weeklyReportList;
 
-  Future<List<ModelWeeklyReport>> fetchWeeklyReport(
+  List<ModelBranchShop> branchList = [];
+
+  List<ModelBranchShop> get getBranchList => branchList;
+
+  List<String> branchNameOnlyList = [];
+
+  List<String> get getBranchNameOnlyList => branchNameOnlyList;
+
+  Future<List<ModelWeeklyReportType>> fetchWeeklyReport(
     String province,
     String area,
     String beginDate,
     String endDate,
   ) async {
-    weeklyReportList.clear();
-    weeklyReportList = await GlobalAPI.fetchWeeklyReport(
-      province,
-      area,
-      beginDate,
-      endDate,
-    );
+    branchList.clear();
+    branchList.addAll(await GlobalAPI.fetchBranchShop('', ''));
 
-    return weeklyReportList;
+    branchNameOnlyList.clear();
+    for (var value in branchList) {
+      branchNameOnlyList.add(value.shopName);
+    }
+
+    weeklyReportTypeList.clear();
+    for (var value in branchList) {
+      weeklyReportTypeList.add(await GlobalAPI.fetchWeeklyReport(
+        province,
+        area,
+        beginDate,
+        endDate,
+      ).then((list) {
+        // weeklyReportList.clear();
+        // weeklyReportList.addAll(
+        //   list.where((element) => element.shopName == 'SURYA INTI PUTRA PERAK'),
+        // );
+        //
+        // branchShopList.clear();
+        // branchShopList.add('SURYA INTI PUTRA PERAK');
+        //
+        // print(weeklyReportList.length);
+        //
+        // for (var value in weeklyReportList) {
+        //   if (value.isActAvailable == 1) {
+        //     value.total += 1;
+        //   }
+        // }
+
+        // print('List length: ${list.length}');
+
+        List<ModelWeeklyReport> briefing = [];
+        briefing.addAll(
+          list.where(
+            (element) =>
+                element.actId == '00' && element.shopName == value.shopName,
+          ),
+        );
+        // print('Briefing length: ${briefing.length}');
+        List<ModelWeeklyReport> visit = [];
+        visit.addAll(
+          list.where(
+            (element) =>
+                element.actId == '01' && element.shopName == value.shopName,
+          ),
+        );
+        // print('Visit length: ${visit.length}');
+        List<ModelWeeklyReport> recruitment = [];
+        recruitment.addAll(
+          list.where(
+            (element) =>
+                element.actId == '02' && element.shopName == value.shopName,
+          ),
+        );
+        // print('Recruitment length: ${recruitment.length}');
+        List<ModelWeeklyReport> daily = [];
+        daily.addAll(
+          list.where(
+            (element) =>
+                element.actId == '03' && element.shopName == value.shopName,
+          ),
+        );
+        // print('Daily length: ${daily.length}');
+
+        return ModelWeeklyReportType(
+          branchName: value.shopName,
+          morningBriefing: briefing,
+          visitMarket: visit,
+          recruitmentInterview: recruitment,
+          dailyReport: daily,
+        );
+      }));
+    }
+
+    weeklyReportTypeList.removeWhere((element) =>
+        element.morningBriefing.isEmpty &&
+        element.dailyReport.isEmpty &&
+        element.recruitmentInterview.isEmpty &&
+        element.dailyReport.isEmpty);
+
+    // print('Weekly Report list: ${weeklyReportList.length}');
+    // print('Branch Shop list: ${branchShopList.length}');
+    print('Weekly Report list: ${weeklyReportTypeList.length}');
+
+    return weeklyReportTypeList;
   }
 }
