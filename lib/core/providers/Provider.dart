@@ -4,13 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stsj/core/models/Activities/activities.dart';
+import 'package:stsj/core/models/Activities/point_calculation.dart';
 import 'package:stsj/core/models/Activities/activity_route.dart';
 import 'package:stsj/core/models/Activities/area.dart';
 import 'package:stsj/core/models/Activities/branch_shop.dart';
 import 'package:stsj/core/models/Activities/details_processing.dart';
 import 'package:stsj/core/models/Activities/image.dart';
 import 'package:stsj/core/models/Activities/manager_activities.dart';
+import 'package:stsj/core/models/Activities/points_type.dart';
 import 'package:stsj/core/models/Activities/province.dart';
+import 'package:stsj/core/models/Activities/return_result.dart';
 import 'package:stsj/core/models/Activities/salesman.dart';
 import 'package:stsj/core/models/Activities/salesman_activities.dart';
 import 'package:stsj/core/models/Activities/weekly_report.dart';
@@ -465,7 +468,7 @@ class MapState with ChangeNotifier {
   // ==================================================================
   // ========================== New Menu ==============================
   // ==================================================================
-  ValueNotifier<String> staticMenuNotifier = ValueNotifier('');
+  ValueNotifier<String> staticMenuNotifier = ValueNotifier('dashboard');
 
   ValueNotifier<String> get getStaticMenuNotifier => staticMenuNotifier;
 
@@ -477,7 +480,6 @@ class MapState with ChangeNotifier {
   // ==================================================================
   // ======================== Weekly Report ===========================
   // ==================================================================
-
   List<ModelWeeklyReportType> weeklyReportTypeList = [];
 
   List<ModelWeeklyReportType> get getWeeklyReportTypeList =>
@@ -589,5 +591,146 @@ class MapState with ChangeNotifier {
     print('Weekly Report list: ${weeklyReportTypeList.length}');
 
     return weeklyReportTypeList;
+  }
+
+  // ==================================================================
+  // ====================== Activities Point ==========================
+  // ==================================================================
+  List<ModelPointsType> activitiesPointList = [];
+
+  List<ModelPointsType> get getActivitiesPointList => activitiesPointList;
+
+  Future<List<ModelPointsType>> fetchActivitiesPoint(
+    String province,
+    String area,
+    String beginDate,
+    String endDate,
+  ) async {
+    activitiesPointList.clear();
+    await GlobalAPI.fetchActivitiesPoint(
+      province,
+      area,
+      beginDate,
+      endDate,
+    ).then((list) {
+      List<String> date = [];
+      List<ModelPointCalculation> briefing = [];
+      List<ModelPointCalculation> visit = [];
+      List<ModelPointCalculation> recruitment = [];
+      List<ModelPointCalculation> daily = [];
+
+      date.addAll(list.map((e) => e.date).toSet());
+
+      activitiesPointList.addAll(date.asMap().entries.map((e) {
+        final date = e.value;
+
+        briefing.clear();
+        briefing.addAll(
+          list.where(
+            (element) => element.actId == '00' && element.date == date,
+          ),
+        );
+        // print('Briefing length: ${briefing.length}');
+
+        visit.clear();
+        visit.addAll(
+          list.where(
+            (element) => element.actId == '01' && element.date == date,
+          ),
+        );
+        // print('Visit length: ${visit.length}');
+
+        recruitment.clear();
+        recruitment.addAll(
+          list.where(
+            (element) => element.actId == '02' && element.date == date,
+          ),
+        );
+        // print('Recruitment length: ${recruitment.length}');
+
+        daily.clear();
+        daily.addAll(
+          list.where(
+            (element) => element.actId == '03' && element.date == date,
+          ),
+        );
+        // print('Daily length: ${daily.length}');
+
+        return ModelPointsType(
+          date: date,
+          morningBriefing: briefing,
+          visitMarket: visit,
+          recruitmentInterview: recruitment,
+          dailyReport: daily,
+        );
+      }));
+    });
+
+    // print('Point List length: ${activitiesPointList.length}');
+
+    return activitiesPointList;
+  }
+
+  // ==================================================================
+  // ===================== Point Calculation ==========================
+  // ==================================================================
+  int point1 = 0;
+  int point2 = 0;
+  int point3 = 0;
+
+  int get getPoint1 => point1;
+  int get getPoint2 => point2;
+  int get getPoint3 => point3;
+
+  List<ModelPointCalculation> pointCalculationList = [];
+
+  List<ModelPointCalculation> get getPointCalculationList =>
+      pointCalculationList;
+
+  List<Map<String, dynamic>> modifyPoint = [];
+
+  List<ModelReturnResult> returnResult = [];
+
+  void setPoint1(String value, ModelPointCalculation point) {
+    point.point1 = int.parse(value);
+  }
+
+  void setPoint2(String value, ModelPointCalculation point) {
+    point.point2 = int.parse(value);
+  }
+
+  void setPoint3(String value, ModelPointCalculation point) {
+    point.point3 = int.parse(value);
+  }
+
+  Future<List<ModelPointCalculation>> fetchPointCalculation(
+    String province,
+    String area,
+    String date,
+  ) async {
+    pointCalculationList.clear();
+    pointCalculationList.addAll(await GlobalAPI.fetchPointCalculation(
+      province,
+      area,
+      date,
+    ));
+
+    return pointCalculationList;
+  }
+
+  Future<List<ModelReturnResult>> fetchModifyPoint(
+    List<Map<String, dynamic>> map,
+  ) async {
+    // print('First Data Only');
+    // for (var value in map) {
+    //   value.forEach((key, value) {
+    //     print('$key: $value');
+    //   });
+    // }
+
+    returnResult.clear();
+    returnResult.addAll(await GlobalAPI.fetchModifyPoint(map));
+
+    return returnResult;
   }
 }

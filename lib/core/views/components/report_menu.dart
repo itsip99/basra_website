@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:stsj/core/cleanArc/dashboard_service/pages/dialog_filter.dart';
 import 'package:stsj/router/router_const.dart';
 
-class ActivityMenuComponent extends HookWidget {
-  const ActivityMenuComponent({super.key});
+class ReportMenuComponent extends HookWidget {
+  const ReportMenuComponent({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,76 +20,13 @@ class ActivityMenuComponent extends HookWidget {
           children: [
             Column(
               children: [
-                // ~:NEW:~
                 _buildMenuIcon(
                   context,
-                  'assets/images/maps.png',
-                  'Peta',
-                  RoutesConstant.map,
+                  'assets/images/progress-report.png',
+                  'Report',
+                  RoutesConstant.report,
                 ),
-                const Text('Peta'),
-                // ~:NEW:~
-              ],
-            ),
-
-            // Aktivitas Sales
-            Column(
-              children: [
-                // ~:NEW:~
-                // Map
-                _buildMenuIcon(
-                  context,
-                  'assets/images/destination.png',
-                  'Aktivitas Sales',
-                  RoutesConstant.salesActivities,
-                ),
-                const Text('Aktivitas Sales'),
-                // ~:NEW:~
-              ],
-            ),
-
-            // Aktivitas Manager
-            Column(
-              children: [
-                // ~:NEW:~
-                // Map
-                _buildMenuIcon(
-                  context,
-                  'assets/images/activity.png',
-                  'Aktivitas Manager',
-                  RoutesConstant.managerActivities,
-                ),
-                const Text('Aktivitas Manager'),
-                // ~:NEW:~
-              ],
-            ),
-
-            // Aktivitas Manager
-            Column(
-              children: [
-                // ~:NEW:~
-                // Map
-                _buildMenuIcon(
-                  context,
-                  'assets/images/weekly.png',
-                  'Aktivitas Mingguan',
-                  RoutesConstant.weeklyActivitiesReport,
-                ),
-                const Text('Aktivitas Mingguan'),
-                // ~:NEW:~
-              ],
-            ),
-
-            Column(
-              children: [
-                // Points
-                _buildMenuIcon(
-                  context,
-                  'assets/images/coin.png',
-                  'Peta',
-                  RoutesConstant.activitiesPoint,
-                ),
-                const Text('Points'),
+                const Text('Report')
               ],
             ),
           ],

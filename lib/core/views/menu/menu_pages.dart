@@ -3,9 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stsj/core/providers/Provider.dart';
+import 'package:stsj/core/views/components/authorization_menu.dart';
+import 'package:stsj/core/views/components/dashboard_menu.dart';
+import 'package:stsj/core/views/components/report_menu.dart';
 import 'package:stsj/core/views/components/activity_menu.dart';
-import 'package:stsj/core/views/components/sales_menu.dart';
-import 'package:stsj/global/widget/static_menu_dropdown.dart';
+import 'package:stsj/core/views/components/tools_menu.dart';
+import 'package:stsj/global/font.dart';
 import 'package:stsj/router/router_const.dart';
 import 'package:stsj/global/widget/app_bar.dart';
 
@@ -39,55 +42,211 @@ class _MenuPagesState extends State<MenuPages>
         child: CustomAppBar(goBack: RoutesConstant.homepage),
       ),
       body: Container(
-        color: Color.fromARGB(255, 231, 230, 230),
-        alignment: Alignment.center,
-        child: Container(
-          width: MediaQuery.of(context).size.width * 0.5,
-          height: MediaQuery.of(context).size.height * 0.5,
-          padding: EdgeInsets.symmetric(
-            horizontal: MediaQuery.of(context).size.width * 0.05,
-            vertical: MediaQuery.of(context).size.height * 0.05,
-          ),
-          decoration: BoxDecoration(
-            color: Color.fromARGB(255, 244, 243, 243),
-            borderRadius: BorderRadius.circular(20.0),
-          ),
-          child: Column(
-            children: [
-              Container(
-                width: MediaQuery.of(context).size.height * 0.75,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  // border: Border.all(color: Colors.black),
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        margin: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width * 0.05,
+          vertical: MediaQuery.of(context).size.height * 0.075,
+        ),
+        child: Column(
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.1,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: [
+                  // ===================== Sales Menu ======================
+                  InkWell(
+                    onTap: () => setStaticMenu(menuPagesState, 'dashboard'),
+                    hoverColor: Colors.transparent,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.15,
+                      alignment: Alignment.center,
+                      decoration: ShapeDecoration(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.red[800]!,
+                            Colors.red[600]!,
+                            Colors.red[400]!,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: Text(
+                        'Dashboard',
+                        style: GlobalFont.mediumgiantfontRBoldWhite,
+                      ),
+                    ),
+                  ),
+
+                  // ====================== Devider ========================
+                  SizedBox(width: 20.0),
+
+                  // =================== Activity Menu =====================
+                  InkWell(
+                    onTap: () => setStaticMenu(menuPagesState, 'activity'),
+                    hoverColor: Colors.transparent,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.15,
+                      alignment: Alignment.center,
+                      decoration: ShapeDecoration(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.amber[700]!,
+                            Colors.amber[600]!,
+                            Colors.amber[400]!,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: Text(
+                        'Sales Activity',
+                        style: GlobalFont.mediumgiantfontRBoldWhite,
+                      ),
+                    ),
+                  ),
+
+                  // ======================== Devider ==========================
+                  SizedBox(width: 20.0),
+
+                  // =================== Authorization Menu ====================
+                  InkWell(
+                    onTap: () => setStaticMenu(menuPagesState, 'authorization'),
+                    hoverColor: Colors.transparent,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.15,
+                      alignment: Alignment.center,
+                      decoration: ShapeDecoration(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.green[800]!,
+                            Colors.green[600]!,
+                            Colors.green[400]!,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: Text(
+                        'Authorization',
+                        style: GlobalFont.mediumgiantfontRBoldWhite,
+                      ),
+                    ),
+                  ),
+
+                  // ======================== Devider ==========================
+                  SizedBox(width: 20.0),
+
+                  // ====================== Report Menu ========================
+                  InkWell(
+                    onTap: () => setStaticMenu(menuPagesState, 'report'),
+                    hoverColor: Colors.transparent,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.15,
+                      alignment: Alignment.center,
+                      decoration: ShapeDecoration(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.blue[800]!,
+                            Colors.blue[600]!,
+                            Colors.blue[400]!,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: Text(
+                        'Report',
+                        style: GlobalFont.mediumgiantfontRBoldWhite,
+                      ),
+                    ),
+                  ),
+
+                  // ======================== Devider ==========================
+                  SizedBox(width: 20.0),
+
+                  // ====================== Tools Menu =========================
+                  InkWell(
+                    onTap: () => setStaticMenu(menuPagesState, 'tools'),
+                    hoverColor: Colors.transparent,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.15,
+                      alignment: Alignment.center,
+                      decoration: ShapeDecoration(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.purple[800]!,
+                            Colors.purple[600]!,
+                            Colors.purple[400]!,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: Text(
+                        'Tools',
+                        style: GlobalFont.mediumgiantfontRBoldWhite,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // =========================== Devider =============================
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.025,
+            ),
+
+            // ========================= Menu Result ===========================
+            Container(
+              height: MediaQuery.of(context).size.height * 0.66,
+              decoration: ShapeDecoration(
+                color: Colors.grey[350],
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20.0),
                 ),
-                padding: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width * 0.01,
-                  vertical: MediaQuery.of(context).size.height * 0.005,
-                ),
-                child: StaticMenuDropdown(
-                  inputan: staticMenu,
-                  hint: 'jenis',
-                  handle: setStaticMenu,
-                ),
               ),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.025,
+              padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.035,
+                vertical: MediaQuery.of(context).size.height * 0.06,
               ),
-              ValueListenableBuilder(
-                valueListenable: menuPagesState.staticMenuNotifier,
-                builder: (context, value, child) {
-                  if (value == 'sales') {
-                    return SalesMenuComponent();
+              child: ValueListenableBuilder(
+                valueListenable: menuPagesState.getStaticMenuNotifier,
+                builder: (context, value, _) {
+                  if (value == 'dashboard' || value == '') {
+                    return DashboardMenuComponent();
                   } else if (value == 'activity') {
                     return ActivityMenuComponent();
-                  } else {
-                    return Text('Please choose your type.');
+                  } else if (value == 'authorization') {
+                    return AuthorizationMenuComponent();
+                  } else if (value == 'report') {
+                    return ReportMenuComponent();
+                  } else if (value == 'tools') {
+                    return ToolsMenuComponent();
                   }
+                  return Text('Please choose your type.');
                 },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

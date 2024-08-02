@@ -1,24 +1,23 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:stsj/core/cleanArc/dashboard_service/helpers/format.dart';
 import 'package:stsj/core/providers/Provider.dart';
 import 'package:stsj/global/font.dart';
+import 'package:stsj/global/widget/activities_point_table.dart';
 import 'package:stsj/global/widget/app_bar.dart';
 import 'package:stsj/global/widget/area_dropdown.dart';
-import 'package:stsj/global/widget/weekly_report_table.dart';
 import 'package:stsj/global/widget/province_dropdown.dart';
 import 'package:stsj/router/router_const.dart';
 
-class WeeklyActivitiesReport extends StatefulWidget {
-  const WeeklyActivitiesReport({super.key});
+class ActivitiesPoint extends StatefulWidget {
+  const ActivitiesPoint({super.key});
 
   @override
-  State<WeeklyActivitiesReport> createState() => _WeeklyActivitiesReportState();
+  State<ActivitiesPoint> createState() => _ActivitiesPointState();
 }
 
-class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
+class _ActivitiesPointState extends State<ActivitiesPoint> {
   String province = '';
   String area = '';
   String beginDate = '';
@@ -81,18 +80,8 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
     );
 
     if (picked != null && picked != DateTime.parse(tgl)) {
-      // tgl = picked.toString().substring(0, 10);
-      // setBeginDate(tgl);
-      if (picked.weekday == DateTime.monday) {
-        tgl = picked.toString().substring(0, 10);
-        setBeginDate(tgl);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Day should be set to Monday'),
-          ),
-        );
-      }
+      tgl = picked.toString().substring(0, 10);
+      setBeginDate(tgl);
     } else {
       // Nothing happened
     }
@@ -120,16 +109,8 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
     );
 
     if (picked != null && picked != DateTime.parse(tgl)) {
-      if (picked.weekday == DateTime.saturday) {
-        tgl = picked.toString().substring(0, 10);
-        setEndDate(tgl);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Day should be set to Saturday'),
-          ),
-        );
-      }
+      tgl = picked.toString().substring(0, 10);
+      setEndDate(tgl);
     } else {
       // Nothing happened
     }
@@ -170,29 +151,23 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
     });
   }
 
-  // Reset Data from Filter to easily remove all current filter
   void resetData(
     MapState state,
   ) {
-    // print('Reset Data');
-    print('Province before: $province');
     setState(() {
       province = '';
       area = '';
       beginDate = '';
       endDate = '';
-      state.provinceNotifier.value = '';
-      state.areaNotifier.value = '';
       beginDateNotifier.value = '';
       endDateNotifier.value = '';
       filterDataNotifier.value.clear();
     });
-    print('Province after: $province');
   }
 
   @override
   Widget build(BuildContext context) {
-    final weeklyReportState = Provider.of<MapState>(context);
+    final activitiesPointState = Provider.of<MapState>(context);
 
     return Scaffold(
       appBar: PreferredSize(
@@ -255,13 +230,13 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
                 AnimatedSize(
                   duration: const Duration(milliseconds: 500),
                   reverseDuration: const Duration(milliseconds: 500),
-                  curve: weeklyReportState.isFilterOpen
+                  curve: activitiesPointState.isFilterOpen
                       ? Curves.easeInOut
                       : Curves.easeIn,
                   child: SizedBox(
                     // Note -> used for slide in and slide out animation
                     // but it didn't work because maybe it's a web based program
-                    // width: weeklyReportState.isFilterOpen
+                    // width: activitiesPointState.isFilterOpen
                     //     ? MediaQuery.of(context).size.width * 0.5
                     //     : 0.0,
                     height: MediaQuery.of(context).size.height * 0.05,
@@ -281,7 +256,7 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
                             vertical: MediaQuery.of(context).size.height * 0.01,
                           ),
                           child: ProvinceDropdown(
-                            listData: weeklyReportState.provinceList,
+                            listData: activitiesPointState.provinceList,
                             inputan: province,
                             hint: 'Area',
                             handle: setProvince,
@@ -293,12 +268,13 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
 
                         // Wilayah Dropdown
                         ValueListenableBuilder(
-                          valueListenable: weeklyReportState.provinceNotifier,
+                          valueListenable:
+                              activitiesPointState.provinceNotifier,
                           builder: (context, value, _) {
                             return SizedBox(
                               width: MediaQuery.of(context).size.width * 0.125,
                               child: FutureBuilder(
-                                future: weeklyReportState.fetchAreas(value),
+                                future: activitiesPointState.fetchAreas(value),
                                 builder: (context, snapshot) {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
@@ -453,37 +429,19 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
                         // Search Button
                         InkWell(
                           onTap: () {
-                            print(
-                              'Date Difference in Days: ${DateTime.parse(endDate).difference(DateTime.parse(beginDate)).inDays}',
+                            getFilterData(
+                              context,
+                              activitiesPointState,
                             );
 
-                            if (DateTime.parse(endDate)
-                                    .difference(DateTime.parse(beginDate))
-                                    .inDays ==
-                                5) {
-                              getFilterData(
-                                context,
-                                weeklyReportState,
-                              );
-
-                              filterDataNotifier.value.clear();
-                              filterDataNotifier.value.add(
-                                  weeklyReportState.provinceNotifier.value);
-                              filterDataNotifier.value
-                                  .add(weeklyReportState.areaNotifier.value);
-                              filterDataNotifier.value
-                                  .add(beginDateNotifier.value);
-                              filterDataNotifier.value
-                                  .add(endDateNotifier.value);
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Dates must be set with a difference of 5 days',
-                                  ),
-                                ),
-                              );
-                            }
+                            filterDataNotifier.value.clear();
+                            filterDataNotifier.value.add(
+                                activitiesPointState.provinceNotifier.value);
+                            filterDataNotifier.value
+                                .add(activitiesPointState.areaNotifier.value);
+                            filterDataNotifier.value
+                                .add(beginDateNotifier.value);
+                            filterDataNotifier.value.add(endDateNotifier.value);
                           },
                           child: Container(
                             // width: MediaQuery.of(context).size.width * 0.03,
@@ -507,8 +465,8 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
                         // Reset Button
                         InkWell(
                           onTap: () {
-                            resetData(weeklyReportState);
-                            weeklyReportState.setIsReset();
+                            resetData(activitiesPointState);
+                            activitiesPointState.setIsReset();
                           },
                           child: Container(
                             // width: MediaQuery.of(context).size.width * 0.05,
@@ -521,6 +479,30 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
                             padding: EdgeInsets.symmetric(horizontal: 15.0),
                             child: Text(
                               'Reset',
+                              style: GlobalFont.mediumgiantfontR,
+                            ),
+                          ),
+                        ),
+
+                        // Devider
+                        SizedBox(width: 10.0),
+
+                        // Reset Button
+                        InkWell(
+                          onTap: () => context.goNamed(
+                            RoutesConstant.editActivitiesPoint,
+                          ),
+                          child: Container(
+                            // width: MediaQuery.of(context).size.width * 0.05,
+                            height: MediaQuery.of(context).size.height * 0.05,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[400],
+                              borderRadius: BorderRadius.circular(15.0),
+                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 15.0),
+                            child: Text(
+                              'Edit',
                               style: GlobalFont.mediumgiantfontR,
                             ),
                           ),
@@ -540,7 +522,7 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
             ),
 
             // =================================================================
-            // ====================== Report in Table ==========================
+            // ====================== Points in Table ==========================
             // =================================================================
             SizedBox(
               height: MediaQuery.of(context).size.height * 0.82,
@@ -552,7 +534,7 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
                   if (value.isNotEmpty) {
                     // Filter Date are not empty
                     return FutureBuilder(
-                      future: weeklyReportState.fetchWeeklyReport(
+                      future: activitiesPointState.fetchActivitiesPoint(
                         province,
                         area,
                         beginDate,
@@ -594,7 +576,19 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
                             child: Text('Error: ${snapshot.error}'),
                           );
                         } else if (snapshot.hasData && snapshot.data!.isEmpty) {
-                          return Center(
+                          return Container(
+                            width: MediaQuery.of(context).size.width,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              horizontal:
+                                  MediaQuery.of(context).size.width * 0.02,
+                              vertical:
+                                  MediaQuery.of(context).size.height * 0.02,
+                            ),
                             child: Text('Data not available'),
                           );
                         } else {
@@ -610,7 +604,7 @@ class _WeeklyActivitiesReportState extends State<WeeklyActivitiesReport> {
                               vertical:
                                   MediaQuery.of(context).size.height * 0.02,
                             ),
-                            child: WeeklyReportTable(),
+                            child: ActivitiesPointTable(),
                           );
                         }
                       },

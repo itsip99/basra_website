@@ -22,6 +22,8 @@ class RoutesConstant {
   static String managerActivities = 'managerActivities';
   static String managerActivitiesInMap = 'managerActivitiesInMap';
   static String weeklyActivitiesReport = 'weeklyActivitiesReport';
+  static String activitiesPoint = 'activitiesPoint';
+  static String editActivitiesPoint = 'editActivitiesPoint';
   // ~:NEW:~
 
   static String dashboardService = "dashboardService";

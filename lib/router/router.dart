@@ -8,6 +8,8 @@ import 'package:stsj/core/cleanArc/dashboard_service/pages/dashboard02.dart';
 import 'package:stsj/core/cleanArc/dashboard_service/pages/dashboard03.dart';
 import 'package:stsj/core/cleanArc/dashboard_service/pages/dashboard04.dart';
 import 'package:stsj/core/cleanArc/dashboard_service/pages/dashboard05.dart';
+import 'package:stsj/core/views/activities/activities_point.dart';
+import 'package:stsj/core/views/activities/edit_activites_point.dart';
 import 'package:stsj/core/views/activities/manager_activities.dart';
 import 'package:stsj/core/views/activities/sales_activities.dart';
 import 'package:stsj/core/views/activities/carousel_route_details.dart';
@@ -252,6 +254,22 @@ class RouterSettings {
             pageBuilder: (context, state) {
               return MaterialPage(child: WeeklyActivitiesReport());
             },
+          ),
+          GoRoute(
+            name: RoutesConstant.activitiesPoint,
+            path: 'activitiesPoint',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: ActivitiesPoint());
+            },
+            routes: [
+              GoRoute(
+                name: RoutesConstant.editActivitiesPoint,
+                path: 'editActivitiesPoint',
+                pageBuilder: (context, state) {
+                  return MaterialPage(child: EditActivitiesPoint());
+                },
+              ),
+            ],
           ),
           // ~:NEW:~
         ],

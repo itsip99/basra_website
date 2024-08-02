@@ -1,11 +1,13 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:stsj/core/models/Activities/point_calculation.dart';
 import 'package:stsj/core/models/Activities/activity_route.dart';
 import 'package:stsj/core/models/Activities/area.dart';
 import 'package:stsj/core/models/Activities/branch_shop.dart';
 import 'package:stsj/core/models/Activities/manager_activities.dart';
 import 'package:stsj/core/models/Activities/province.dart';
+import 'package:stsj/core/models/Activities/return_result.dart';
 import 'package:stsj/core/models/Activities/salesman.dart';
 import 'package:stsj/core/models/Activities/salesman_activities.dart';
 import 'package:stsj/core/models/Activities/weekly_report.dart';
@@ -341,6 +343,135 @@ class GlobalAPI {
     } catch (e) {
       print(e.toString());
       return branchShopList;
+    }
+  }
+
+  static Future<List<ModelPointCalculation>> fetchActivitiesPoint(
+    String province,
+    String area,
+    String beginDate,
+    String endDate,
+  ) async {
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/api/SIPSales/BrowseEmployeePointSM',
+    );
+
+    Map mapActivitiesPoint = {
+      "BigArea": province,
+      "SmallArea": area,
+      "BeginDate": beginDate,
+      "EndDate": endDate,
+    };
+
+    List<ModelPointCalculation> activitiesPointList = [];
+
+    try {
+      final response =
+          await http.post(url, body: jsonEncode(mapActivitiesPoint), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      if (response.statusCode <= 200) {
+        var jsonActivitiesPoint = jsonDecode(response.body);
+        if (jsonActivitiesPoint['code'] == '100' &&
+            jsonActivitiesPoint['msg'] == 'Sukses') {
+          activitiesPointList = (jsonActivitiesPoint['data'] as List)
+              .map<ModelPointCalculation>(
+                  (list) => ModelPointCalculation.fromJson(list))
+              .toList();
+        } else {
+          return activitiesPointList;
+        }
+      } else {}
+      return activitiesPointList;
+    } catch (e) {
+      print(e.toString());
+      return activitiesPointList;
+    }
+  }
+
+  static Future<List<ModelPointCalculation>> fetchPointCalculation(
+    String province,
+    String area,
+    String date,
+  ) async {
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/api/SIPSales/CalculateEmployeePointSM',
+    );
+
+    Map mapPointCalculation = {
+      "BigArea": province,
+      "SmallArea": area,
+      "CurrentDate": date,
+    };
+
+    List<ModelPointCalculation> pointCalculationList = [];
+
+    try {
+      final response =
+          await http.post(url, body: jsonEncode(mapPointCalculation), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      if (response.statusCode <= 200) {
+        var jsonPointCalculation = jsonDecode(response.body);
+        if (jsonPointCalculation['code'] == '100' &&
+            jsonPointCalculation['msg'] == 'Sukses') {
+          pointCalculationList = (jsonPointCalculation['data'] as List)
+              .map<ModelPointCalculation>(
+                  (list) => ModelPointCalculation.fromJson(list))
+              .toList();
+        } else {
+          return pointCalculationList;
+        }
+      } else {}
+      return pointCalculationList;
+    } catch (e) {
+      print(e.toString());
+      return pointCalculationList;
+    }
+  }
+
+  static Future<List<ModelReturnResult>> fetchModifyPoint(
+    List<Map<String, dynamic>> map,
+  ) async {
+    for (var value in map) {
+      value.forEach((key, value) {
+        print('$key: $value');
+      });
+      print('');
+    }
+
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/api/SIPSales/InsertEmployeePointSM',
+    );
+
+    List<ModelReturnResult> modifyPointResult = [];
+
+    try {
+      final response = await http.post(url, body: jsonEncode(map), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      if (response.statusCode <= 200) {
+        var jsonModifyPoint = jsonDecode(response.body);
+        if (jsonModifyPoint['code'] == '100' &&
+            jsonModifyPoint['msg'] == 'Sukses') {
+          modifyPointResult = (jsonModifyPoint['data'] as List)
+              .map<ModelReturnResult>(
+                  (list) => ModelReturnResult.fromJson(list))
+              .toList();
+        } else {
+          return modifyPointResult;
+        }
+      } else {}
+      return modifyPointResult;
+    } catch (e) {
+      print(e.toString());
+      return modifyPointResult;
     }
   }
 }
