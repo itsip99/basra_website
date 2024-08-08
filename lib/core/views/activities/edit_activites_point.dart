@@ -537,10 +537,6 @@ class _EditActivitiesPointState extends State<EditActivitiesPoint> {
                                 borderRadius: BorderRadius.circular(15.0),
                               ),
                               padding: EdgeInsets.symmetric(horizontal: 10.0),
-                              // child: Text(
-                              //   'Modify',
-                              //   style: GlobalFont.mediumgiantfontR,
-                              // ),
                               child: Row(
                                 children: [
                                   const Icon(
@@ -550,7 +546,7 @@ class _EditActivitiesPointState extends State<EditActivitiesPoint> {
                                   ),
                                   SizedBox(width: 5.0),
                                   Text(
-                                    'Modify',
+                                    'Save',
                                     style: GlobalFont.mediumgiantfontR,
                                   ),
                                 ],

@@ -346,6 +346,13 @@ class GlobalFont {
     fontWeight: FontWeight.bold,
   );
 
+  static TextStyle mediumgiantfontRBoldBlue = TextStyle(
+    color: Colors.black,
+    fontFamily: GlobalFontFamily.fontRubik,
+    fontSize: GlobalSize.mediumgiantfont,
+    fontWeight: FontWeight.bold,
+  );
+
   static TextStyle mediumgiantfontRBoldWhite = TextStyle(
     color: Colors.white,
     fontFamily: GlobalFontFamily.fontRubik,

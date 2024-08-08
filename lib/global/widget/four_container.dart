@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:stsj/core/models/Activities/manager_activities.dart';
 import 'package:stsj/core/providers/Provider.dart';
 import 'package:stsj/global/font.dart';
+import 'package:stsj/global/function.dart';
 import 'package:stsj/router/router_const.dart';
 
 class FourContainer extends StatefulWidget {
@@ -46,6 +47,52 @@ class _FourContainerState extends State<FourContainer> {
         ),
       );
     }
+  }
+
+  void viewImage(String url, {String time = ''}) {
+    GlobalFunction.tampilkanDialog(
+      context,
+      true,
+      Container(
+        width: MediaQuery.of(context).size.width * 0.35,
+        height: MediaQuery.of(context).size.height * 0.6,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width * 0.025,
+          vertical: MediaQuery.of(context).size.height * 0.025,
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20.0),
+          child: Stack(
+            alignment: AlignmentDirectional.bottomEnd,
+            children: [
+              Image.memory(base64Decode(url)),
+              (time != '')
+                  ? Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 5.0,
+                        vertical: 2.5,
+                      ),
+                      margin: EdgeInsets.all(5.0),
+                      child: Text(
+                        'Pukul $time',
+                        style: GlobalFont.bigfontR,
+                      ),
+                    )
+                  : SizedBox(),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -168,42 +215,42 @@ class _FourContainerState extends State<FourContainer> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                briefing.image != ''
-                                    ? ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(20.0),
-                                        child: Image.memory(
-                                          base64Decode(briefing.image),
-                                        ),
-                                      )
-                                    : SizedBox(),
-                                SizedBox(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.01,
-                                ),
-                                (briefing.image != '' &&
-                                        briefing.lat != 0 &&
-                                        briefing.lng != 0)
-                                    ? Column(
-                                        children: [
-                                          ElevatedButton(
-                                            onPressed: () => configMapData(
-                                              context,
-                                              managerActivitiesState,
-                                              briefing.lat,
-                                              briefing.lng,
-                                            ),
-                                            child: Text('View In Map'),
-                                          ),
-                                          SizedBox(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.01,
-                                          ),
-                                        ],
-                                      )
-                                    : SizedBox(),
+                                // briefing.image != ''
+                                //     ? ClipRRect(
+                                //         borderRadius:
+                                //             BorderRadius.circular(20.0),
+                                //         child: Image.memory(
+                                //           base64Decode(briefing.image),
+                                //         ),
+                                //       )
+                                //     : SizedBox(),
+                                // SizedBox(
+                                //   height:
+                                //       MediaQuery.of(context).size.height * 0.01,
+                                // ),
+                                // (briefing.image != '' &&
+                                //         briefing.lat != 0 &&
+                                //         briefing.lng != 0)
+                                //     ? Column(
+                                //         children: [
+                                //           ElevatedButton(
+                                //             onPressed: () => configMapData(
+                                //               context,
+                                //               managerActivitiesState,
+                                //               briefing.lat,
+                                //               briefing.lng,
+                                //             ),
+                                //             child: Text('Open Maps'),
+                                //           ),
+                                //           SizedBox(
+                                //             height: MediaQuery.of(context)
+                                //                     .size
+                                //                     .height *
+                                //                 0.01,
+                                //           ),
+                                //         ],
+                                //       )
+                                //     : SizedBox(),
                                 Text(
                                   briefing.actDesc != ''
                                       ? briefing.actDesc
@@ -211,29 +258,123 @@ class _FourContainerState extends State<FourContainer> {
                                   style: GlobalFont.bigfontR,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                (briefing.image == '' &&
-                                        briefing.lat != 0 &&
-                                        briefing.lng != 0)
-                                    ? Column(
-                                        children: [
-                                          SizedBox(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.01,
-                                          ),
-                                          ElevatedButton(
-                                            onPressed: () => configMapData(
-                                              context,
-                                              managerActivitiesState,
-                                              briefing.lat,
-                                              briefing.lng,
+                                Row(
+                                  children: [
+                                    (briefing.lat != 0 && briefing.lng != 0)
+                                        ? Expanded(
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                SizedBox(
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.01,
+                                                ),
+                                                ElevatedButton(
+                                                  onPressed: () =>
+                                                      configMapData(
+                                                    context,
+                                                    managerActivitiesState,
+                                                    briefing.lat,
+                                                    briefing.lng,
+                                                  ),
+                                                  child: Text('Buka Map'),
+                                                ),
+                                              ],
                                             ),
-                                            child: Text('View In Map'),
-                                          ),
-                                        ],
-                                      )
-                                    : SizedBox(),
+                                          )
+                                        : SizedBox(),
+                                    (briefing.image != '')
+                                        ? Expanded(
+                                            child: Column(
+                                              children: [
+                                                SizedBox(
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.01,
+                                                ),
+                                                ElevatedButton(
+                                                  onPressed: () => viewImage(
+                                                    briefing.image,
+                                                    time: briefing
+                                                                .currentTime !=
+                                                            ''
+                                                        ? briefing.currentTime
+                                                        : '',
+                                                  ),
+                                                  child: Text('Lihat Gambar'),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : SizedBox(),
+                                  ],
+                                ),
+                                // (briefing.image == '' &&
+                                //         briefing.lat != 0 &&
+                                //         briefing.lng != 0)
+                                //     ? Column(
+                                //         children: [
+                                //           SizedBox(
+                                //             height: MediaQuery.of(context)
+                                //                     .size
+                                //                     .height *
+                                //                 0.01,
+                                //           ),
+                                //           ElevatedButton(
+                                //             onPressed: () => configMapData(
+                                //               context,
+                                //               managerActivitiesState,
+                                //               briefing.lat,
+                                //               briefing.lng,
+                                //             ),
+                                //             child: Text('Open Map'),
+                                //           ),
+                                //         ],
+                                //       )
+                                //     : SizedBox(),
+                                // briefing.image != ''
+                                //     ? Container(
+                                //         decoration: BoxDecoration(
+                                //           border: Border.all(
+                                //             color: Colors.grey,
+                                //             width: 1.5,
+                                //           ),
+                                //           borderRadius:
+                                //               BorderRadius.circular(15.0),
+                                //         ),
+                                //         padding: const EdgeInsets.symmetric(
+                                //           horizontal: 15.0,
+                                //           vertical: 7.5,
+                                //         ),
+                                //         child: Row(
+                                //           mainAxisAlignment:
+                                //               MainAxisAlignment.spaceBetween,
+                                //           children: [
+                                //             Text(
+                                //               'Bukti Aktivitas',
+                                //               style: GlobalFont.bigfontR,
+                                //             ),
+                                //             InkWell(
+                                //               onTap: () => viewImage(
+                                //                 briefing.image,
+                                //                 time: briefing.currentTime != ''
+                                //                     ? briefing.image
+                                //                     : '',
+                                //               ),
+                                //               child: Text(
+                                //                 'Lihat',
+                                //                 style: GlobalFont
+                                //                     .mediumgiantfontRBoldBlue,
+                                //               ),
+                                //             ),
+                                //           ],
+                                //         ),
+                                //       )
+                                //     : SizedBox(),
                               ],
                             ),
                           ),
@@ -316,44 +457,6 @@ class _FourContainerState extends State<FourContainer> {
                           child: SingleChildScrollView(
                             child: Column(
                               children: [
-                                widget.visitMarket[index].image != ''
-                                    ? ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(20.0),
-                                        child: Image.memory(
-                                          base64Decode(
-                                            widget.visitMarket[index].image,
-                                          ),
-                                        ),
-                                      )
-                                    : SizedBox(),
-                                SizedBox(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.01,
-                                ),
-                                (widget.visitMarket[index].image != '' &&
-                                        widget.visitMarket[index].lat != 0 &&
-                                        widget.visitMarket[index].lng != 0)
-                                    ? Column(
-                                        children: [
-                                          ElevatedButton(
-                                            onPressed: () => configMapData(
-                                              context,
-                                              managerActivitiesState,
-                                              widget.visitMarket[index].lat,
-                                              widget.visitMarket[index].lng,
-                                            ),
-                                            child: Text('View In Map'),
-                                          ),
-                                          SizedBox(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.01,
-                                          ),
-                                        ],
-                                      )
-                                    : SizedBox(),
                                 Text(
                                   widget.visitMarket[index].actDesc != ''
                                       ? widget.visitMarket[index].actDesc
@@ -361,29 +464,68 @@ class _FourContainerState extends State<FourContainer> {
                                   style: GlobalFont.bigfontR,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                (widget.visitMarket[index].image == '' &&
-                                        widget.visitMarket[index].lat != 0 &&
-                                        widget.visitMarket[index].lng != 0)
-                                    ? Column(
-                                        children: [
-                                          SizedBox(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.01,
-                                          ),
-                                          ElevatedButton(
-                                            onPressed: () => configMapData(
-                                              context,
-                                              managerActivitiesState,
-                                              widget.visitMarket[index].lat,
-                                              widget.visitMarket[index].lng,
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    (widget.visitMarket[index].lat != 0 &&
+                                            widget.visitMarket[index].lng != 0)
+                                        ? Expanded(
+                                            child: Column(
+                                              children: [
+                                                SizedBox(
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.01,
+                                                ),
+                                                ElevatedButton(
+                                                  onPressed: () =>
+                                                      configMapData(
+                                                    context,
+                                                    managerActivitiesState,
+                                                    widget
+                                                        .visitMarket[index].lat,
+                                                    widget
+                                                        .visitMarket[index].lng,
+                                                  ),
+                                                  child: Text('Buka Map'),
+                                                ),
+                                              ],
                                             ),
-                                            child: Text('View In Map'),
-                                          ),
-                                        ],
-                                      )
-                                    : SizedBox(),
+                                          )
+                                        : SizedBox(),
+                                    (widget.visitMarket[index].image != '')
+                                        ? Expanded(
+                                            child: Column(
+                                              children: [
+                                                SizedBox(
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.01,
+                                                ),
+                                                ElevatedButton(
+                                                  onPressed: () => viewImage(
+                                                    widget.visitMarket[index]
+                                                        .image,
+                                                    time: widget
+                                                                .visitMarket[
+                                                                    index]
+                                                                .currentTime !=
+                                                            ''
+                                                        ? widget
+                                                            .visitMarket[index]
+                                                            .currentTime
+                                                        : '',
+                                                  ),
+                                                  child: Text('Lihat Gambar'),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : SizedBox(),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
@@ -466,52 +608,6 @@ class _FourContainerState extends State<FourContainer> {
                           child: SingleChildScrollView(
                             child: Column(
                               children: [
-                                widget.recruitmentInterview[index].image != ''
-                                    ? ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(20.0),
-                                        child: Image.memory(
-                                          base64Decode(
-                                            widget.recruitmentInterview[index]
-                                                .image,
-                                          ),
-                                        ),
-                                      )
-                                    : SizedBox(),
-                                SizedBox(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.01,
-                                ),
-                                (widget.recruitmentInterview[index].image !=
-                                            '' &&
-                                        widget.recruitmentInterview[index]
-                                                .lat !=
-                                            0 &&
-                                        widget.recruitmentInterview[index]
-                                                .lng !=
-                                            0)
-                                    ? Column(
-                                        children: [
-                                          ElevatedButton(
-                                            onPressed: () => configMapData(
-                                              context,
-                                              managerActivitiesState,
-                                              widget.recruitmentInterview[index]
-                                                  .lat,
-                                              widget.recruitmentInterview[index]
-                                                  .lng,
-                                            ),
-                                            child: Text('View In Map'),
-                                          ),
-                                          SizedBox(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.01,
-                                          ),
-                                        ],
-                                      )
-                                    : SizedBox(),
                                 Text(
                                   widget.recruitmentInterview[index].actDesc !=
                                           ''
@@ -521,36 +617,80 @@ class _FourContainerState extends State<FourContainer> {
                                   style: GlobalFont.bigfontR,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                (widget.recruitmentInterview[index].image ==
-                                            '' &&
-                                        widget.recruitmentInterview[index]
-                                                .lat !=
-                                            0 &&
-                                        widget.recruitmentInterview[index]
-                                                .lng !=
-                                            0)
-                                    ? Column(
-                                        children: [
-                                          SizedBox(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.01,
-                                          ),
-                                          ElevatedButton(
-                                            onPressed: () => configMapData(
-                                              context,
-                                              managerActivitiesState,
-                                              widget.recruitmentInterview[index]
-                                                  .lat,
-                                              widget.recruitmentInterview[index]
-                                                  .lng,
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    (widget.recruitmentInterview[index].lat !=
+                                                0 &&
+                                            widget.recruitmentInterview[index]
+                                                    .lng !=
+                                                0)
+                                        ? Expanded(
+                                            child: Column(
+                                              children: [
+                                                SizedBox(
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.01,
+                                                ),
+                                                ElevatedButton(
+                                                  onPressed: () =>
+                                                      configMapData(
+                                                    context,
+                                                    managerActivitiesState,
+                                                    widget
+                                                        .recruitmentInterview[
+                                                            index]
+                                                        .lat,
+                                                    widget
+                                                        .recruitmentInterview[
+                                                            index]
+                                                        .lng,
+                                                  ),
+                                                  child: Text('Buka Map'),
+                                                ),
+                                              ],
                                             ),
-                                            child: Text('View In Map'),
-                                          ),
-                                        ],
-                                      )
-                                    : SizedBox(),
+                                          )
+                                        : SizedBox(),
+                                    (widget.recruitmentInterview[index].image !=
+                                            '')
+                                        ? Expanded(
+                                            child: Column(
+                                              children: [
+                                                SizedBox(
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.01,
+                                                ),
+                                                ElevatedButton(
+                                                  onPressed: () => viewImage(
+                                                    widget
+                                                        .recruitmentInterview[
+                                                            index]
+                                                        .image,
+                                                    time: widget
+                                                                .recruitmentInterview[
+                                                                    index]
+                                                                .currentTime !=
+                                                            ''
+                                                        ? widget
+                                                            .recruitmentInterview[
+                                                                index]
+                                                            .currentTime
+                                                        : '',
+                                                  ),
+                                                  child: Text('Lihat Gambar'),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : SizedBox(),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
@@ -634,73 +774,75 @@ class _FourContainerState extends State<FourContainer> {
                           child: SingleChildScrollView(
                             child: Column(
                               children: [
-                                widget.dailyReport[index].image != ''
-                                    ? ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(20.0),
-                                        child: Image.memory(
-                                          base64Decode(
-                                            widget.dailyReport[index].image,
-                                          ),
-                                        ),
-                                      )
-                                    : SizedBox(),
-                                SizedBox(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.01,
-                                ),
-                                (widget.dailyReport[index].image != '' &&
-                                        widget.dailyReport[index].lat != 0 &&
-                                        widget.dailyReport[index].lng != 0)
-                                    ? Column(
-                                        children: [
-                                          ElevatedButton(
-                                            onPressed: () => configMapData(
-                                              context,
-                                              managerActivitiesState,
-                                              widget.dailyReport[index].lat,
-                                              widget.dailyReport[index].lng,
-                                            ),
-                                            child: Text('View In Map'),
-                                          ),
-                                          SizedBox(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.01,
-                                          ),
-                                        ],
-                                      )
-                                    : SizedBox(),
                                 Text(
                                   widget.dailyReport[index].actDesc != ''
                                       ? widget.dailyReport[index].actDesc
                                       : 'Description not available',
                                   style: GlobalFont.bigfontR,
                                 ),
-                                (widget.dailyReport[index].image == '' &&
-                                        widget.dailyReport[index].lat != 0 &&
-                                        widget.dailyReport[index].lng != 0)
-                                    ? Column(
-                                        children: [
-                                          SizedBox(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.01,
-                                          ),
-                                          ElevatedButton(
-                                            onPressed: () => configMapData(
-                                              context,
-                                              managerActivitiesState,
-                                              widget.dailyReport[index].lat,
-                                              widget.dailyReport[index].lng,
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    (widget.dailyReport[index].lat != 0 &&
+                                            widget.dailyReport[index].lng != 0)
+                                        ? Expanded(
+                                            child: Column(
+                                              children: [
+                                                SizedBox(
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.01,
+                                                ),
+                                                ElevatedButton(
+                                                  onPressed: () =>
+                                                      configMapData(
+                                                    context,
+                                                    managerActivitiesState,
+                                                    widget
+                                                        .dailyReport[index].lat,
+                                                    widget
+                                                        .dailyReport[index].lng,
+                                                  ),
+                                                  child: Text('Buka Map'),
+                                                ),
+                                              ],
                                             ),
-                                            child: Text('View In Map'),
-                                          ),
-                                        ],
-                                      )
-                                    : SizedBox(),
+                                          )
+                                        : SizedBox(),
+                                    (widget.dailyReport[index].image != '')
+                                        ? Expanded(
+                                            child: Column(
+                                              children: [
+                                                SizedBox(
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.01,
+                                                ),
+                                                ElevatedButton(
+                                                  onPressed: () => viewImage(
+                                                    widget.dailyReport[index]
+                                                        .image,
+                                                    time: widget
+                                                                .dailyReport[
+                                                                    index]
+                                                                .currentTime !=
+                                                            ''
+                                                        ? widget
+                                                            .dailyReport[index]
+                                                            .currentTime
+                                                        : '',
+                                                  ),
+                                                  child: Text('Lihat Gambar'),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : SizedBox(),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
