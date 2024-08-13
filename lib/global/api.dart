@@ -138,16 +138,21 @@ class GlobalAPI {
     }
   }
 
-  static Future<List<ModelProvinces>> getProvinces() async {
+  static Future<List<ModelProvinces>> getProvinces(String userId) async {
     var url = Uri.https(
       'wsip.yamaha-jatim.co.id:2448',
       '/api/SIPSales/BrowseMBigArea',
     );
 
+    Map mapGetProvinces = {
+      "UserID": userId,
+    };
+
     List<ModelProvinces> provinceList = [];
 
     try {
-      final response = await http.post(url, headers: {
+      final response =
+          await http.post(url, body: jsonEncode(mapGetProvinces), headers: {
         'Content-Type': 'application/json',
       }).timeout(const Duration(seconds: 60));
 
@@ -173,6 +178,7 @@ class GlobalAPI {
   }
 
   static Future<List<ModelAreas>> getAreas(
+    String userId,
     String province,
   ) async {
     var url = Uri.https(
@@ -181,6 +187,7 @@ class GlobalAPI {
     );
 
     Map mapAreas = {
+      "UserID": userId,
       "BigArea": province,
     };
 
@@ -213,6 +220,7 @@ class GlobalAPI {
   }
 
   static Future<List<ModelManagerActivities>> fetchManagerActivities(
+    String userid,
     String province,
     String area,
     String date,
@@ -223,6 +231,7 @@ class GlobalAPI {
     );
 
     Map mapManagerActivities = {
+      "UserID": userid,
       "BigArea": province,
       "SmallArea": area,
       "CurrentDate": date,
@@ -258,6 +267,7 @@ class GlobalAPI {
   }
 
   static Future<List<ModelWeeklyReport>> fetchWeeklyReport(
+    String userid,
     String province,
     String area,
     String beginDate,
@@ -269,6 +279,7 @@ class GlobalAPI {
     );
 
     Map mapWeeklyReport = {
+      "UserID": userid,
       "BigArea": province,
       "SmallArea": area,
       "BeginDate": beginDate,
@@ -305,6 +316,7 @@ class GlobalAPI {
   }
 
   static Future<List<ModelBranchShop>> fetchBranchShop(
+    String userid,
     String province,
     String area,
   ) async {
@@ -314,6 +326,7 @@ class GlobalAPI {
     );
 
     Map mapWeeklyReport = {
+      "UserID": userid,
       "BigArea": province,
       "SmallArea": area,
     };
@@ -347,6 +360,7 @@ class GlobalAPI {
   }
 
   static Future<List<ModelPointCalculation>> fetchActivitiesPoint(
+    String userid,
     String province,
     String area,
     String beginDate,
@@ -358,6 +372,7 @@ class GlobalAPI {
     );
 
     Map mapActivitiesPoint = {
+      "UserID": userid,
       "BigArea": province,
       "SmallArea": area,
       "BeginDate": beginDate,
@@ -392,6 +407,7 @@ class GlobalAPI {
   }
 
   static Future<List<ModelPointCalculation>> fetchPointCalculation(
+    String userid,
     String province,
     String area,
     String date,
@@ -402,6 +418,7 @@ class GlobalAPI {
     );
 
     Map mapPointCalculation = {
+      "UserID": userid,
       "BigArea": province,
       "SmallArea": area,
       "CurrentDate": date,

@@ -367,17 +367,19 @@ class MapState with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<ModelProvinces>> fetchProvinces() async {
+  Future<List<ModelProvinces>> fetchProvinces(String userId) async {
     provinceList.clear();
-    provinceList = await GlobalAPI.getProvinces();
+    provinceList = await GlobalAPI.getProvinces(userId);
     // print('Provider - Province length: ${provinceList.length}');
 
     return provinceList;
   }
 
   Future<List<ModelAreas>> fetchAreas(String value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
     areaList.clear();
-    areaList = await GlobalAPI.getAreas(value);
+    areaList = await GlobalAPI.getAreas(prefs.getString('UserID') ?? '', value);
     // print('Provider - Area length: ${areaList.length}');
 
     return areaList;
@@ -400,13 +402,18 @@ class MapState with ChangeNotifier {
     String area,
     String date,
   ) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    username = prefs.getString('UserID') ?? '';
+
     print('Fetch Manager Activities');
+    print(username);
     print(province);
     print(area);
     print(date);
 
     managerActivitiesList.clear();
     managerActivitiesList = await GlobalAPI.fetchManagerActivities(
+      username,
       province,
       area == '' ? province : area,
       date,
@@ -503,8 +510,11 @@ class MapState with ChangeNotifier {
     String beginDate,
     String endDate,
   ) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    username = prefs.getString('UserID') ?? '';
+
     branchList.clear();
-    branchList.addAll(await GlobalAPI.fetchBranchShop('', ''));
+    branchList.addAll(await GlobalAPI.fetchBranchShop(username, '', ''));
 
     branchNameOnlyList.clear();
     for (var value in branchList) {
@@ -514,6 +524,7 @@ class MapState with ChangeNotifier {
     weeklyReportTypeList.clear();
     for (var value in branchList) {
       weeklyReportTypeList.add(await GlobalAPI.fetchWeeklyReport(
+        username,
         province,
         area,
         beginDate,
@@ -534,7 +545,7 @@ class MapState with ChangeNotifier {
         //     value.total += 1;
         //   }
         // }
-
+        //
         // print('List length: ${list.length}');
 
         List<ModelWeeklyReport> briefing = [];
@@ -606,8 +617,12 @@ class MapState with ChangeNotifier {
     String beginDate,
     String endDate,
   ) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    username = prefs.getString('UserID') ?? '';
     activitiesPointList.clear();
+
     await GlobalAPI.fetchActivitiesPoint(
+      username,
       province,
       area,
       beginDate,
@@ -708,8 +723,12 @@ class MapState with ChangeNotifier {
     String area,
     String date,
   ) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    username = prefs.getString('UserID') ?? '';
+
     pointCalculationList.clear();
     pointCalculationList.addAll(await GlobalAPI.fetchPointCalculation(
+      username,
       province,
       area,
       date,

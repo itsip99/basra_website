@@ -22,7 +22,9 @@ class OtorisasiMutasiPages extends HookWidget {
     return Scaffold(
         backgroundColor: Color.fromARGB(255, 231, 230, 230),
         appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(50),
+          preferredSize: Size.fromHeight(
+            MediaQuery.of(context).size.height * 0.065,
+          ),
           child: CustomAppBar(goBack: RoutesConstant.menu),
         ),
         body: LayoutBuilder(

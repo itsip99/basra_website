@@ -54,7 +54,7 @@ class _HomePagesState extends State<HomePages>
         // Check for null values and provide default values if needed
         state.fetchSalesmanList();
         // print('Salesman List length: ${state.getSalesmanList.length}');
-        state.fetchProvinces();
+        state.fetchProvinces(NamaUserID);
         // .then((_) => state.fetchAreas());
         // print('Provinces List length: ${state.getProvinceList.length}');
       } else {
@@ -80,7 +80,9 @@ class _HomePagesState extends State<HomePages>
 
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(50),
+        preferredSize: Size.fromHeight(
+          MediaQuery.of(context).size.height * 0.065,
+        ),
         child: CustomAppBar(),
       ),
       body: FutureBuilder(
