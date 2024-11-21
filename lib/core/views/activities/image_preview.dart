@@ -18,7 +18,7 @@ class ImageView extends StatefulWidget {
 class _ImageViewState extends State<ImageView> {
   @override
   Widget build(BuildContext context) {
-    final mapImageViewState = Provider.of<MapState>(context);
+    final mapImageViewState = Provider.of<MenuState>(context);
 
     return Scaffold(
       appBar: PreferredSize(

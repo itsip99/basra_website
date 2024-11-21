@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:stsj/core/cleanArc/dashboard_service/pages/dialog_filter.dart';
+import 'package:stsj/core/providers/Provider.dart';
 import 'package:stsj/router/router_const.dart';
 
 class AuthorizationMenuComponent extends HookWidget {
@@ -10,25 +12,36 @@ class AuthorizationMenuComponent extends HookWidget {
   @override
   Widget build(BuildContext context) {
     useEffect(() => null);
+    final state = Provider.of<MenuState>(context);
 
     return SizedBox(
       width: MediaQuery.of(context).size.width,
       child: SingleChildScrollView(
         child: Wrap(
-          spacing: 60.0,
-          runSpacing: 50.0,
           children: [
-            Column(
-              children: [
-                // Otorisasi
-                _buildMenuIcon(
-                  context,
-                  'assets/images/authorization.png',
-                  'Otorisasi',
-                  RoutesConstant.authorizationSPK,
-                ),
-                const Text('Otorisasi SPK'),
-              ],
+            // SPK Authorization
+            Builder(
+              builder: (context) {
+                if (state.getSubHeaderList.contains('200')) {
+                  return Container(
+                    margin: EdgeInsets.only(right: 50.0),
+                    child: Column(
+                      children: [
+                        // Otorisasi
+                        _buildMenuIcon(
+                          context,
+                          'assets/images/authorization.png',
+                          'Otorisasi',
+                          RoutesConstant.authorizationSPK,
+                        ),
+                        const Text('Otorisasi SPK'),
+                      ],
+                    ),
+                  );
+                } else {
+                  return const SizedBox();
+                }
+              },
             ),
           ],
         ),

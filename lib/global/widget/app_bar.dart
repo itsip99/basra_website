@@ -1,8 +1,11 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+// ignore_for_file: public_member_api_docs, sort_constructors_first, use_build_context_synchronously
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stsj/core/controller/Login_controller.dart';
+import 'package:stsj/core/providers/Provider.dart';
 import 'package:stsj/global/globalVar.dart';
 import 'package:stsj/router/router_const.dart';
 
@@ -11,10 +14,16 @@ class CustomAppBar extends StatefulWidget {
     Key? key,
     this.goBack,
     this.isRoutes = true,
+    this.imageSize = 50,
+    this.profileRadius = 20,
+    this.returnButtonSize = 25,
   }) : super(key: key);
 
   final String? goBack;
   final bool isRoutes;
+  final double imageSize;
+  final double profileRadius;
+  final double returnButtonSize;
 
   @override
   State<CustomAppBar> createState() => _CustomAppBarState();
@@ -42,7 +51,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
         leading:
             router != RoutesConstant.homepage && router != RoutesConstant.report
                 ? IconButton(
-                    icon: Icon(Icons.arrow_back), // Icon panah kembali
+                    icon: Icon(
+                      Icons.arrow_back,
+                      size: widget.returnButtonSize,
+                    ), // Icon panah kembali
                     onPressed: () {
                       context.goNamed(widget.goBack!);
                     },
@@ -50,7 +62,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 : null,
         title: Image.asset(
           'assets/images/stsj.png',
-          width: 50,
+          width: widget.imageSize,
         ),
         actions: [
           Text(
@@ -67,7 +79,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 CircleAvatar(
                   backgroundImage: NetworkImage(
                       'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg'), // Gambar profil
-                  radius: 20,
+                  radius: widget.profileRadius,
                 ),
                 Positioned(
                   right: 0,
@@ -90,8 +102,12 @@ class _CustomAppBarState extends State<CustomAppBar> {
                       PopupMenuItem<String>(
                           value: 'logout',
                           child: Text('Logout'),
-                          onTap: () {
+                          onTap: () async {
                             DataLoginController.removeDataUser();
+
+                            final SharedPreferences prefs =
+                                await SharedPreferences.getInstance();
+                            prefs.clear();
 
                             // loginModel.setLogin(false);
 
@@ -121,11 +137,14 @@ class _CustomAppBarState extends State<CustomAppBar> {
         backgroundColor: const Color(0xFF9EDDFF),
         leading: IconButton(
           onPressed: () => Navigator.of(context).pop(),
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(
+            Icons.arrow_back,
+            size: widget.returnButtonSize,
+          ),
         ),
         title: Image.asset(
           'assets/images/stsj.png',
-          width: 50,
+          width: widget.imageSize,
         ),
         actions: [
           Text(
@@ -142,7 +161,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 CircleAvatar(
                   backgroundImage: NetworkImage(
                       'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg'), // Gambar profil
-                  radius: 20,
+                  radius: widget.profileRadius,
                 ),
                 Positioned(
                   right: 0,

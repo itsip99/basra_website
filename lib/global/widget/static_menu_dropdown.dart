@@ -37,7 +37,7 @@ class AreaeDropdownState extends State<StaticMenuDropdown> {
 
   @override
   Widget build(BuildContext context) {
-    final staticMenuState = Provider.of<MapState>(context);
+    final staticMenuState = Provider.of<MenuState>(context);
 
     return DropdownButtonHideUnderline(
       child: DropdownButton(

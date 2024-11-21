@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:stsj/core/providers/Provider.dart';
 import 'package:stsj/global/font.dart';
 
-class ProvinceDropdown extends StatefulWidget {
-  const ProvinceDropdown({
+class BranchShopDropdown extends StatefulWidget {
+  const BranchShopDropdown({
     required this.listData,
     required this.inputan,
     required this.hint,
@@ -22,10 +22,10 @@ class ProvinceDropdown extends StatefulWidget {
   final bool isMobile;
 
   @override
-  State<ProvinceDropdown> createState() => _ProvinceDropdownState();
+  State<BranchShopDropdown> createState() => _BranchShopDropdownState();
 }
 
-class _ProvinceDropdownState extends State<ProvinceDropdown> {
+class _BranchShopDropdownState extends State<BranchShopDropdown> {
   String teksDisable = '';
   String value = '';
 
@@ -33,21 +33,26 @@ class _ProvinceDropdownState extends State<ProvinceDropdown> {
   void initState() {
     value = widget.inputan;
     print('Value: $value');
+    // TODO: implement initState
     super.initState();
   }
 
   @override
   void dispose() {
+    // TODO: implement dispose
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final state = Provider.of<MenuState>(context);
+    // print('Dropdown provider: ${state.getFilteredDriverList.length}');
+    // print('Dropdown data: ${widget.listData.length}');
 
     if (!widget.isMobile) {
       return DropdownButtonHideUnderline(
         child: DropdownButton(
+          menuWidth: MediaQuery.of(context).size.width * 0.175,
           borderRadius: BorderRadius.circular(20),
           isExpanded: true,
           isDense: true,
@@ -69,13 +74,13 @@ class _ProvinceDropdownState extends State<ProvinceDropdown> {
           items: widget.disable == true
               ? null
               : widget.listData.asMap().entries.map((entry) {
-                  // final int index = entry.key;
-                  final String province = entry.value;
+                  // final index = entry.key;
+                  final branchName = entry.value;
 
                   return DropdownMenuItem(
-                    value: province,
+                    value: branchName,
                     child: Text(
-                      province,
+                      branchName,
                       textAlign: TextAlign.center,
                       style: GlobalFont.mediumfontR,
                       overflow: TextOverflow.ellipsis,
@@ -86,7 +91,11 @@ class _ProvinceDropdownState extends State<ProvinceDropdown> {
             if (value != newValues) {
               setState(() => value = newValues.toString());
               // print('Province Dropdown value: $value');
-              state.setProvinceNotifier(value);
+              state.setBranchNameNotifier(value);
+
+              // Note -> Not working perfectly yet
+              state.filterDriver(newValues.toString());
+
               await widget.handle(newValues);
             }
           },
@@ -95,6 +104,7 @@ class _ProvinceDropdownState extends State<ProvinceDropdown> {
     } else {
       return DropdownButtonHideUnderline(
         child: DropdownButton(
+          menuWidth: MediaQuery.of(context).size.width * 0.175,
           borderRadius: BorderRadius.circular(20),
           isExpanded: true,
           isDense: true,
@@ -113,12 +123,12 @@ class _ProvinceDropdownState extends State<ProvinceDropdown> {
               ? null
               : widget.listData.asMap().entries.map((entry) {
                   // final int index = entry.key;
-                  final String province = entry.value;
+                  final branchName = entry.value;
 
                   return DropdownMenuItem(
-                    value: province,
+                    value: branchName,
                     child: Text(
-                      province,
+                      branchName,
                       textAlign: TextAlign.center,
                       style: GlobalFont.smallfontRBold,
                       overflow: TextOverflow.ellipsis,
@@ -129,7 +139,11 @@ class _ProvinceDropdownState extends State<ProvinceDropdown> {
             if (value != newValues) {
               setState(() => value = newValues.toString());
               // print('Province Dropdown value: $value');
-              state.setProvinceNotifier(value);
+              state.setBranchNameNotifier(value);
+
+              // Note -> Not working perfectly yet
+              state.filterDriver(newValues.toString());
+
               await widget.handle(newValues);
             }
           },

@@ -64,7 +64,7 @@ class HomeMenuComponent extends HookWidget {
       return null;
     }, []);
     // const double height = 10;
-    final homeMenuState = Provider.of<MapState>(context);
+    final homeMenuState = Provider.of<MenuState>(context);
 
     return Center(
       child: loadingmenu.value
@@ -149,7 +149,7 @@ class HomeMenuComponent extends HookWidget {
     String desc,
     String route,
     bool shouldShowIcon,
-    MapState state,
+    MenuState state,
   ) {
     final isHovered = ValueNotifier<bool>(false);
 

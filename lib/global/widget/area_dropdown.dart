@@ -11,12 +11,14 @@ class AreaDropdown extends StatefulWidget {
       required this.hint,
       required this.handle,
       this.disable = false,
+      this.isMobile = false,
       super.key});
   final List<dynamic> listData;
   final String inputan;
   final String hint;
   final Function handle;
   final bool disable;
+  final bool isMobile;
 
   @override
   State<AreaDropdown> createState() => AreaeDropdownState();
@@ -40,53 +42,102 @@ class AreaeDropdownState extends State<AreaDropdown> {
 
   @override
   Widget build(BuildContext context) {
-    final dropdownState = Provider.of<MapState>(context);
+    final dropdownState = Provider.of<MenuState>(context);
 
-    return DropdownButtonHideUnderline(
-      child: DropdownButton(
-        borderRadius: BorderRadius.circular(20),
-        isExpanded: true,
-        isDense: true,
-        hint: Text(
-          'Masukkan ${widget.hint}',
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'Metropolis',
+    if (!widget.isMobile) {
+      return DropdownButtonHideUnderline(
+        child: DropdownButton(
+          borderRadius: BorderRadius.circular(20),
+          isExpanded: true,
+          isDense: true,
+          hint: Text(
+            'Masukkan ${widget.hint}',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'Metropolis',
+            ),
           ),
-        ),
-        value: value == '' ? null : value,
-        icon: const Icon(
-          Icons.arrow_drop_down_rounded,
-          size: 25,
-          color: Colors.black,
-        ),
-        items: widget.disable == true
-            ? null
-            : widget.listData.asMap().entries.map((entry) {
-                // final int index = entry.key;
-                final ModelAreas area = entry.value;
+          value: value == '' ? null : value,
+          icon: const Icon(
+            Icons.arrow_drop_down_rounded,
+            size: 25,
+            color: Colors.black,
+          ),
+          items: widget.disable == true
+              ? null
+              : widget.listData.isEmpty
+                  ? null
+                  : widget.listData.asMap().entries.map((entry) {
+                      // final int index = entry.key;
+                      final ModelAreas area = entry.value;
 
-                return DropdownMenuItem(
-                  value: area.areaName,
-                  child: Text(
-                    area.areaName,
-                    textAlign: TextAlign.center,
-                    style: GlobalFont.mediumfontR,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                );
-              }).toList(),
-        onChanged: (newValues) {
-          if (value != newValues) {
-            setState(() => value = newValues.toString());
-            // print('Province Dropdown value: $value');
-            dropdownState.setAreaNotifier(value);
-            widget.handle(newValues);
-          }
-        },
-      ),
-    );
+                      return DropdownMenuItem(
+                        value: area.areaName,
+                        child: Text(
+                          area.areaName,
+                          textAlign: TextAlign.center,
+                          style: GlobalFont.mediumfontR,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      );
+                    }).toList(),
+          onChanged: (newValues) {
+            if (value != newValues) {
+              setState(() => value = newValues.toString());
+              // print('Province Dropdown value: $value');
+              dropdownState.setAreaNotifier(value);
+              widget.handle(newValues);
+            }
+          },
+        ),
+      );
+    } else {
+      return DropdownButtonHideUnderline(
+        child: DropdownButton(
+          borderRadius: BorderRadius.circular(20),
+          isExpanded: true,
+          isDense: true,
+          hint: Text(
+            'Masukkan ${widget.hint}',
+            textAlign: TextAlign.center,
+            style: GlobalFont.smallfontR,
+          ),
+          value: value == '' ? null : value,
+          icon: const Icon(
+            Icons.arrow_drop_down_rounded,
+            size: 15,
+            color: Colors.black,
+          ),
+          items: widget.disable == true
+              ? null
+              : widget.listData.isEmpty
+                  ? null
+                  : widget.listData.asMap().entries.map((entry) {
+                      // final int index = entry.key;
+                      final ModelAreas area = entry.value;
+
+                      return DropdownMenuItem(
+                        value: area.areaName,
+                        child: Text(
+                          area.areaName,
+                          textAlign: TextAlign.center,
+                          style: GlobalFont.smallfontRBold,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      );
+                    }).toList(),
+          onChanged: (newValues) {
+            if (value != newValues) {
+              setState(() => value = newValues.toString());
+              // print('Province Dropdown value: $value');
+              dropdownState.setAreaNotifier(value);
+              widget.handle(newValues);
+            }
+          },
+        ),
+      );
+    }
   }
 }

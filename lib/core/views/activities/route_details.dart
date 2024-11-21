@@ -17,7 +17,7 @@ class RouteDetailsPage extends StatefulWidget {
 class _RouteDetailsPageState extends State<RouteDetailsPage> {
   @override
   Widget build(BuildContext context) {
-    final routeDetailsState = Provider.of<MapState>(context);
+    final routeDetailsState = Provider.of<MenuState>(context);
 
     return Scaffold(
       appBar: PreferredSize(

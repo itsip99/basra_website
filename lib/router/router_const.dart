@@ -13,6 +13,8 @@ class RoutesConstant {
   static String otoriasiSPK = "otoriasiSPK";
   static String salesDashboard = "salesDashboard";
   // ~:NEW:~
+  static String delivery = 'delivery';
+  static String mapDelivery = 'mapDelivery';
   static String map = 'maps';
   static String carouselRouteDetails = 'carouselRouteDetails';
   static String routeDetails = 'routeDetails';

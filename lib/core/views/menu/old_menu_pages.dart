@@ -21,7 +21,7 @@ class _MenuPagesState extends State<MenuPages>
   String staticMenu = '';
 
   void setStaticMenu(
-    MapState state,
+    MenuState state,
     String value,
   ) {
     staticMenu = value;
@@ -31,7 +31,7 @@ class _MenuPagesState extends State<MenuPages>
 
   @override
   Widget build(BuildContext context) {
-    final menuPagesState = Provider.of<MapState>(context);
+    final menuPagesState = Provider.of<MenuState>(context);
 
     return Scaffold(
       appBar: PreferredSize(

@@ -216,7 +216,7 @@ class _SalesActivitiesPageState extends State<SalesActivitiesPage> {
 
   void getFilterData(
     BuildContext context,
-    MapState salesActivitiesState,
+    MenuState salesActivitiesState,
   ) {
     setState(() {
       employeeIDNotifier.value = employeeID;
@@ -265,7 +265,7 @@ class _SalesActivitiesPageState extends State<SalesActivitiesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final salesActivitiesState = Provider.of<MapState>(context);
+    final salesActivitiesState = Provider.of<MenuState>(context);
 
     return Scaffold(
       appBar: PreferredSize(

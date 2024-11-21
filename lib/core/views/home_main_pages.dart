@@ -1,3 +1,5 @@
+// ignore_for_file: use_key_in_widget_constructors, library_private_types_in_public_api, non_constant_identifier_names
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,14 +19,15 @@ class _HomePagesState extends State<HomePages>
     with AutomaticKeepAliveClientMixin<HomePages> {
   bool isLoading = false; // Initialize with a default value
 
-  late String NamaUserID;
-  late String EntryLevelID;
-  late String EntryLevelName;
-  late String Password;
-
+  // String NamaUserID = '';
+  // String EntryLevelID = '';
+  // String EntryLevelName = '';
+  // String Password = '';
+  // String companyName = '';
+  //
   // String getGreeting(String currentTime) {
   //   final hour = int.parse(currentTime.split(":")[0]);
-
+  //
   //   if (hour >= 6 && hour < 12) {
   //     return "Selamat Pagi";
   //   } else if (hour >= 12 && hour < 16) {
@@ -36,33 +39,82 @@ class _HomePagesState extends State<HomePages>
   //   }
   // }
 
-  Future<void> fetchData(MapState state) async {
+  Future<void> fetchData(MenuState state) async {
     // setState(() {
     //   isLoading = true;
     // });
     try {
-      SharedPreferences NamaLoginPref = await SharedPreferences.getInstance();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
 
-      bool status = NamaLoginPref.getBool("Status") ?? false;
+      bool status = prefs.getBool("Status") ?? false;
 
       if (status == true) {
-        NamaUserID = NamaLoginPref.getString("UserID") ?? '';
-        EntryLevelID = NamaLoginPref.getString("EntryLevelID") ?? '';
-        EntryLevelName = NamaLoginPref.getString("EntryLevelName") ?? '';
-        Password = NamaLoginPref.getString("Password") ?? '';
+        state.userId = prefs.getString("UserID") ?? '';
+        state.entryLevelId = prefs.getString("EntryLevelID") ?? '';
+        state.entryLevelName = prefs.getString("EntryLevelName") ?? '';
+        state.password = prefs.getString("Password") ?? '';
+        state.companyName = prefs.getString('CompanyName') ?? '';
 
         // Check for null values and provide default values if needed
         state.fetchSalesmanList();
         // print('Salesman List length: ${state.getSalesmanList.length}');
-        state.fetchProvinces(NamaUserID);
+        state.fetchDriver();
+        state.fetchProvinces();
+        state.fetchBranches();
         // .then((_) => state.fetchAreas());
         // print('Provinces List length: ${state.getProvinceList.length}');
+        state
+            .fetchUserAccess(state.getCompanyName, state.getEntryLevelId)
+            .then((data) async {
+          state.userAccessList.addAll(data);
+
+          // Note --> disable for a while to display dashboard menu as the initial page
+          // Delivery Page is still considered as global page who can be accessed by all users
+          String category = data.first.category;
+          if (category == 'DASHBOARD') {
+            state.setStaticMenuNotifier('dashboard');
+          } else if (category == 'SALES ACTIVITY') {
+            state.setStaticMenuNotifier('activity');
+          } else if (category == 'AUTHORIZATION') {
+            state.setStaticMenuNotifier('authorization');
+          } else if (category == 'INFORMATION') {
+            state.setStaticMenuNotifier('report');
+          } else if (category == 'TOOLS') {
+            state.setStaticMenuNotifier('tools');
+          } else {
+            state.setStaticMenuNotifier('');
+          }
+
+          state.headerList.clear();
+          state.headerList.addAll(data.map((e) => e.category).toSet().toList());
+          print('Header list length: ${state.headerList.length}');
+          if (state.headerList.isEmpty) {
+            state.headerList.add('dashboard');
+          }
+          await prefs.setStringList('header', state.headerList);
+
+          state.headerStateList.addAll(data.map((e) {
+            if (e.isAllow == 1) {
+              return true;
+            } else {
+              return false;
+            }
+          }).toList());
+
+          state.subHeaderList.clear();
+          state.subHeaderList.addAll(data.map((e) => e.menuNumber).toList());
+          await prefs.setStringList('subheader', state.subHeaderList);
+
+          // print('Menu Initialization Value: ${state.staticMenuNotifier.value}');
+          // print('Header length: ${state.headerList.length}');
+        });
       } else {
         // Handle the case where "Status" is not true or data is missing
         print("Data di SharedPreferences kosong atau Status tidak benar.");
       }
     } catch (e) {
       // Handle any exceptions here
+      print('Error: ${e.toString()}');
     }
     // finally {
     //   setState(() {
@@ -72,11 +124,20 @@ class _HomePagesState extends State<HomePages>
   }
 
   @override
+  void initState() {
+    // TODO: implement initState
+    // fetchData(Provider.of<MenuState>(context, listen: false));
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
 
     double screenWidth = MediaQuery.of(context).size.width;
     bool screen = screenWidth >= screenHeight.screen;
+    final state = Provider.of<MenuState>(context);
 
     return Scaffold(
       appBar: PreferredSize(
@@ -85,92 +146,89 @@ class _HomePagesState extends State<HomePages>
         ),
         child: CustomAppBar(),
       ),
-      body: FutureBuilder(
-        future: fetchData(Provider.of<MapState>(context)),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else {
-            return Center(
-              child: SingleChildScrollView(
-                child: SpGrid(
-                  spacing: 50,
-                  runSpacing: 50,
-                  alignment: WrapAlignment.center,
-                  width: MediaQuery.of(context).size.width,
-                  children: [
-                    SpGridItem(
-                      xs: 12,
-                      sm: 5,
-                      md: 5,
-                      lg: 3,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
-                              spreadRadius: 5,
-                              blurRadius: 7,
-                              offset: Offset(0, 3),
+      body: Center(
+        child: SingleChildScrollView(
+          child: SpGrid(
+            spacing: 50,
+            runSpacing: 50,
+            alignment: WrapAlignment.center,
+            width: MediaQuery.of(context).size.width,
+            children: [
+              SpGridItem(
+                xs: 12,
+                sm: 5,
+                md: 5,
+                lg: 3,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 5,
+                        blurRadius: 7,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  height: screen ? 400 : 250,
+                  child: FutureBuilder(
+                    future: fetchData(state),
+                    builder: (context, snapshot) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            CircleAvatar(
+                              radius: screen ? 100 : 80,
+                              backgroundImage: NetworkImage(
+                                'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg',
+                              ),
                             ),
+                            SizedBox(height: 10),
+                            Text(
+                              state.getUserId,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 25,
+                              ),
+                            ),
+                            Text(state.getEntryLevelName),
                           ],
                         ),
-                        height: screen ? 400 : 250,
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              CircleAvatar(
-                                radius: screen ? 100 : 80,
-                                backgroundImage: NetworkImage(
-                                    'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg'),
-                              ),
-                              SizedBox(height: 10),
-                              Text(
-                                NamaUserID,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 25,
-                                ),
-                              ),
-                              Text(EntryLevelName),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    SpGridItem(
-                      xs: 12,
-                      sm: 7,
-                      md: 7,
-                      lg: 8,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
-                              spreadRadius: 5,
-                              blurRadius: 7,
-                              offset: Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        height: screen ? 400 : 250,
-                        child: HomeMenuComponent(),
-                      ),
-                    ),
-                  ],
+                      );
+                    },
+                  ),
                 ),
               ),
-            );
-          }
-        },
+              SpGridItem(
+                xs: 12,
+                sm: 7,
+                md: 7,
+                lg: 8,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 5,
+                        blurRadius: 7,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  height: screen ? 400 : 250,
+                  child: HomeMenuComponent(),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

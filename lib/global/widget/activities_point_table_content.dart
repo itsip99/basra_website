@@ -6,16 +6,23 @@ import 'package:stsj/core/models/Activities/point_calculation.dart';
 import 'package:stsj/core/providers/Provider.dart';
 
 class ActivitiesPointTableContent extends StatelessWidget {
-  ActivitiesPointTableContent(this.list, {this.isModify = false, super.key});
+  ActivitiesPointTableContent(
+    this.list,
+    this.pointsIndex, {
+    this.isModify = false,
+    this.isMobile = false,
+    super.key,
+  });
 
   final List<ModelPointCalculation> list;
+  final int pointsIndex;
   bool isModify;
+  bool isMobile;
 
-  @override
-  Widget build(BuildContext context) {
+  Widget computerView(BuildContext context) {
     if (!isModify) {
       return SizedBox(
-        height: MediaQuery.of(context).size.height * 0.275,
+        height: MediaQuery.of(context).size.height * 0.2425,
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -23,72 +30,226 @@ class ActivitiesPointTableContent extends StatelessWidget {
               final index = e.key;
               final ModelPointCalculation point = e.value;
 
-              if (list.length - 1 == index) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        point.point1.toString(),
-                        textAlign: TextAlign.center,
-                      ),
+              if (pointsIndex % 2 == 0) {
+                if (list.length - 1 == index) {
+                  return DecoratedBox(
+                    decoration: BoxDecoration(
+                      border: ((list.length - 1) == index)
+                          ? Border()
+                          : Border(
+                              bottom: BorderSide(color: Colors.black),
+                            ),
+                      color: (index % 2 == 0)
+                          ? Colors.grey[350]
+                          : Colors.transparent,
                     ),
-                    Expanded(
-                      child: Text(
-                        point.point2.toString(),
-                        textAlign: TextAlign.center,
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            point.point1.toString(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: (point.point1 == 1)
+                                  ? Colors.red
+                                  : Colors.black,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            point.point2.toString(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: (point.point2 == 1)
+                                  ? Colors.red
+                                  : Colors.black,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            point.point3.toString(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: (point.point3 == 1)
+                                  ? Colors.red
+                                  : Colors.black,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    Expanded(
-                      child: Text(
-                        point.point3.toString(),
-                        textAlign: TextAlign.center,
-                      ),
+                  );
+                } else {
+                  return Container(
+                    height: MediaQuery.of(context).size.height * 0.027125,
+                    decoration: BoxDecoration(
+                      border: ((list.length - 1) == index)
+                          ? Border()
+                          : Border(
+                              bottom: BorderSide(color: Colors.black),
+                            ),
+                      color: (index % 2 == 0)
+                          ? Colors.grey[350]
+                          : Colors.transparent,
                     ),
-                  ],
-                );
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            point.point1.toString(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: (point.point1 == 1)
+                                  ? Colors.red
+                                  : Colors.black,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            point.point2.toString(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: (point.point2 == 1)
+                                  ? Colors.red
+                                  : Colors.black,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            point.point3.toString(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: (point.point3 == 1)
+                                  ? Colors.red
+                                  : Colors.black,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
               } else {
-                return Container(
-                  width: MediaQuery.of(context).size.width * 0.225,
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(color: Colors.black),
+                if (list.length - 1 == index) {
+                  return DecoratedBox(
+                    decoration: BoxDecoration(
+                      border: ((list.length - 1) == index)
+                          ? Border()
+                          : Border(
+                              bottom: BorderSide(color: Colors.black),
+                            ),
+                      color: (index % 2 == 0)
+                          ? Colors.transparent
+                          : Colors.grey[350],
                     ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          point.point1.toString(),
-                          textAlign: TextAlign.center,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            point.point1.toString(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: (point.point1 == 1)
+                                  ? Colors.red
+                                  : Colors.black,
+                            ),
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          point.point2.toString(),
-                          textAlign: TextAlign.center,
+                        Expanded(
+                          child: Text(
+                            point.point2.toString(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: (point.point2 == 1)
+                                  ? Colors.red
+                                  : Colors.black,
+                            ),
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          point.point3.toString(),
-                          textAlign: TextAlign.center,
+                        Expanded(
+                          child: Text(
+                            point.point3.toString(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: (point.point3 == 1)
+                                  ? Colors.red
+                                  : Colors.black,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
+                      ],
+                    ),
+                  );
+                } else {
+                  return Container(
+                    height: MediaQuery.of(context).size.height * 0.027125,
+                    decoration: BoxDecoration(
+                      border: ((list.length - 1) == index)
+                          ? Border()
+                          : Border(
+                              bottom: BorderSide(color: Colors.black),
+                            ),
+                      color: (index % 2 == 0)
+                          ? Colors.transparent
+                          : Colors.grey[350],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            point.point1.toString(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: (point.point1 == 1)
+                                  ? Colors.red
+                                  : Colors.black,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            point.point2.toString(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: (point.point2 == 1)
+                                  ? Colors.red
+                                  : Colors.black,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            point.point3.toString(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: (point.point3 == 1)
+                                  ? Colors.red
+                                  : Colors.black,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
               }
             }).toList(),
           ),
         ),
       );
     } else {
-      final pointTableState = Provider.of<MapState>(context);
+      final pointTableState = Provider.of<MenuState>(context);
 
       return SizedBox(
-        height: MediaQuery.of(context).size.height * 0.275,
+        height: MediaQuery.of(context).size.height * 0.2425,
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -96,9 +257,19 @@ class ActivitiesPointTableContent extends StatelessWidget {
               final int index = e.key;
               final ModelPointCalculation point = e.value;
 
-              if (list.length - 1 == index) {
-                return SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.02675,
+              if (pointsIndex % 2 == 0) {
+                return Container(
+                  height: MediaQuery.of(context).size.height * 0.02705,
+                  decoration: BoxDecoration(
+                    border: ((list.length - 1) == index)
+                        ? Border()
+                        : Border(
+                            bottom: BorderSide(color: Colors.black),
+                          ),
+                    color: (index % 2 == 0)
+                        ? Colors.grey[350]
+                        : Colors.transparent,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -107,6 +278,10 @@ class ActivitiesPointTableContent extends StatelessWidget {
                           initialValue: point.point1.toString(),
                           decoration: InputDecoration(
                             border: InputBorder.none,
+                          ),
+                          style: TextStyle(
+                            color:
+                                (point.point1 == 1) ? Colors.red : Colors.black,
                           ),
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
@@ -123,6 +298,10 @@ class ActivitiesPointTableContent extends StatelessWidget {
                           decoration: InputDecoration(
                             border: InputBorder.none,
                           ),
+                          style: TextStyle(
+                            color:
+                                (point.point2 == 1) ? Colors.red : Colors.black,
+                          ),
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
                           textAlignVertical: TextAlignVertical.center,
@@ -137,6 +316,10 @@ class ActivitiesPointTableContent extends StatelessWidget {
                           initialValue: point.point3.toString(),
                           decoration: InputDecoration(
                             border: InputBorder.none,
+                          ),
+                          style: TextStyle(
+                            color:
+                                (point.point3 == 1) ? Colors.red : Colors.black,
                           ),
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
@@ -152,12 +335,16 @@ class ActivitiesPointTableContent extends StatelessWidget {
                 );
               } else {
                 return Container(
-                  width: MediaQuery.of(context).size.width * 0.225,
-                  height: MediaQuery.of(context).size.height * 0.02675,
+                  height: MediaQuery.of(context).size.height * 0.02705,
                   decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(color: Colors.black),
-                    ),
+                    border: ((list.length - 1) == index)
+                        ? Border()
+                        : Border(
+                            bottom: BorderSide(color: Colors.black),
+                          ),
+                    color: (index % 2 == 0)
+                        ? Colors.transparent
+                        : Colors.grey[350],
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -167,6 +354,10 @@ class ActivitiesPointTableContent extends StatelessWidget {
                           initialValue: point.point1.toString(),
                           decoration: InputDecoration(
                             border: InputBorder.none,
+                          ),
+                          style: TextStyle(
+                            color:
+                                (point.point1 == 1) ? Colors.red : Colors.black,
                           ),
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
@@ -183,6 +374,10 @@ class ActivitiesPointTableContent extends StatelessWidget {
                           decoration: InputDecoration(
                             border: InputBorder.none,
                           ),
+                          style: TextStyle(
+                            color:
+                                (point.point2 == 1) ? Colors.red : Colors.black,
+                          ),
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
                           textAlignVertical: TextAlignVertical.center,
@@ -197,6 +392,10 @@ class ActivitiesPointTableContent extends StatelessWidget {
                           initialValue: point.point3.toString(),
                           decoration: InputDecoration(
                             border: InputBorder.none,
+                          ),
+                          style: TextStyle(
+                            color:
+                                (point.point3 == 1) ? Colors.red : Colors.black,
                           ),
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
@@ -216,5 +415,292 @@ class ActivitiesPointTableContent extends StatelessWidget {
         ),
       );
     }
+  }
+
+  Widget mobileView(BuildContext context) {
+    if (!isModify) {
+      return SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: list.asMap().entries.map((e) {
+            final index = e.key;
+            final ModelPointCalculation point = e.value;
+
+            if (pointsIndex % 2 == 0) {
+              return DecoratedBox(
+                decoration: BoxDecoration(
+                  border: ((list.length - 1) == index)
+                      ? Border()
+                      : Border(
+                          bottom: BorderSide(color: Colors.black),
+                        ),
+                  color:
+                      (index % 2 == 0) ? Colors.grey[350] : Colors.transparent,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        point.point1.toString(),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color:
+                              (point.point1 == 1) ? Colors.red : Colors.black,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        point.point2.toString(),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color:
+                              (point.point2 == 1) ? Colors.red : Colors.black,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        point.point3.toString(),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color:
+                              (point.point3 == 1) ? Colors.red : Colors.black,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return DecoratedBox(
+                decoration: BoxDecoration(
+                  border: ((list.length - 1) == index)
+                      ? Border()
+                      : Border(
+                          bottom: BorderSide(color: Colors.black),
+                        ),
+                  color:
+                      (index % 2 == 0) ? Colors.transparent : Colors.grey[350],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        point.point1.toString(),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color:
+                              (point.point1 == 1) ? Colors.red : Colors.black,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        point.point2.toString(),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color:
+                              (point.point2 == 1) ? Colors.red : Colors.black,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        point.point3.toString(),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color:
+                              (point.point3 == 1) ? Colors.red : Colors.black,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+          }).toList(),
+        ),
+      );
+    } else {
+      final pointTableState = Provider.of<MenuState>(context);
+
+      return SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: list.asMap().entries.map((e) {
+            final int index = e.key;
+            final ModelPointCalculation point = e.value;
+
+            if (pointsIndex % 2 == 0) {
+              return Container(
+                height: MediaQuery.of(context).size.height * 0.0465,
+                decoration: BoxDecoration(
+                  border: ((list.length - 1) == index)
+                      ? Border()
+                      : Border(
+                          bottom: BorderSide(color: Colors.black),
+                        ),
+                  color:
+                      (index % 2 == 0) ? Colors.grey[350] : Colors.transparent,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        initialValue: point.point1.toString(),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                        ),
+                        style: TextStyle(
+                          color:
+                              (point.point1 == 1) ? Colors.red : Colors.black,
+                        ),
+                        keyboardType: TextInputType.number,
+                        textAlign: TextAlign.center,
+                        textAlignVertical: TextAlignVertical.center,
+                        onChanged: (value) => pointTableState.setPoint1(
+                          value,
+                          list[index],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: TextFormField(
+                        initialValue: point.point2.toString(),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                        ),
+                        style: TextStyle(
+                          color:
+                              (point.point2 == 1) ? Colors.red : Colors.black,
+                        ),
+                        keyboardType: TextInputType.number,
+                        textAlign: TextAlign.center,
+                        textAlignVertical: TextAlignVertical.center,
+                        onChanged: (value) => pointTableState.setPoint2(
+                          value,
+                          list[index],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: TextFormField(
+                        initialValue: point.point3.toString(),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                        ),
+                        style: TextStyle(
+                          color:
+                              (point.point3 == 1) ? Colors.red : Colors.black,
+                        ),
+                        keyboardType: TextInputType.number,
+                        textAlign: TextAlign.center,
+                        textAlignVertical: TextAlignVertical.center,
+                        onChanged: (value) => pointTableState.setPoint3(
+                          value,
+                          list[index],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return Container(
+                height: MediaQuery.of(context).size.height * 0.0465,
+                decoration: BoxDecoration(
+                  border: ((list.length - 1) == index)
+                      ? Border()
+                      : Border(
+                          bottom: BorderSide(color: Colors.black),
+                        ),
+                  color:
+                      (index % 2 == 0) ? Colors.transparent : Colors.grey[350],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        initialValue: point.point1.toString(),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                        ),
+                        style: TextStyle(
+                          color:
+                              (point.point1 == 1) ? Colors.red : Colors.black,
+                        ),
+                        keyboardType: TextInputType.number,
+                        textAlign: TextAlign.center,
+                        textAlignVertical: TextAlignVertical.center,
+                        onChanged: (value) => pointTableState.setPoint1(
+                          value,
+                          list[index],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: TextFormField(
+                        initialValue: point.point2.toString(),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                        ),
+                        style: TextStyle(
+                          color:
+                              (point.point2 == 1) ? Colors.red : Colors.black,
+                        ),
+                        keyboardType: TextInputType.number,
+                        textAlign: TextAlign.center,
+                        textAlignVertical: TextAlignVertical.center,
+                        onChanged: (value) => pointTableState.setPoint2(
+                          value,
+                          list[index],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: TextFormField(
+                        initialValue: point.point3.toString(),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                        ),
+                        style: TextStyle(
+                          color:
+                              (point.point3 == 1) ? Colors.red : Colors.black,
+                        ),
+                        keyboardType: TextInputType.number,
+                        textAlign: TextAlign.center,
+                        textAlignVertical: TextAlignVertical.center,
+                        onChanged: (value) => pointTableState.setPoint3(
+                          value,
+                          list[index],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+          }).toList(),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth >= 1024) {
+          return computerView(context);
+        } else {
+          return mobileView(context);
+        }
+      },
+    );
   }
 }

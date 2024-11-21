@@ -17,6 +17,8 @@ import 'package:stsj/core/views/activities/image_preview.dart';
 import 'package:stsj/core/views/activities/map.dart';
 import 'package:stsj/core/views/activities/route_details.dart';
 import 'package:stsj/core/views/activities/weekly_activities_report.dart';
+import 'package:stsj/core/views/sales_dashboard/delivery.dart';
+import 'package:stsj/core/views/sales_dashboard/delivery_map.dart';
 import 'package:stsj/global/globalVar.dart';
 import 'package:stsj/global/widget/open_map.dart';
 
@@ -111,6 +113,22 @@ class RouterSettings {
             pageBuilder: (context, state) {
               return MaterialPage(child: DashboardServiceMain());
             },
+          ),
+          GoRoute(
+            name: RoutesConstant.delivery,
+            path: 'delivery',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: DeliveryPage());
+            },
+            routes: [
+              GoRoute(
+                name: RoutesConstant.mapDelivery,
+                path: 'detilMap',
+                pageBuilder: (context, state) {
+                  return MaterialPage(child: DeliveryMap());
+                },
+              ),
+            ],
           ),
           GoRoute(
             name: RoutesConstant.service,

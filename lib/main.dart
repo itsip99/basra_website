@@ -14,7 +14,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => LoadingModel()),
         ChangeNotifierProvider(create: (_) => UserIDmodel()),
         ChangeNotifierProvider(create: (_) => PtModel()),
-        ChangeNotifierProvider(create: (_) => MapState()),
+        ChangeNotifierProvider(create: (_) => MenuState()),
       ],
       child: MyApp(),
     ),

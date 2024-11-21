@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_grid/simple_grid.dart';
 import 'package:stsj/core/controller/Login_controller.dart';
 import 'package:stsj/core/models/AuthModel/Auth_Model.dart';
 import 'package:stsj/core/models/AuthModel/DataAuth.dart';
+import 'package:stsj/core/providers/Provider.dart';
 
 import 'package:stsj/router/router_const.dart';
 
@@ -43,14 +46,102 @@ class _LoginPagesState extends State<LoginPages> {
     final key = event.logicalKey;
 
     if (event is KeyDownEvent && key == LogicalKeyboardKey.enter) {
-      loginHandler(context);
+      loginHandler(context, Provider.of<MenuState>(context, listen: false));
     }
 
     return false;
   }
 
+  Future<void> fetchData(MenuState state) async {
+    // setState(() {
+    //   isLoading = true;
+    // });
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      bool status = prefs.getBool("Status") ?? false;
+
+      if (status == true) {
+        state.userId = prefs.getString("UserID") ?? '';
+        state.entryLevelId = prefs.getString("EntryLevelID") ?? '';
+        state.entryLevelName = prefs.getString("EntryLevelName") ?? '';
+        state.password = prefs.getString("Password") ?? '';
+        state.companyName = prefs.getString('CompanyName') ?? '';
+
+        // Check for null values and provide default values if needed
+        state.fetchSalesmanList();
+        // print('Salesman List length: ${state.getSalesmanList.length}');
+        state.fetchDriver();
+        state.fetchProvinces();
+        state.fetchBranches();
+        // .then((_) => state.fetchAreas());
+        // print('Provinces List length: ${state.getProvinceList.length}');
+        state
+            .fetchUserAccess(
+          state.getCompanyName,
+          state.getEntryLevelId,
+        )
+            .then((data) async {
+          state.userAccessList.addAll(data);
+
+          // Note --> disable for a while to display dashboard menu as the initial page
+          // Delivery Page is still considered as global page who can be accessed by all users
+          String category = data.first.category;
+          if (category == 'DASHBOARD') {
+            state.setStaticMenuNotifier('dashboard');
+          } else if (category == 'SALES ACTIVITY') {
+            state.setStaticMenuNotifier('activity');
+          } else if (category == 'AUTHORIZATION') {
+            state.setStaticMenuNotifier('authorization');
+          } else if (category == 'INFORMATION') {
+            state.setStaticMenuNotifier('report');
+          } else if (category == 'TOOLS') {
+            state.setStaticMenuNotifier('tools');
+          } else {
+            state.setStaticMenuNotifier('');
+          }
+
+          state.headerList.clear();
+          state.headerList.addAll(data.map((e) => e.category).toSet().toList());
+          print('Header list length: ${state.headerList.length}');
+          if (state.headerList.isEmpty) {
+            state.headerList.add('dashboard');
+          }
+          await prefs.setStringList('header', state.headerList);
+
+          state.headerStateList.addAll(data.map((e) {
+            if (e.isAllow == 1) {
+              return true;
+            } else {
+              return false;
+            }
+          }).toList());
+
+          state.subHeaderList.clear();
+          state.subHeaderList.addAll(data.map((e) => e.menuNumber).toList());
+          await prefs.setStringList('subheader', state.subHeaderList);
+
+          // print('Menu Initialization Value: ${state.staticMenuNotifier.value}');
+          // print('Header length: ${state.headerList.length}');
+        });
+      } else {
+        // Handle the case where "Status" is not true or data is missing
+        print("Data di SharedPreferences kosong atau Status tidak benar.");
+      }
+    } catch (e) {
+      // Handle any exceptions here
+      print('Error: ${e.toString()}');
+    }
+    // finally {
+    //   setState(() {
+    //     isLoading = false;
+    //   });
+    // }
+  }
+
   void loginHandler(
     BuildContext context,
+    MenuState state,
   ) async {
     // print("LoginHanlder");
     // set laodng
@@ -71,6 +162,7 @@ class _LoginPagesState extends State<LoginPages> {
           listdatalogin[0].userID,
           listdatalogin[0].entryLevelID,
           listdatalogin[0].entryLevelName,
+          listdatalogin[0].dataDT[0].pt,
         );
 
         Auth.saveDataToSharedPreferences(listdatalogin[0].dataDT);
@@ -88,7 +180,9 @@ class _LoginPagesState extends State<LoginPages> {
           //   listdatalogin[0].entryLevelName,
           // ]);
 
-          context.replaceNamed(RoutesConstant.homepage);
+          await fetchData(state);
+
+          if (context.mounted) context.replaceNamed(RoutesConstant.homepage);
         }
       } else {
         // login failure
@@ -147,6 +241,7 @@ class _LoginPagesState extends State<LoginPages> {
   Widget build(BuildContext context) {
     /// login handler
     // final loginModel = context.read<UserIDmodel>();
+    final state = Provider.of<MenuState>(context);
 
     return Scaffold(
       body: Center(
@@ -203,13 +298,15 @@ class _LoginPagesState extends State<LoginPages> {
                             autofocus: true,
                             inputFormatters: [UppercaseTextInputFormatter()],
                             decoration: InputDecoration(
-                                filled: true, //<-- SEE HERE
-                                fillColor: Colors.white70,
-                                labelText: "Username", //babel text
-                                hintText: 'Masukan username perusahaan'
-
-                                // border: OutlineInputBorder(),
-                                ),
+                              filled: true, //<-- SEE HERE
+                              fillColor: Colors.white70,
+                              labelText: "Username", //babel text
+                              hintText: 'Masukan username perusahaan',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide: BorderSide(width: 0.5),
+                              ),
+                            ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter userid';
@@ -235,7 +332,10 @@ class _LoginPagesState extends State<LoginPages> {
 
                               filled: true, //<-- SEE HERE
                               fillColor: Colors.white70,
-                              // border: OutlineInputBorder(),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide: BorderSide(width: 0.5),
+                              ),
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   // Based on passwordVisible state choose the icon
@@ -282,16 +382,20 @@ class _LoginPagesState extends State<LoginPages> {
                             )
                           : ElevatedButton(
                               style: ButtonStyle(
-                                padding: MaterialStateProperty.all(
-                                    EdgeInsets.symmetric(
-                                        horizontal: 40, vertical: 20)),
-                                backgroundColor: MaterialStateProperty.all(
-                                    Theme.of(context).primaryColorLight),
+                                padding: WidgetStateProperty.all(
+                                  EdgeInsets.symmetric(
+                                    horizontal: 40,
+                                    vertical: 20,
+                                  ),
+                                ),
+                                backgroundColor: WidgetStateProperty.all(
+                                  Theme.of(context).primaryColorLight,
+                                ),
                               ),
                               onPressed: () {
                                 if (formKey.currentState!.validate()) {
                                   formKey.currentState!.save();
-                                  loginHandler(context);
+                                  loginHandler(context, state);
                                 }
                               },
                               child: Row(

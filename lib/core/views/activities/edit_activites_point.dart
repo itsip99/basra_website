@@ -32,9 +32,9 @@ class _EditActivitiesPointState extends State<EditActivitiesPoint> {
 
   // Set Province (same as Area as the placeholder of the UI)
   void setProvince(String value) {
-    setState(() {
-      province = value;
-    });
+    province = value;
+    Provider.of<MenuState>(context, listen: false).fetchAreas(value);
+    Provider.of<MenuState>(context, listen: false).setAreaNotifier('');
   }
 
   // Set Area (same as Wilayah as the placeholder of the UI)
@@ -54,15 +54,11 @@ class _EditActivitiesPointState extends State<EditActivitiesPoint> {
     BuildContext context,
     String tgl,
   ) async {
-    tgl = tgl == ''
-        ? DateTime.now().subtract(Duration(days: 6)).toString().substring(0, 10)
-        : tgl;
+    tgl = tgl == '' ? DateTime.now().toString().substring(0, 10) : tgl;
 
     DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: tgl == ''
-          ? DateTime.now().subtract(Duration(days: 6))
-          : DateTime.parse(tgl),
+      initialDate: tgl == '' ? DateTime.now() : DateTime.parse(tgl),
       firstDate: DateTime(2000),
       lastDate: DateTime(DateTime.now().year + 1, 1, 0),
       selectableDayPredicate: (DateTime day) {
@@ -85,7 +81,7 @@ class _EditActivitiesPointState extends State<EditActivitiesPoint> {
   // Get Data from Filter for further data processing
   void getFilterData(
     BuildContext context,
-    MapState state,
+    MenuState state,
   ) {
     setState(() {
       state.provinceNotifier.value = province;
@@ -93,10 +89,7 @@ class _EditActivitiesPointState extends State<EditActivitiesPoint> {
 
       if (date == '') {
         setDate(
-          DateTime.now()
-              .subtract(Duration(days: 7))
-              .toString()
-              .substring(0, 10),
+          DateTime.now().toString().substring(0, 10),
         );
         dateNotifier.value = date;
       } else {
@@ -107,7 +100,7 @@ class _EditActivitiesPointState extends State<EditActivitiesPoint> {
 
   void modifyPoint(
     BuildContext context,
-    MapState state,
+    MenuState state,
   ) async {
     // for (var values in state.activitiesPointList) {
     //   for (var value in values.morningBriefing) {
@@ -230,9 +223,9 @@ class _EditActivitiesPointState extends State<EditActivitiesPoint> {
 
   void pointCalculation(
     BuildContext context,
-    MapState state,
+    MenuState state,
   ) async {
-    state.fetchPointCalculation(
+    await state.fetchPointCalculation(
       province,
       area,
       date,
@@ -244,10 +237,7 @@ class _EditActivitiesPointState extends State<EditActivitiesPoint> {
 
       if (date == '') {
         setDate(
-          DateTime.now()
-              .subtract(Duration(days: 7))
-              .toString()
-              .substring(0, 10),
+          DateTime.now().toString().substring(0, 10),
         );
         dateNotifier.value = date;
       } else {
@@ -257,7 +247,7 @@ class _EditActivitiesPointState extends State<EditActivitiesPoint> {
   }
 
   void resetData(
-    MapState state,
+    MenuState state,
   ) {
     setState(() {
       province = '';
@@ -268,9 +258,8 @@ class _EditActivitiesPointState extends State<EditActivitiesPoint> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final editPointState = Provider.of<MapState>(context);
+  Widget computerView(BuildContext context) {
+    final editPointState = Provider.of<MenuState>(context);
     final formKey = GlobalKey<FormState>();
 
     return Scaffold(
@@ -351,25 +340,66 @@ class _EditActivitiesPointState extends State<EditActivitiesPoint> {
                       child: Row(
                         children: [
                           // Area Dropdown
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.125,
-                            alignment: Alignment.centerLeft,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[400],
-                              borderRadius: BorderRadius.circular(15.0),
-                            ),
-                            padding: EdgeInsets.symmetric(
-                              horizontal:
-                                  MediaQuery.of(context).size.width * 0.01,
-                              vertical:
-                                  MediaQuery.of(context).size.height * 0.01,
-                            ),
-                            child: ProvinceDropdown(
-                              listData: editPointState.provinceList,
-                              inputan: province,
-                              hint: 'Area',
-                              handle: setProvince,
-                            ),
+                          Consumer<MenuState>(
+                            builder: (context, value, child) {
+                              if (value.getProvinceList.isEmpty) {
+                                return AnimatedContainer(
+                                  duration: const Duration(milliseconds: 500),
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.125,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.05,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey,
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal:
+                                        MediaQuery.of(context).size.width *
+                                            0.01,
+                                    vertical:
+                                        MediaQuery.of(context).size.height *
+                                            0.01,
+                                  ),
+                                  child: ProvinceDropdown(
+                                    listData: const [],
+                                    inputan: '',
+                                    hint: 'Provinsi',
+                                    handle: () {},
+                                    disable: true,
+                                  ),
+                                );
+                              } else {
+                                return AnimatedContainer(
+                                  duration: const Duration(milliseconds: 500),
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.125,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.05,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[400],
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal:
+                                        MediaQuery.of(context).size.width *
+                                            0.01,
+                                    vertical:
+                                        MediaQuery.of(context).size.height *
+                                            0.01,
+                                  ),
+                                  child: ProvinceDropdown(
+                                    listData: value.getProvinceList,
+                                    inputan: province,
+                                    hint: 'Provinsi',
+                                    handle: setProvince,
+                                    disable: false,
+                                  ),
+                                );
+                              }
+                            },
                           ),
 
                           // Devider
@@ -378,59 +408,73 @@ class _EditActivitiesPointState extends State<EditActivitiesPoint> {
                           // Wilayah Dropdown
                           ValueListenableBuilder(
                             valueListenable: editPointState.provinceNotifier,
-                            builder: (context, value, _) {
-                              return SizedBox(
-                                width:
-                                    MediaQuery.of(context).size.width * 0.125,
-                                child: FutureBuilder(
-                                  future: editPointState.fetchAreas(value),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return Center(
-                                        child: CircularProgressIndicator(),
-                                      );
-                                    } else if (snapshot.hasError) {
-                                      return Center(
-                                        child: Text('Error: ${snapshot.error}'),
-                                      );
-                                    } else {
-                                      return AnimatedContainer(
-                                        duration: const Duration(seconds: 1),
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                          color: (snapshot.data!.isNotEmpty &&
-                                                  snapshot.data!.length > 2)
-                                              ? Colors.grey[400]
-                                              : Colors.grey,
-                                          borderRadius:
-                                              BorderRadius.circular(15.0),
-                                        ),
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.01,
-                                          vertical: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.01,
-                                        ),
-                                        child: AreaDropdown(
-                                          listData: snapshot.data!,
-                                          inputan: area,
-                                          hint: 'Wilayah',
-                                          handle: setArea,
-                                          disable: (value == province &&
-                                                  snapshot.data!.length > 2)
-                                              ? false
-                                              : true,
-                                        ),
-                                      );
-                                    }
-                                  },
-                                ),
-                              );
+                            builder: (context, value, child) {
+                              if (value == '') {
+                                return AnimatedContainer(
+                                  duration: const Duration(milliseconds: 500),
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.125,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.05,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey,
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal:
+                                        MediaQuery.of(context).size.width *
+                                            0.01,
+                                    vertical:
+                                        MediaQuery.of(context).size.height *
+                                            0.01,
+                                  ),
+                                  child: AreaDropdown(
+                                    listData: const [],
+                                    inputan: '',
+                                    hint: 'Wilayah',
+                                    handle: () {},
+                                    disable: true,
+                                  ),
+                                );
+                              } else {
+                                return AnimatedContainer(
+                                  duration: const Duration(milliseconds: 500),
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.125,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.05,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: (editPointState.getAreaList.length >
+                                                1 &&
+                                            province != '')
+                                        ? Colors.grey[400]
+                                        : Colors.grey,
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal:
+                                        MediaQuery.of(context).size.width *
+                                            0.01,
+                                    vertical:
+                                        MediaQuery.of(context).size.height *
+                                            0.01,
+                                  ),
+                                  child: AreaDropdown(
+                                    listData: editPointState.getAreaList,
+                                    inputan: area,
+                                    hint: 'Wilayah',
+                                    handle: setArea,
+                                    disable: (value == province &&
+                                            province != '' &&
+                                            editPointState.getAreaList.length >
+                                                1)
+                                        ? false
+                                        : true,
+                                  ),
+                                );
+                              }
                             },
                           ),
 
@@ -469,7 +513,6 @@ class _EditActivitiesPointState extends State<EditActivitiesPoint> {
                                     date == ''
                                         ? Format.tanggalFormat(
                                             DateTime.now()
-                                                .subtract(Duration(days: 6))
                                                 .toString()
                                                 .substring(0, 10),
                                           )
@@ -567,12 +610,12 @@ class _EditActivitiesPointState extends State<EditActivitiesPoint> {
                                 editPointState,
                               );
 
-                              filterDataNotifier.value.clear();
-                              filterDataNotifier.value
-                                  .add(editPointState.provinceNotifier.value);
-                              filterDataNotifier.value
-                                  .add(editPointState.areaNotifier.value);
-                              filterDataNotifier.value.add(dateNotifier.value);
+                              // filterDataNotifier.value.clear();
+                              // filterDataNotifier.value
+                              //     .add(editPointState.provinceNotifier.value);
+                              // filterDataNotifier.value
+                              //     .add(editPointState.areaNotifier.value);
+                              // filterDataNotifier.value.add(dateNotifier.value);
                             },
                             child: Container(
                               height: MediaQuery.of(context).size.height * 0.05,
@@ -672,8 +715,7 @@ class _EditActivitiesPointState extends State<EditActivitiesPoint> {
                             return Center(
                               child: Text('Error: ${snapshot.error}'),
                             );
-                          } else if (snapshot.hasData &&
-                              snapshot.data!.isEmpty) {
+                          } else if (!snapshot.hasData) {
                             return Container(
                               width: MediaQuery.of(context).size.width,
                               alignment: Alignment.center,
@@ -720,25 +762,6 @@ class _EditActivitiesPointState extends State<EditActivitiesPoint> {
                           horizontal: MediaQuery.of(context).size.width * 0.02,
                           vertical: MediaQuery.of(context).size.height * 0.02,
                         ),
-                        // child: Builder(
-                        //   builder: (context) {
-                        //     WidgetsBinding.instance.addPostFrameCallback((_) {
-                        //       ScaffoldMessenger.of(context).showSnackBar(
-                        //         SnackBar(
-                        //           content: Text(
-                        //             'You are in EDIT MODE',
-                        //             style: TextStyle(
-                        //               fontFamily: 'Rubik',
-                        //               fontSize: 15.0,
-                        //             ),
-                        //             textAlign: TextAlign.center,
-                        //           ),
-                        //         ),
-                        //       );
-                        //     });
-                        //     return Text('Data not available');
-                        //   },
-                        // ),
                         child: Text('Data not available'),
                       );
                     }
@@ -749,6 +772,589 @@ class _EditActivitiesPointState extends State<EditActivitiesPoint> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget mobileView(BuildContext context, double deviceWidth) {
+    final editPointState = Provider.of<MenuState>(context);
+    final formKey = GlobalKey<FormState>();
+
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(
+          (deviceWidth <= 450)
+              ? MediaQuery.of(context).size.height * 0.055
+              : MediaQuery.of(context).size.height * 0.085,
+        ),
+        child: CustomAppBar(
+          goBack: RoutesConstant.activitiesPoint,
+          imageSize: 35,
+          profileRadius: 15,
+          returnButtonSize: 20,
+        ),
+      ),
+      body: Form(
+        key: formKey,
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          alignment: Alignment.center,
+          margin: EdgeInsets.symmetric(
+            horizontal: MediaQuery.of(context).size.width * 0.01,
+            vertical: MediaQuery.of(context).size.height * 0.01,
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: MediaQuery.of(context).size.width * 0.01,
+            vertical: MediaQuery.of(context).size.height * 0.01,
+          ),
+          child: Column(
+            children: [
+              // ==================================================================
+              // =========================== Filter ===============================
+              // ==================================================================
+              SizedBox(
+                width: MediaQuery.of(context).size.width,
+                height: (deviceWidth <= 450)
+                    ? MediaQuery.of(context).size.height * 0.0425
+                    : MediaQuery.of(context).size.height * 0.065,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    // Filter text
+                    InkWell(
+                      onTap: null,
+                      child: Container(
+                        height: (deviceWidth <= 450)
+                            ? MediaQuery.of(context).size.height * 0.0425
+                            : MediaQuery.of(context).size.height * 0.065,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[400],
+                          borderRadius: BorderRadius.circular(15.0),
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Icon(
+                              Icons.filter_alt_rounded,
+                              size: 17.5,
+                              color: Colors.black,
+                            ),
+                            Text(
+                              'Filter',
+                              style: GlobalFont.mediumbigfontR,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // Devider
+                    SizedBox(width: 5.0),
+
+                    // Filter's Expand and Collapse Animation
+                    AnimatedSize(
+                      duration: const Duration(milliseconds: 500),
+                      reverseDuration: const Duration(milliseconds: 500),
+                      curve: editPointState.isFilterOpen
+                          ? Curves.easeInOut
+                          : Curves.easeIn,
+                      child: SizedBox(
+                        // Note -> used for slide in and slide out animation
+                        // but it didn't work because maybe it's a web based program
+                        // width: editPointState.isFilterOpen
+                        //     ? MediaQuery.of(context).size.width * 0.5
+                        //     : 0.0,
+                        // height: MediaQuery.of(context).size.height * 0.065,
+                        child: Wrap(
+                          spacing: 10.0,
+                          children: [
+                            // Area Dropdown
+                            Consumer<MenuState>(
+                              builder: (context, value, child) {
+                                if (value.getProvinceList.isEmpty) {
+                                  return AnimatedContainer(
+                                    duration: const Duration(milliseconds: 500),
+                                    width: (deviceWidth <= 450)
+                                        ? MediaQuery.of(context).size.width *
+                                            0.3
+                                        : MediaQuery.of(context).size.width *
+                                            0.16,
+                                    height: (deviceWidth <= 450)
+                                        ? MediaQuery.of(context).size.height *
+                                            0.0425
+                                        : MediaQuery.of(context).size.height *
+                                            0.065,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey,
+                                      borderRadius: BorderRadius.circular(15.0),
+                                    ),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal:
+                                          MediaQuery.of(context).size.width *
+                                              0.01,
+                                      vertical:
+                                          MediaQuery.of(context).size.height *
+                                              0.01,
+                                    ),
+                                    child: ProvinceDropdown(
+                                      listData: const [],
+                                      inputan: '',
+                                      hint: 'Provinsi',
+                                      handle: () {},
+                                      disable: true,
+                                      isMobile: true,
+                                    ),
+                                  );
+                                } else {
+                                  return AnimatedContainer(
+                                    duration: const Duration(milliseconds: 500),
+                                    width: (deviceWidth <= 450)
+                                        ? MediaQuery.of(context).size.width *
+                                            0.3
+                                        : MediaQuery.of(context).size.width *
+                                            0.16,
+                                    height: (deviceWidth <= 450)
+                                        ? MediaQuery.of(context).size.height *
+                                            0.0425
+                                        : MediaQuery.of(context).size.height *
+                                            0.065,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[400],
+                                      borderRadius: BorderRadius.circular(15.0),
+                                    ),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal:
+                                          MediaQuery.of(context).size.width *
+                                              0.01,
+                                      vertical:
+                                          MediaQuery.of(context).size.height *
+                                              0.01,
+                                    ),
+                                    child: ProvinceDropdown(
+                                      listData: value.getProvinceList,
+                                      inputan: province,
+                                      hint: 'Provinsi',
+                                      handle: setProvince,
+                                      disable: false,
+                                      isMobile: true,
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                            // Wilayah Dropdown
+                            ValueListenableBuilder(
+                              valueListenable: editPointState.provinceNotifier,
+                              builder: (context, value, child) {
+                                if (value == '') {
+                                  return AnimatedContainer(
+                                    duration: const Duration(milliseconds: 500),
+                                    width: (deviceWidth <= 450)
+                                        ? MediaQuery.of(context).size.width *
+                                            0.3
+                                        : MediaQuery.of(context).size.width *
+                                            0.16,
+                                    height: (deviceWidth <= 450)
+                                        ? MediaQuery.of(context).size.height *
+                                            0.0425
+                                        : MediaQuery.of(context).size.height *
+                                            0.065,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey,
+                                      borderRadius: BorderRadius.circular(15.0),
+                                    ),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal:
+                                          MediaQuery.of(context).size.width *
+                                              0.01,
+                                      vertical:
+                                          MediaQuery.of(context).size.height *
+                                              0.01,
+                                    ),
+                                    child: AreaDropdown(
+                                      listData: const [],
+                                      inputan: '',
+                                      hint: 'Wilayah',
+                                      handle: () {},
+                                      disable: true,
+                                      isMobile: true,
+                                    ),
+                                  );
+                                } else {
+                                  return AnimatedContainer(
+                                    duration: const Duration(milliseconds: 500),
+                                    width: (deviceWidth <= 450)
+                                        ? MediaQuery.of(context).size.width *
+                                            0.3
+                                        : MediaQuery.of(context).size.width *
+                                            0.16,
+                                    height: (deviceWidth <= 450)
+                                        ? MediaQuery.of(context).size.height *
+                                            0.0425
+                                        : MediaQuery.of(context).size.height *
+                                            0.065,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color:
+                                          (editPointState.getAreaList.length >
+                                                      1 &&
+                                                  province != '')
+                                              ? Colors.grey[400]
+                                              : Colors.grey,
+                                      borderRadius: BorderRadius.circular(15.0),
+                                    ),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal:
+                                          MediaQuery.of(context).size.width *
+                                              0.01,
+                                      vertical:
+                                          MediaQuery.of(context).size.height *
+                                              0.01,
+                                    ),
+                                    child: AreaDropdown(
+                                      listData: editPointState.getAreaList,
+                                      inputan: area,
+                                      hint: 'Wilayah',
+                                      handle: setArea,
+                                      disable: (value == province &&
+                                              province != '' &&
+                                              editPointState
+                                                      .getAreaList.length >
+                                                  1)
+                                          ? false
+                                          : true,
+                                      isMobile: true,
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                            // Start Date Picker
+                            InkWell(
+                              onTap: () {
+                                filterDataNotifier.value.clear();
+
+                                setDateByGoogle(
+                                  context,
+                                  date,
+                                );
+                              },
+                              child: Container(
+                                height: (deviceWidth <= 450)
+                                    ? MediaQuery.of(context).size.height *
+                                        0.0425
+                                    : MediaQuery.of(context).size.height *
+                                        0.065,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[400],
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
+                                padding: EdgeInsets.symmetric(horizontal: 15.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Icon(
+                                      Icons.date_range_rounded,
+                                      size: 17.5,
+                                    ),
+                                    SizedBox(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.003,
+                                    ),
+                                    Text(
+                                      date == ''
+                                          ? Format.tanggalFormat(
+                                              DateTime.now()
+                                                  .toString()
+                                                  .substring(0, 10),
+                                            )
+                                          : Format.tanggalFormat(date),
+                                      style: GlobalFont.mediumbigfontR,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            // Search Button
+                            InkWell(
+                              onTap: () {
+                                getFilterData(
+                                  context,
+                                  editPointState,
+                                );
+
+                                filterDataNotifier.value.clear();
+                                filterDataNotifier.value
+                                    .add(editPointState.provinceNotifier.value);
+                                filterDataNotifier.value
+                                    .add(editPointState.areaNotifier.value);
+                                filterDataNotifier.value
+                                    .add(dateNotifier.value);
+                              },
+                              child: Container(
+                                height: (deviceWidth <= 450)
+                                    ? MediaQuery.of(context).size.height *
+                                        0.0425
+                                    : MediaQuery.of(context).size.height *
+                                        0.065,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[400],
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
+                                padding: EdgeInsets.symmetric(horizontal: 10.0),
+                                child: const Icon(
+                                  Icons.search_rounded,
+                                  size: 17.5,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                            // Modify Button
+                            InkWell(
+                              onTap: () {
+                                if (formKey.currentState!.validate()) {
+                                  modifyPoint(context, editPointState);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Please fill the form',
+                                        style: GlobalFont.mediumbigfontR,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                              child: Container(
+                                height: (deviceWidth <= 450)
+                                    ? MediaQuery.of(context).size.height *
+                                        0.0425
+                                    : MediaQuery.of(context).size.height *
+                                        0.065,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[400],
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
+                                padding: EdgeInsets.symmetric(horizontal: 10.0),
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.edit_note_rounded,
+                                      size: 17.5,
+                                      color: Colors.black,
+                                    ),
+                                    SizedBox(width: 5.0),
+                                    Text(
+                                      'Save',
+                                      style: GlobalFont.mediumbigfontR,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            // Calculate Button
+                            InkWell(
+                              onTap: () {
+                                pointCalculation(
+                                  context,
+                                  editPointState,
+                                );
+
+                                // filterDataNotifier.value.clear();
+                                // filterDataNotifier.value
+                                //     .add(editPointState.provinceNotifier.value);
+                                // filterDataNotifier.value
+                                //     .add(editPointState.areaNotifier.value);
+                                // filterDataNotifier.value.add(dateNotifier.value);
+                              },
+                              child: Container(
+                                height: (deviceWidth <= 450)
+                                    ? MediaQuery.of(context).size.height *
+                                        0.0425
+                                    : MediaQuery.of(context).size.height *
+                                        0.065,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[400],
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
+                                padding: EdgeInsets.symmetric(horizontal: 10.0),
+                                // child: Text(
+                                //   'Calculate',
+                                //   style: GlobalFont.mediumgiantfontR,
+                                // ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.calculate_rounded,
+                                      size: 17.5,
+                                      color: Colors.black,
+                                    ),
+                                    SizedBox(width: 5.0),
+                                    Text(
+                                      'Calculate',
+                                      style: GlobalFont.mediumbigfontR,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+
+              // =================================================================
+              // ========================== Devider ==============================
+              // =================================================================
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.025,
+              ),
+
+              // =================================================================
+              // ==================== Edit Points in Table =======================
+              // =================================================================
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.785,
+                child: ValueListenableBuilder(
+                  valueListenable: filterDataNotifier,
+                  builder: (context, value, _) {
+                    // print('Data notifier: ${filterDataNotifier.value.length}');
+
+                    if (value.isNotEmpty) {
+                      // Filter Date are not empty
+                      return FutureBuilder(
+                        future: editPointState.fetchActivitiesPoint(
+                          province,
+                          area,
+                          date,
+                          date,
+                        ),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Container(
+                              width: MediaQuery.of(context).size.width,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                horizontal:
+                                    MediaQuery.of(context).size.width * 0.02,
+                                vertical:
+                                    MediaQuery.of(context).size.height * 0.02,
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 20.0,
+                                    height: 20.0,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.black,
+                                      strokeWidth: 3.0,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: MediaQuery.of(context).size.height *
+                                        0.01,
+                                  ),
+                                  Text(
+                                    'Loading...',
+                                    style: GlobalFont.mediumbigfontR,
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else if (snapshot.hasError) {
+                            return Center(
+                              child: Text('Error: ${snapshot.error}'),
+                            );
+                          } else if (!snapshot.hasData) {
+                            return Container(
+                              width: MediaQuery.of(context).size.width,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                horizontal:
+                                    MediaQuery.of(context).size.width * 0.02,
+                                vertical:
+                                    MediaQuery.of(context).size.height * 0.02,
+                              ),
+                              child: Text('Data not available'),
+                            );
+                          } else {
+                            return Container(
+                              width: MediaQuery.of(context).size.width,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                horizontal:
+                                    MediaQuery.of(context).size.width * 0.02,
+                                vertical:
+                                    MediaQuery.of(context).size.height * 0.02,
+                              ),
+                              child: ActivitiesPointTable(
+                                isModify: true,
+                                isMobile: true,
+                              ),
+                            );
+                          }
+                        },
+                      );
+                    } else {
+                      // Filter Date are empty
+                      return Container(
+                        width: MediaQuery.of(context).size.width,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.of(context).size.width * 0.02,
+                          vertical: MediaQuery.of(context).size.height * 0.02,
+                        ),
+                        child: Text('Data not available'),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth >= 1024) {
+          return computerView(context);
+        } else {
+          return mobileView(context, constraints.maxWidth);
+        }
+      },
     );
   }
 }

@@ -1,4 +1,6 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, use_build_context_synchronously
+
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -18,6 +20,12 @@ import 'package:stsj/core/models/Activities/salesman.dart';
 import 'package:stsj/core/models/Activities/salesman_activities.dart';
 import 'package:stsj/core/models/Activities/weekly_report.dart';
 import 'package:stsj/core/models/Activities/weekly_report_type.dart';
+import 'package:stsj/core/models/AuthModel/user_access.dart';
+import 'package:stsj/core/models/Dashboard/branch_shop.dart';
+import 'package:stsj/core/models/Dashboard/delivery.dart';
+import 'package:stsj/core/models/Dashboard/delivery_memo.dart';
+import 'package:stsj/core/models/Dashboard/delivery_history.dart';
+import 'package:stsj/core/models/Dashboard/driver.dart';
 import 'package:stsj/global/api.dart';
 import 'package:stsj/router/router_const.dart';
 
@@ -60,7 +68,323 @@ class PtModel with ChangeNotifier {
   }
 }
 
-class MapState with ChangeNotifier {
+class MenuState with ChangeNotifier {
+  // ===================================================================
+  // ======================== App Management ===========================
+  // ===================================================================
+  bool isLoading = false;
+
+  bool get getIsLoading => isLoading;
+
+  void setIsLoading() {
+    isLoading = !isLoading;
+    notifyListeners();
+  }
+
+  // =================================================================
+  // ======================== User Account ===========================
+  // =================================================================
+  String userId = '';
+  String get getUserId => userId;
+
+  String entryLevelId = '';
+  String get getEntryLevelId => entryLevelId;
+
+  String entryLevelName = '';
+  String get getEntryLevelName => entryLevelName;
+
+  String password = '';
+  String get getPassword => password;
+
+  String companyName = '';
+  String get getCompanyName => companyName;
+
+  String branchId = '';
+  String get getBranchId => branchId;
+
+  String shopId = '';
+  String get getShopId => shopId;
+
+  // ================================================================
+  // ======================== User Access ===========================
+  // ================================================================
+  List<ModelUserAccess> userAccessList = [];
+
+  List<ModelUserAccess> get getUserAccessList => userAccessList;
+
+  List<String> headerList = [];
+
+  List<String> get getHeaderList => headerList;
+
+  List<bool> headerStateList = [];
+
+  List<bool> get getHeaderStateList => headerStateList;
+
+  List<String> subHeaderList = [];
+
+  List<String> get getSubHeaderList => subHeaderList;
+
+  Future<void> loadSubHeader() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    subHeaderList.clear();
+    subHeaderList.addAll(prefs.getStringList('subheader') ?? []);
+    notifyListeners();
+
+    print('Load Sub Header: ${subHeaderList.length}');
+  }
+
+  Future<List<ModelUserAccess>> fetchUserAccess(
+    String companyName,
+    String entryLevelId,
+  ) async {
+    List<ModelUserAccess> temp = [];
+    temp.addAll(await GlobalAPI.fetchUserAccess(
+      companyName,
+      entryLevelId,
+    ));
+
+    // for (ModelUserAccess data in userAccessList) {
+    //   print(
+    //     '${data.category}; ${data.menuNumber}; ${data.menuName}; ${data.isAllow}',
+    //   );
+    // }
+
+    return temp;
+  }
+
+  // ================================================================
+  // ========================= Dashboard ============================
+  // ================================================================
+  List<ModelBranches> branchShopList = [];
+
+  List<ModelBranches> get getBranchShopList => branchShopList;
+
+  List<String> branchNameList = [];
+
+  List<String> get getBranchNameList => branchNameList;
+
+  ValueNotifier<String> branchNameNotifier = ValueNotifier('');
+
+  void setBranchNameNotifier(String value) {
+    branchNameNotifier.value = value;
+    notifyListeners();
+  }
+
+  List<ModelDriver> driverList = [];
+
+  List<ModelDriver> get getDriverList => driverList;
+
+  Future<void> loadBranches() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    log('Branch Name List (before): ${getBranchNameList.length}');
+    if (branchNameList.isNotEmpty) {
+      log('Branch Name List is not empty');
+      branchNameList = [];
+      log('Branch Name List: ${getBranchNameList.length}');
+    }
+    branchNameList.addAll(prefs.getStringList('branches') ?? []);
+    log('Branch Name List (after): ${getBranchNameList.length}');
+    notifyListeners();
+  }
+
+  Future<void> fetchBranches() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('UserID') ?? '';
+    final companyId = prefs.getString('CompanyName') ?? '';
+
+    print('User ID: $userId');
+    print('Company ID: $companyId');
+
+    branchShopList.clear();
+    branchShopList.addAll(await GlobalAPI.getBranchShop(userId, companyId));
+
+    if (prefs.getStringList('branches') == null) {
+      await prefs.setStringList(
+        'branches',
+        branchShopList.map((e) => e.name).toList(),
+      );
+    }
+  }
+
+  // Future<void> loadDrivers() async {
+  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
+  //
+  //   branchShopList.clear();
+  //   branchShopList.addAll(prefs.getStringList('branches') ?? []);
+  //   print('Branch Shop List: ${branchShopList.length}');
+  //   notifyListeners();
+  //
+  //   print('Load Branches: ${branchShopList.length}');
+  // }
+
+  Future<void> fetchDriver() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final companyId = prefs.getString('CompanyName') ?? '';
+
+    print('Company ID: $companyId');
+
+    driverList = [];
+    driverList.addAll(await GlobalAPI.getDrivers(companyId));
+    print('Driver List: ${driverList.length}');
+
+    filteredDriverList = [];
+    filteredDriverList.addAll(driverList);
+    print('Filtered Driver List: ${filteredDriverList.length}');
+  }
+
+  List<ModelDriver> filteredDriverList = [];
+
+  List<ModelDriver> get getFilteredDriverList => filteredDriverList;
+
+  Future<void> filterDriver(String selectedBranch) async {
+    if (branchShopList.isEmpty) {
+      await fetchBranches();
+    }
+    List<ModelBranches> temp = [];
+    log('Branch Shop (before): ${branchShopList.length}');
+    temp.addAll(branchShopList.where((e) => e.name == selectedBranch));
+    log('Branch Shop (after): ${temp.length}');
+
+    if (driverList.isEmpty) {
+      await fetchDriver();
+    }
+    log('Driver List (before): ${filteredDriverList.length}');
+    filteredDriverList = [];
+    filteredDriverList.addAll(
+      driverList
+          .where((e) =>
+              (e.shopId == temp[0].shopId && e.branchId == temp[0].branchId))
+          .toList(),
+    );
+    log('Driver List (after): ${filteredDriverList.length}');
+    notifyListeners();
+    log('filterDriver called. New filtered list length: ${filteredDriverList.length}');
+  }
+
+  List<DeliveryModel> deliveryList = [];
+
+  List<DeliveryModel> get getDeliveryList => deliveryList;
+
+  List<DeliveryHistoryModel> deliveryHistoryList = [];
+
+  List<DeliveryHistoryModel> get getDeliveryHistoryList => deliveryHistoryList;
+
+  Future<List<DeliveryModel>> fetchDeliveryChecklist(
+    String companyId,
+    String branchId,
+    String shopId,
+    String employeeId,
+    String currentDate,
+  ) async {
+    log('Fetch Delivery Checklist');
+    print('Company ID: $companyId');
+    print('Employee ID: $employeeId');
+    print('Branch ID: $branchId');
+    print('Shop ID: $shopId');
+    print('Date: $currentDate');
+
+    deliveryList.clear();
+    deliveryList.addAll(
+      await GlobalAPI.fetchDeliveryList(
+        companyId,
+        branchId,
+        shopId,
+        employeeId,
+        currentDate,
+      ),
+    );
+
+    print('Delivery length: ${deliveryList.length}');
+    print('Delivery Details length: ${deliveryList[0].deliveryDetail.length}');
+
+    deliveryHistoryList.clear();
+    deliveryHistoryList.addAll(
+      await GlobalAPI.fetchDeliveryHistory(
+        'F5EM45MAZDTNEMGZWD48',
+        deliveryList[0].imeiNumber,
+        currentDate,
+      ),
+    );
+
+    print('Delivery History length: ${deliveryHistoryList.length}');
+
+    return deliveryList;
+  }
+
+  void resetDeliveryData() {
+    deliveryList.clear();
+    // notifyListeners();
+  }
+
+  String highDefinitionImage = '';
+
+  String get getHighDefinitionImage => highDefinitionImage;
+
+  // "Companyid":"STSJ",
+  // "Jenis":"DETAIL", // START/END/DETAIL
+  // "TransNo":"5198DAT24110005",
+  // "ShippingCLNo":"5198PCL24111076" // KHUSUS UNTUK DETAIL
+  Future<String> fetchDeliveryHDImage(
+    String timelineType,
+    String transNumber,
+    String shippingNumber,
+  ) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final companyId = prefs.getString('CompanyName') ?? '';
+
+    highDefinitionImage = '';
+    highDefinitionImage = await GlobalAPI.fetchDeliveryHDImage(
+      companyId,
+      timelineType,
+      transNumber,
+      shippingNumber,
+    );
+    // print('HD Image: $highDefinitionImage');
+
+    return highDefinitionImage;
+  }
+
+  List<DeliveryMemoModel> deliveryMemoList = [];
+
+  List<DeliveryMemoModel> get getDeliveryMemoList => deliveryMemoList;
+
+  String status = '';
+
+  String get getStatus => status;
+
+  Future<List<dynamic>> fetchDeliveryMemo(
+    String branchId,
+    String shopId,
+    String transNumber,
+  ) async {
+    print('Branch ID: $branchId');
+    print('Shop ID: $shopId');
+    print('Trans ID: $transNumber');
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final companyId = prefs.getString('CompanyName') ?? '';
+
+    await GlobalAPI.fetchDeliveryMemo(
+      companyId,
+      branchId,
+      shopId,
+      transNumber,
+    ).then((Map<String, dynamic> result) {
+      print('Map return result: ${result.values.length}');
+      deliveryMemoList.clear();
+      for (var entry in result.entries) {
+        if (entry.key == 'data') deliveryMemoList.addAll(entry.value);
+        if (entry.key == 'status') status = entry.value;
+      }
+    });
+
+    print('Delivery Memo List length: ${deliveryMemoList.length}');
+    print('Status: $status');
+
+    return [deliveryMemoList, status];
+  }
+
   // ================================================================
   // ============================ Map ===============================
   // ================================================================
@@ -346,9 +670,9 @@ class MapState with ChangeNotifier {
   List<ModelManagerActivities> get getManagerActivities =>
       managerActivitiesList;
 
-  List<ModelProvinces> provinceList = [];
+  List<String> provinceList = [];
 
-  List<ModelProvinces> get getProvinceList => provinceList;
+  List<String> get getProvinceList => provinceList;
 
   List<ModelAreas> areaList = [];
 
@@ -357,30 +681,61 @@ class MapState with ChangeNotifier {
   ValueNotifier<String> provinceNotifier = ValueNotifier('');
   ValueNotifier<String> areaNotifier = ValueNotifier('');
 
+  ValueNotifier<String> get getAreaNotifier => areaNotifier;
+
   void setProvinceNotifier(String value) {
     provinceNotifier.value = value;
     notifyListeners();
   }
 
   void setAreaNotifier(String value) {
+    // print('Area Notifier (before): ${areaNotifier.value}');
     areaNotifier.value = value;
     notifyListeners();
+    // print('Area Notifier (after): ${areaNotifier.value}');
   }
 
-  Future<List<ModelProvinces>> fetchProvinces(String userId) async {
-    provinceList.clear();
-    provinceList = await GlobalAPI.getProvinces(userId);
-    // print('Provider - Province length: ${provinceList.length}');
+  Future<void> loadHeader() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    return provinceList;
+    headerList.clear();
+    headerList.addAll(prefs.getStringList('header') ?? []);
+    notifyListeners();
+
+    print('Load Menu Header: ${headerList.length}');
+  }
+
+  Future<void> loadProvinces() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    provinceList.clear();
+    provinceList.addAll(prefs.getStringList('provinces') ?? []);
+    notifyListeners();
+
+    print('Load Provinces: ${provinceList.length}');
+  }
+
+  Future<void> fetchProvinces() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('UserID') ?? '';
+
+    List<ModelProvinces> temp = [];
+    temp.addAll(await GlobalAPI.getProvinces(userId));
+
+    await prefs.setStringList(
+      'provinces',
+      temp.map((e) => e.provinceName).toList(),
+    );
   }
 
   Future<List<ModelAreas>> fetchAreas(String value) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
     areaList.clear();
-    areaList = await GlobalAPI.getAreas(prefs.getString('UserID') ?? '', value);
-    // print('Provider - Area length: ${areaList.length}');
+    areaList.addAll(
+      await GlobalAPI.getAreas(prefs.getString('UserID') ?? '', value),
+    );
+    notifyListeners();
 
     return areaList;
   }
@@ -405,11 +760,11 @@ class MapState with ChangeNotifier {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     username = prefs.getString('UserID') ?? '';
 
-    print('Fetch Manager Activities');
-    print(username);
-    print(province);
-    print(area);
-    print(date);
+    // print('Fetch Manager Activities');
+    // print(username);
+    // print(province);
+    // print(area);
+    // print(date);
 
     managerActivitiesList.clear();
     managerActivitiesList = await GlobalAPI.fetchManagerActivities(
@@ -437,6 +792,12 @@ class MapState with ChangeNotifier {
     dailyReportList.addAll(
         managerActivitiesList.where((list) => list.actName == 'DAILY REPORT'));
 
+    print('Morning Briefing List length: ${morningBriefingList.length}');
+    print('Visit Market List length: ${visitMarketList.length}');
+    print(
+        'Recruitment Interview List length: ${recruitmentInterviewList.length}');
+    print('Daily Report List length: ${dailyReportList.length}');
+
     if (morningBriefingList.length == managerActivitiesList.length / 4 &&
         visitMarketList.length == managerActivitiesList.length / 4 &&
         recruitmentInterviewList.length == managerActivitiesList.length / 4 &&
@@ -450,6 +811,62 @@ class MapState with ChangeNotifier {
     } else {
       return [];
     }
+  }
+
+  String imgDir = '';
+
+  String get getImgDir => imgDir;
+
+  Future<List<String>> fetchImageDir(
+    String date,
+    String employeeId,
+    String actId,
+    double lat,
+    double lng,
+  ) async {
+    // print('Latitude: $lat');
+    // print('Longitude: $lng');
+
+    imgDir = '';
+    if (actId == '02') {
+      imgDir = await GlobalAPI.fetchImageDirectory(
+        date,
+        employeeId,
+        actId,
+      );
+
+      if (imgDir == '' && actId == '02') {
+        imgDir = await GlobalAPI.fetchImageDirectory(
+          date,
+          employeeId,
+          '04',
+        );
+      }
+    } else {
+      imgDir = await GlobalAPI.fetchImageDirectory(
+        date,
+        employeeId,
+        actId,
+      );
+    }
+
+    if (imgDir.length % 2 == 0) {
+      print('Image directory length is EVEN');
+    } else {
+      print('Image directory length is ODD');
+    }
+
+    // List<Placemark> address = [];
+    // try {
+    //   await placemarkFromCoordinates(lat, lng)
+    //       .then((value) => address.addAll(value));
+    //
+    //   print('Placemark length: ${address.length}');
+    // } catch (e) {
+    //   print('Error: $e');
+    // }
+
+    return [imgDir, ''];
   }
 
   // ==================================================================
@@ -472,6 +889,13 @@ class MapState with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<List<double>> getLatLng() async {
+    print('Lat: $lat');
+    print('Lng: $lng');
+
+    return [lat, lng];
+  }
+
   // ==================================================================
   // ========================== New Menu ==============================
   // ==================================================================
@@ -481,7 +905,7 @@ class MapState with ChangeNotifier {
 
   void setStaticMenuNotifier(String value) {
     staticMenuNotifier.value = value;
-    notifyListeners();
+    // notifyListeners();
   }
 
   // ==================================================================
@@ -617,9 +1041,13 @@ class MapState with ChangeNotifier {
     String beginDate,
     String endDate,
   ) async {
+    // print('Province: $province');
+    // print('Area: $area');
+    // print('Begin Date: $beginDate');
+    // print('End Date: $endDate');
+
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     username = prefs.getString('UserID') ?? '';
-    activitiesPointList.clear();
 
     await GlobalAPI.fetchActivitiesPoint(
       username,
@@ -629,17 +1057,16 @@ class MapState with ChangeNotifier {
       endDate,
     ).then((list) {
       List<String> date = [];
-      List<ModelPointCalculation> briefing = [];
-      List<ModelPointCalculation> visit = [];
-      List<ModelPointCalculation> recruitment = [];
-      List<ModelPointCalculation> daily = [];
+      date.addAll(list.map((e) => e.date).toSet().toList());
 
-      date.addAll(list.map((e) => e.date).toSet());
+      // for (var data in date) {
+      //   print('Date: $data');
+      // }
 
-      activitiesPointList.addAll(date.asMap().entries.map((e) {
-        final date = e.value;
-
-        briefing.clear();
+      activitiesPointList.clear();
+      for (var date in date) {
+        // print('Date: $date');
+        List<ModelPointCalculation> briefing = [];
         briefing.addAll(
           list.where(
             (element) => element.actId == '00' && element.date == date,
@@ -647,7 +1074,7 @@ class MapState with ChangeNotifier {
         );
         // print('Briefing length: ${briefing.length}');
 
-        visit.clear();
+        List<ModelPointCalculation> visit = [];
         visit.addAll(
           list.where(
             (element) => element.actId == '01' && element.date == date,
@@ -655,7 +1082,7 @@ class MapState with ChangeNotifier {
         );
         // print('Visit length: ${visit.length}');
 
-        recruitment.clear();
+        List<ModelPointCalculation> recruitment = [];
         recruitment.addAll(
           list.where(
             (element) => element.actId == '02' && element.date == date,
@@ -663,7 +1090,7 @@ class MapState with ChangeNotifier {
         );
         // print('Recruitment length: ${recruitment.length}');
 
-        daily.clear();
+        List<ModelPointCalculation> daily = [];
         daily.addAll(
           list.where(
             (element) => element.actId == '03' && element.date == date,
@@ -671,17 +1098,19 @@ class MapState with ChangeNotifier {
         );
         // print('Daily length: ${daily.length}');
 
-        return ModelPointsType(
-          date: date,
-          morningBriefing: briefing,
-          visitMarket: visit,
-          recruitmentInterview: recruitment,
-          dailyReport: daily,
+        activitiesPointList.add(
+          ModelPointsType(
+            date: date,
+            morningBriefing: briefing,
+            visitMarket: visit,
+            recruitmentInterview: recruitment,
+            dailyReport: daily,
+          ),
         );
-      }));
+      }
     });
 
-    // print('Point List length: ${activitiesPointList.length}');
+    print('Point List length: ${activitiesPointList.length}');
 
     return activitiesPointList;
   }

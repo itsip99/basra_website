@@ -15,7 +15,7 @@ class WeeklyReportTable extends StatefulWidget {
 class _WeeklyReportTableState extends State<WeeklyReportTable> {
   @override
   Widget build(BuildContext context) {
-    final weeklyTableReportState = Provider.of<MapState>(context);
+    final weeklyTableReportState = Provider.of<MenuState>(context);
 
     return SingleChildScrollView(
       child: Table(

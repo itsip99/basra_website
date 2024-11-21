@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stsj/core/cleanArc/dashboard_service/helpers/format.dart';
-import 'package:stsj/core/models/Activities/salesman.dart';
+import 'package:stsj/core/models/Dashboard/driver.dart';
 import 'package:stsj/core/providers/Provider.dart';
 import 'package:stsj/global/font.dart';
 
-class NIPAutoComplete extends StatefulWidget {
-  const NIPAutoComplete(this.inputan, this.setFilter, {super.key});
+class DriverAutoComplete extends StatefulWidget {
+  const DriverAutoComplete(
+    this.inputan,
+    this.setFilter, {
+    super.key,
+  });
+
   final String inputan;
   final Function setFilter;
 
   @override
-  State<NIPAutoComplete> createState() => _NIPAutoCompleteState();
+  State<DriverAutoComplete> createState() => _DriverAutoCompleteState();
 }
 
-class _NIPAutoCompleteState extends State<NIPAutoComplete> {
+class _DriverAutoCompleteState extends State<DriverAutoComplete> {
   late String nameInputan;
 
   @override
@@ -29,12 +34,18 @@ class _NIPAutoCompleteState extends State<NIPAutoComplete> {
 
   @override
   Widget build(BuildContext context) {
-    final autoCompleteState = Provider.of<MenuState>(context);
+    final state = Provider.of<MenuState>(context);
+    // print('Autocomplete widget rebuilt');
+    // print('Autocomplete: ${state.filteredDriverList.length}');
+
+    // for (var driver in state.filteredDriverList) {
+    //   print('Driver Name: ${driver.employeeName}');
+    // }
 
     if (widget.inputan != '') {
-      nameInputan = (autoCompleteState.salesmanList.firstWhere((element) {
-        return element.id == widget.inputan;
-      })).name;
+      nameInputan = (state.filteredDriverList.firstWhere((element) {
+        return element.employeeId == widget.inputan;
+      })).employeeName;
     } else {
       nameInputan = '';
     }
@@ -47,9 +58,9 @@ class _NIPAutoCompleteState extends State<NIPAutoComplete> {
         color: Colors.grey[400],
         borderRadius: BorderRadius.circular(15.0),
       ),
-      child: Autocomplete<ModelSalesman>(
+      child: Autocomplete<ModelDriver>(
         initialValue: TextEditingValue(text: nameInputan),
-        optionsViewBuilder: (context, onSelected, salesman) {
+        optionsViewBuilder: (context, onSelected, drivers) {
           return Align(
             alignment: Alignment.topLeft,
             child: Material(
@@ -57,27 +68,30 @@ class _NIPAutoCompleteState extends State<NIPAutoComplete> {
               borderRadius: BorderRadius.circular(20.0),
               child: SizedBox(
                 width: 330,
-                height: salesman.length > 2 ? 250 : salesman.length * 135,
+                height: drivers.length > 2 ? 150 : drivers.length * 135,
                 child: ListView.separated(
                   shrinkWrap: false,
-                  itemCount: salesman.length,
+                  itemCount: drivers.length,
                   separatorBuilder: (context, _) => const Divider(height: 5),
                   itemBuilder: (BuildContext context, int index) {
-                    final ModelSalesman item = salesman.elementAt(index);
+                    final ModelDriver driver = drivers.elementAt(index);
+
                     return ListTile(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                       title: Text(
-                        item.name,
+                        driver.employeeName,
                         style: const TextStyle(color: Colors.black),
                       ),
                       subtitle: Text(
-                        '${item.id}\n${item.location}',
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.grey),
+                        '${driver.employeeId}\n${driver.shopName}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
                       ),
-                      onTap: () => onSelected(item),
+                      onTap: () => onSelected(driver),
                     );
                   },
                 ),
@@ -91,8 +105,6 @@ class _NIPAutoCompleteState extends State<NIPAutoComplete> {
           focusNode,
           onFieldSubmitted,
         ) {
-          final state = Provider.of<MenuState>(context);
-
           if (state.isReset) {
             textEditingController.text = '';
             state.setIsReset();
@@ -124,21 +136,21 @@ class _NIPAutoCompleteState extends State<NIPAutoComplete> {
             ),
           );
         },
-        displayStringForOption: (ModelSalesman salesman) {
-          return salesman.id;
+        displayStringForOption: (ModelDriver driver) {
+          return driver.employeeName;
         },
         optionsBuilder: (TextEditingValue textEditingValue) {
           if (textEditingValue.text == '') {
             return [];
           }
-          return autoCompleteState.salesmanList.where((ModelSalesman salesman) {
-            return salesman.name.startsWith(textEditingValue.text) ||
-                salesman.id.contains(textEditingValue.text);
+
+          return state.filteredDriverList.where((ModelDriver driver) {
+            return driver.employeeName.startsWith(textEditingValue.text) ||
+                driver.employeeId.contains(textEditingValue.text);
           }).toList();
         },
-        onSelected: (ModelSalesman selection) {
-          widget.setFilter(selection.id);
-        },
+        onSelected: (ModelDriver selection) =>
+            widget.setFilter(selection.employeeId),
       ),
     );
   }

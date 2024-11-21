@@ -243,6 +243,19 @@ class GlobalFont {
   );
 
   // Rubik
+  static TextStyle smallfontR = TextStyle(
+    color: Colors.black,
+    fontFamily: GlobalFontFamily.fontRubik,
+    fontSize: 11,
+  );
+
+  static TextStyle smallfontRBold = TextStyle(
+    color: Colors.black,
+    fontFamily: GlobalFontFamily.fontRubik,
+    fontSize: 11,
+    fontWeight: FontWeight.w600,
+  );
+
   static TextStyle mediumfontR = TextStyle(
     color: Colors.black,
     fontFamily: GlobalFontFamily.fontRubik,
@@ -268,6 +281,26 @@ class GlobalFont {
     color: Colors.black,
     fontFamily: GlobalFontFamily.fontRubik,
     fontSize: GlobalSize.mediumbigfont,
+  );
+
+  static TextStyle mediumbigfontRBlue = TextStyle(
+    color: Colors.blue,
+    fontFamily: GlobalFontFamily.fontRubik,
+    fontSize: GlobalSize.mediumbigfont,
+  );
+
+  static TextStyle mediumbigfontRBoldWhite = TextStyle(
+    color: Colors.white,
+    fontFamily: GlobalFontFamily.fontRubik,
+    fontSize: GlobalSize.mediumbigfont,
+    fontWeight: FontWeight.bold,
+  );
+
+  static TextStyle mediumbigfontRBoldBlue = TextStyle(
+    color: Colors.blue,
+    fontFamily: GlobalFontFamily.fontRubik,
+    fontSize: GlobalSize.mediumbigfont,
+    fontWeight: FontWeight.bold,
   );
 
   static TextStyle mediumbigfontRWhite = TextStyle(
@@ -298,21 +331,18 @@ class GlobalFont {
     backgroundColor: Colors.transparent,
   );
 
+  static TextStyle bigfontRBlue = TextStyle(
+    color: Colors.blue,
+    fontFamily: GlobalFontFamily.fontRubik,
+    fontSize: GlobalSize.bigfont,
+  );
+
   static TextStyle bigfontRBold = TextStyle(
     color: Colors.black,
     fontFamily: GlobalFontFamily.fontRubik,
     fontSize: GlobalSize.bigfont,
     fontWeight: FontWeight.bold,
     backgroundColor: Colors.transparent,
-  );
-
-  static TextStyle bigfontRBoldUnderlinedBlue = TextStyle(
-    color: Colors.blue,
-    fontFamily: GlobalFontFamily.fontRubik,
-    fontSize: GlobalSize.bigfont,
-    fontWeight: FontWeight.bold,
-    backgroundColor: Colors.transparent,
-    decoration: TextDecoration.underline,
   );
 
   static TextStyle mediumgiantfontR = TextStyle(

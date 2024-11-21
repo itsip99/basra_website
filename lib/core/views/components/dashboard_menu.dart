@@ -1,44 +1,116 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:stsj/core/cleanArc/dashboard_service/pages/dialog_filter.dart';
+import 'package:stsj/core/providers/Provider.dart';
 import 'package:stsj/router/router_const.dart';
 
 class DashboardMenuComponent extends HookWidget {
-  const DashboardMenuComponent({super.key});
+  DashboardMenuComponent({super.key});
+
+  final Map<int, String> allowedPages = {
+    001: 'Peta',
+    002: 'Sales',
+  };
 
   @override
   Widget build(BuildContext context) {
     useEffect(() => null);
+    final state = Provider.of<MenuState>(context);
 
     return SizedBox(
       width: MediaQuery.of(context).size.width,
       child: SingleChildScrollView(
         child: Wrap(
-          spacing: 60.0,
-          runSpacing: 50.0,
           children: [
-            Column(
-              children: [
-                _buildMenuIcon(
-                  context,
-                  'assets/images/sales.png',
-                  'Sales Dashboard',
-                  RoutesConstant.salesDashboard,
-                ),
-                const Text('Sales Dashboard'),
-              ],
+            // Sales Dashboard
+            Builder(
+              builder: (context) {
+                if (state.getSubHeaderList.contains('000')) {
+                  return Container(
+                    margin: EdgeInsets.only(right: 50.0),
+                    child: Column(
+                      children: [
+                        _buildMenuIcon(
+                          context,
+                          'assets/images/sales.png',
+                          'Sales Dashboard',
+                          RoutesConstant.salesDashboard,
+                        ),
+                        const Text('Sales Dashboard'),
+                      ],
+                    ),
+                  );
+                } else {
+                  return const SizedBox();
+                }
+              },
             ),
-            Column(
-              children: [
-                _buildMenuIcon(
-                  context,
-                  'assets/images/dashboard.png',
-                  'Dashboard Service',
-                  RoutesConstant.dashboardService,
-                ),
-                const Text('Dashboard Service'),
-              ],
+
+            // Service Dashboard
+            Builder(
+              builder: (context) {
+                if (state.getSubHeaderList.contains('002')) {
+                  return Container(
+                    margin: EdgeInsets.only(right: 50.0),
+                    child: Column(
+                      children: [
+                        _buildMenuIcon(
+                          context,
+                          'assets/images/dashboard.png',
+                          'Dashboard Service',
+                          RoutesConstant.dashboardService,
+                        ),
+                        const Text('Dashboard Service'),
+                      ],
+                    ),
+                  );
+                } else {
+                  return const SizedBox();
+                }
+              },
+            ),
+
+            // Delivery
+            Builder(
+              builder: (context) {
+                // With User Access
+                if (state.getSubHeaderList.contains('003')) {
+                  return Container(
+                    margin: EdgeInsets.only(right: 50.0),
+                    child: Column(
+                      children: [
+                        _buildMenuIcon(
+                          context,
+                          'assets/images/delivery.png',
+                          'Delivery',
+                          RoutesConstant.delivery,
+                        ),
+                        const Text('Delivery'),
+                      ],
+                    ),
+                  );
+                } else {
+                  return const SizedBox();
+                }
+
+                // Without User Access
+                // return Container(
+                //   margin: EdgeInsets.only(right: 50.0),
+                //   child: Column(
+                //     children: [
+                //       _buildMenuIcon(
+                //         context,
+                //         'assets/images/delivery.png',
+                //         'Delivery',
+                //         RoutesConstant.delivery,
+                //       ),
+                //       const Text('Delivery'),
+                //     ],
+                //   ),
+                // );
+              },
             ),
           ],
         ),

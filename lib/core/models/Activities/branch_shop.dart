@@ -1,14 +1,14 @@
 class ModelBranchShop {
   String province;
   String area;
-  String branch;
+  String branchId;
   String shopId;
   String shopName;
 
   ModelBranchShop({
     required this.province,
     required this.area,
-    required this.branch,
+    required this.branchId,
     required this.shopId,
     required this.shopName,
   });
@@ -17,7 +17,7 @@ class ModelBranchShop {
     return ModelBranchShop(
       province: json['bigArea'],
       area: json['smallArea'],
-      branch: json['branch'],
+      branchId: json['branch'],
       shopId: json['shop'],
       shopName: json['bsName'],
     );

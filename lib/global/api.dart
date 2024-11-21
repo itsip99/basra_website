@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:http/http.dart' as http;
+import 'package:stsj/core/models/Activities/image_dir.dart';
 import 'package:stsj/core/models/Activities/point_calculation.dart';
 import 'package:stsj/core/models/Activities/activity_route.dart';
 import 'package:stsj/core/models/Activities/area.dart';
@@ -11,8 +13,395 @@ import 'package:stsj/core/models/Activities/return_result.dart';
 import 'package:stsj/core/models/Activities/salesman.dart';
 import 'package:stsj/core/models/Activities/salesman_activities.dart';
 import 'package:stsj/core/models/Activities/weekly_report.dart';
+import 'package:stsj/core/models/AuthModel/user_access.dart';
+import 'package:stsj/core/models/Dashboard/branch_shop.dart';
+import 'package:stsj/core/models/Dashboard/delivery.dart';
+import 'package:stsj/core/models/Dashboard/delivery_history.dart';
+import 'package:stsj/core/models/Dashboard/delivery_memo.dart';
+import 'package:stsj/core/models/Dashboard/driver.dart';
 
 class GlobalAPI {
+  static Future<List<ModelUserAccess>> fetchUserAccess(
+    String companyName,
+    String entryLevelId,
+  ) async {
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/api/Login/Privilege',
+    );
+
+    Map mapUserAccess = {
+      "PT": companyName,
+      "EntryLevelID": entryLevelId,
+    };
+
+    List<ModelUserAccess> userAccessList = [];
+
+    try {
+      final response =
+          await http.post(url, body: jsonEncode(mapUserAccess), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 120));
+
+      if (response.statusCode <= 200) {
+        var jsonUserAccess = jsonDecode(response.body);
+        if (jsonUserAccess['code'] == '100' &&
+            jsonUserAccess['msg'] == 'Sukses') {
+          userAccessList = (jsonUserAccess['data'] as List)
+              .map<ModelUserAccess>((list) => ModelUserAccess.fromJson(list))
+              .toList();
+
+          return userAccessList;
+        } else {
+          return userAccessList;
+        }
+      } else {}
+      return userAccessList;
+    } catch (e) {
+      print(e.toString());
+      return userAccessList;
+    }
+  }
+
+  static Future<List<ModelBranches>> getBranchShop(
+    String userId,
+    String companyId,
+  ) async {
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/SIS/Driver/GetBranchShop',
+    );
+
+    Map mapGetBranches = {
+      "Companyid": companyId,
+      "UserID": userId,
+    };
+
+    List<ModelBranches> branchList = [];
+
+    try {
+      final response =
+          await http.post(url, body: jsonEncode(mapGetBranches), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      if (response.statusCode <= 200) {
+        var jsonBranches = jsonDecode(response.body);
+        if (jsonBranches['code'] == '100' && jsonBranches['msg'] == 'Sukses') {
+          branchList.add(ModelBranches(branchId: '', shopId: '', name: ''));
+          branchList.addAll((jsonBranches['data'] as List)
+              .map<ModelBranches>((list) => ModelBranches.fromJson(list))
+              .toList());
+
+          return branchList;
+        } else {
+          return branchList;
+        }
+      }
+      return branchList;
+    } catch (e) {
+      print('Error: ${e.toString()}');
+      return branchList;
+    }
+  }
+
+  static Future<List<ModelDriver>> getDrivers(
+    String companyId, {
+    String branchId = '',
+    String shopId = '',
+  }) async {
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/SIS/Driver/GetDriver',
+    );
+
+    Map mapGetBranches = {
+      "Companyid": companyId,
+      "Branch": branchId,
+      "Shop": shopId,
+    };
+
+    List<ModelDriver> driverList = [];
+
+    try {
+      final response =
+          await http.post(url, body: jsonEncode(mapGetBranches), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      if (response.statusCode <= 200) {
+        var jsonBranches = jsonDecode(response.body);
+        if (jsonBranches['code'] == '100' && jsonBranches['msg'] == 'Sukses') {
+          driverList.add(ModelDriver(
+            employeeId: '',
+            employeeName: '',
+            branchId: '',
+            shopId: '',
+            shopName: '',
+          ));
+          driverList.addAll((jsonBranches['data'] as List)
+              .map<ModelDriver>((list) => ModelDriver.fromJson(list))
+              .toSet()
+              .toList());
+
+          return driverList;
+        } else {
+          return driverList;
+        }
+      }
+      return driverList;
+    } catch (e) {
+      print('Error: ${e.toString()}');
+      return driverList;
+    }
+  }
+
+  static Future<List<DeliveryModel>> fetchDeliveryList(
+    String companyId,
+    String branchId,
+    String shopId,
+    String employeeId,
+    String currentDate,
+  ) async {
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/SIS/Driver/CheckListPengiriman',
+    );
+
+    Map mapDelivery = {
+      "Companyid": companyId,
+      "Branch": branchId,
+      "Shop": shopId,
+      "EmployeeID": employeeId,
+      "CurrentDate": currentDate,
+    };
+
+    // print(mapDelivery);
+
+    List<DeliveryModel> deliveryList = [];
+
+    try {
+      final response =
+          await http.post(url, body: jsonEncode(mapDelivery), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      // print(response.body);
+
+      if (response.statusCode <= 200) {
+        var jsonBranches = jsonDecode(response.body);
+        if (jsonBranches['code'] == '100' && jsonBranches['msg'] == 'Sukses') {
+          deliveryList.addAll((jsonBranches['data'] as List)
+              .map<DeliveryModel>((list) => DeliveryModel.fromJson(list))
+              .toSet()
+              .toList());
+
+          log('Fetch data succeed');
+          return deliveryList;
+        } else {
+          log('Fetch data failed or error occured');
+          deliveryList.add(DeliveryModel(
+            employeeId: '',
+            employeeName: '',
+            chasisNumber: '',
+            plateNumber: '',
+            imeiNumber: '',
+            drivingLicense: '',
+            activityNumber: '',
+            startTime: '',
+            startImageThumb: '',
+            startKm: '',
+            endTime: '',
+            endImageThumb: '',
+            endKm: '',
+            deliveryDetail: [],
+          ));
+
+          return deliveryList;
+        }
+      }
+
+      return [];
+    } catch (e) {
+      print('Error: ${e.toString()}');
+      return [];
+    }
+  }
+
+  static Future<List<DeliveryHistoryModel>> fetchDeliveryHistory(
+    String token,
+    String imei,
+    String date,
+  ) async {
+    Map mapDeliveryHistory = {
+      "token": token,
+      "imei": imei,
+      "CurrentDate": date,
+    };
+
+    print(mapDeliveryHistory);
+
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/SIS/Driver/MaxTracker',
+    );
+
+    print(url);
+
+    List<DeliveryHistoryModel> deliveryHistoryList = [];
+
+    try {
+      final response =
+          await http.post(url, body: jsonEncode(mapDeliveryHistory), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      // print(response.body);
+
+      if (response.statusCode <= 200) {
+        var jsonBranches = jsonDecode(response.body);
+        deliveryHistoryList.addAll((jsonBranches as List)
+            .map<DeliveryHistoryModel>(
+                (list) => DeliveryHistoryModel.fromJson(list))
+            .toList());
+
+        log('Fetch data succeed');
+        return deliveryHistoryList;
+      }
+
+      log('Fetch data failed');
+      return [];
+    } catch (e) {
+      print('Error: ${e.toString()}');
+      return [];
+    }
+  }
+
+  static Future<String> fetchDeliveryHDImage(
+    String companyId,
+    String timelineType,
+    String transNumber,
+    String shippingNumber,
+  ) async {
+    Map mapDeliveryHDImage = {
+      "Companyid": companyId,
+      "Jenis": timelineType,
+      "TransNo": transNumber,
+      "ShippingCLNo": shippingNumber,
+    };
+
+    print(mapDeliveryHDImage);
+
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/SIS/Driver/DriverActivityImage',
+    );
+
+    print(url);
+
+    try {
+      final response =
+          await http.post(url, body: jsonEncode(mapDeliveryHDImage), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      // print(response.body);
+      print('Response stage passed');
+
+      if (response.statusCode <= 200) {
+        var jsonBranches = jsonDecode(response.body);
+        print('JSON Branches stage passed');
+        if (jsonBranches['data'] != null) {
+          log('Fetch data succeed, data available');
+          return jsonBranches['data'][0]['image1'];
+        } else {
+          log('Fetch data succeed, data not available');
+          return '';
+        }
+      }
+
+      log('Fetch data failed');
+      return 'fail';
+    } catch (e) {
+      print('Error: ${e.toString()}');
+      return 'error';
+    }
+  }
+
+  static Future<Map<String, dynamic>> fetchDeliveryMemo(
+    String companyId,
+    String branchId,
+    String shopId,
+    String transNumber,
+  ) async {
+    Map<String, dynamic> mapDeliveryMemoReturn = {
+      'data': [],
+      'status': '',
+    };
+
+    Map mapDeliveryMemo = {
+      "Companyid": companyId,
+      "Branch": branchId,
+      "Shop": shopId,
+      "TransNo": transNumber,
+    };
+
+    // print(mapDeliveryMemo);
+
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/SIS/Driver/CheckListPengirimanDetail',
+    );
+
+    // print(url);
+
+    try {
+      final response =
+          await http.post(url, body: jsonEncode(mapDeliveryMemo), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      // print(response.body);
+
+      List<DeliveryMemoModel> deliveryDetailList = [];
+
+      if (response.statusCode <= 200) {
+        // print('200');
+        var jsonDeliveryMemo = jsonDecode(response.body);
+        if (jsonDeliveryMemo['code'] == '100' &&
+            jsonDeliveryMemo['msg'] == 'Sukses') {
+          // print('processing');
+          deliveryDetailList.addAll((jsonDeliveryMemo['data'] as List)
+              .map<DeliveryMemoModel>(
+                  (list) => DeliveryMemoModel.fromJson(list))
+              .toList());
+
+          // print('success');
+          mapDeliveryMemoReturn.update('data', (_) => deliveryDetailList);
+          mapDeliveryMemoReturn.update('status', (_) => 'success');
+
+          return mapDeliveryMemoReturn;
+        } else {
+          // print('failed'); // gagal memuat data
+          mapDeliveryMemoReturn.update('status', (_) => 'failed');
+
+          return mapDeliveryMemoReturn;
+        }
+      } else {
+        // print('404'); // terjadi kesalahan, mohon coba lagi
+        mapDeliveryMemoReturn.update('status', (_) => 'not found');
+
+        return mapDeliveryMemoReturn;
+      }
+    } catch (e) {
+      // terjadi kesalahan, mohon coba lagi
+      // print('Error: ${e.toString()}');
+      mapDeliveryMemoReturn.update('status', (_) => 'error');
+
+      return mapDeliveryMemoReturn;
+    }
+  }
+
   static Future<List<ModelActivityRoute>> fetchActivityRoute(
     String employeeID,
     String date,
@@ -181,6 +570,9 @@ class GlobalAPI {
     String userId,
     String province,
   ) async {
+    print(userId);
+    print(province);
+
     var url = Uri.https(
       'wsip.yamaha-jatim.co.id:2448',
       '/api/SIPSales/BrowseMSmallArea',
@@ -207,6 +599,7 @@ class GlobalAPI {
               .map<ModelAreas>((list) => ModelAreas.fromJson(list))
               .toList());
 
+          // print('API Area List: ${areaList.length}');
           return areaList;
         } else {
           return areaList;
@@ -229,6 +622,8 @@ class GlobalAPI {
       'wsip.yamaha-jatim.co.id:2448',
       '/api/SIPSales/EmployeeActivitySMByArea',
     );
+
+    // print('Fetch Manager Activities: $userid, $province, $area, $date');
 
     Map mapManagerActivities = {
       "UserID": userid,
@@ -263,6 +658,57 @@ class GlobalAPI {
     } catch (e) {
       print(e.toString());
       return manangerActivitiesList;
+    }
+  }
+
+  static Future<String> fetchImageDirectory(
+    String date,
+    String eId,
+    String aId,
+  ) async {
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/api/SIPSales/EmployeeActivitySMPic',
+    );
+
+    print('Fetch Image Dir');
+    print(date);
+    print(eId);
+    print(aId);
+
+    Map mapImageDirectory = {
+      "CurrentDate": date,
+      "EmployeeID": eId,
+      "ActivityID": aId,
+    };
+
+    List<ModelImageDirectory> imageDirectory = [];
+
+    try {
+      final response =
+          await http.post(url, body: jsonEncode(mapImageDirectory), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      if (response.statusCode <= 200) {
+        var jsonImageDirectory = jsonDecode(response.body);
+        if (jsonImageDirectory['code'] == '100' &&
+            jsonImageDirectory['msg'] == 'Sukses') {
+          imageDirectory = (jsonImageDirectory['data'] as List)
+              .map<ModelImageDirectory>(
+                  (list) => ModelImageDirectory.fromJson(list))
+              .toList();
+
+          return imageDirectory[0].imgDir;
+        } else {
+          return '';
+        }
+      } else {
+        return '';
+      }
+    } catch (e) {
+      print(e.toString());
+      return '';
     }
   }
 

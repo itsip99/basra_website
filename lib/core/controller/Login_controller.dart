@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -52,12 +54,14 @@ class DataLoginController {
     String userID,
     String EntryLevelID,
     String EntryLevelName,
+    String companyName,
   ) async {
     SharedPreferences NamaLoginPref = await SharedPreferences.getInstance();
     await NamaLoginPref.setBool("Status", true);
     await NamaLoginPref.setString("UserID", userID);
     await NamaLoginPref.setString("EntryLevelID", EntryLevelID);
     await NamaLoginPref.setString("EntryLevelName", EntryLevelName);
+    await NamaLoginPref.setString("CompanyName", companyName);
   }
 
   static void removeDataUser() async {

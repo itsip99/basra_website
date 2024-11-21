@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stsj/core/models/Activities/image.dart';
@@ -15,7 +15,7 @@ class ImageCarousel extends StatefulWidget {
 
 class _ImageCarouselState extends State<ImageCarousel> {
   int imageCarouselIndex = 0;
-  CarouselController imageController = CarouselController();
+  dynamic imageController;
 
   void rightNavigator() {
     imageController.nextPage(
@@ -33,27 +33,27 @@ class _ImageCarouselState extends State<ImageCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    final imageCarouselState = Provider.of<MapState>(context);
+    final imageCarouselState = Provider.of<MenuState>(context);
 
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.35,
-      child: CarouselSlider(
-        carouselController: imageController,
-        options: CarouselOptions(
-          aspectRatio: 0.75,
-          viewportFraction: 1.0,
-          height: MediaQuery.of(context).size.height * 0.65,
-          scrollPhysics: NeverScrollableScrollPhysics(),
-          // onPageChanged: (index, reason) {
-          //   imageCarouselState.resetSelectImage();
-          //   imageCarouselState.onCarouselChanged(index);
-          //   setState(() {
-          //     imageCarouselIndex = index;
-          //   });
-          //
-          //   imageCarouselState.setSelectImage(index);
-          // },
-        ),
+      child: FlutterCarousel(
+        options: FlutterCarouselOptions(
+            aspectRatio: 0.75,
+            viewportFraction: 1.0,
+            height: MediaQuery.of(context).size.height * 0.65,
+            controller: imageController
+            // scrollPhysics: NeverScrollableScrollPhysics(),
+            // onPageChanged: (index, reason) {
+            //   imageCarouselState.resetSelectImage();
+            //   imageCarouselState.onCarouselChanged(index);
+            //   setState(() {
+            //     imageCarouselIndex = index;
+            //   });
+            //
+            //   imageCarouselState.setSelectImage(index);
+            // },
+            ),
         items: imageCarouselState.imageList[imageCarouselState.getImageIndex]
             .asMap()
             .entries

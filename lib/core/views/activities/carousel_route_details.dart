@@ -1,6 +1,6 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:stsj/core/providers/Provider.dart';
 import 'package:stsj/core/views/activities/image_carousel.dart';
@@ -18,7 +18,7 @@ class CarouselRouteDetailsPage extends StatefulWidget {
 
 class _CarouselRouteDetailsPageState extends State<CarouselRouteDetailsPage> {
   int carouselActiveIndex = 0;
-  CarouselController carouselController = CarouselController();
+  dynamic carouselController;
 
   void rightNavigator() {
     carouselController.nextPage(
@@ -36,7 +36,7 @@ class _CarouselRouteDetailsPageState extends State<CarouselRouteDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final carouselRouteDetailsState = Provider.of<MapState>(context);
+    final carouselRouteDetailsState = Provider.of<MenuState>(context);
 
     return Scaffold(
       appBar: PreferredSize(
@@ -74,13 +74,13 @@ class _CarouselRouteDetailsPageState extends State<CarouselRouteDetailsPage> {
                   ),
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.9,
-                    child: CarouselSlider(
-                      carouselController: carouselController,
-                      options: CarouselOptions(
+                    child: FlutterCarousel(
+                      options: FlutterCarouselOptions(
                         aspectRatio: 1.0,
                         viewportFraction: 1.0,
                         height: MediaQuery.of(context).size.height * 0.85,
-                        scrollPhysics: NeverScrollableScrollPhysics(),
+                        controller: carouselController,
+                        // scrollPhysics: NeverScrollableScrollPhysics(),
                         onPageChanged: (index, reason) {
                           carouselRouteDetailsState.resetSelectImage();
                           carouselRouteDetailsState.onCarouselChanged(index);
