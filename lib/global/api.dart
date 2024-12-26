@@ -19,6 +19,7 @@ import 'package:stsj/core/models/Dashboard/delivery.dart';
 import 'package:stsj/core/models/Dashboard/delivery_history.dart';
 import 'package:stsj/core/models/Dashboard/delivery_memo.dart';
 import 'package:stsj/core/models/Dashboard/driver.dart';
+import 'package:stsj/core/models/Report/absent_history.dart';
 
 class GlobalAPI {
   static Future<List<ModelUserAccess>> fetchUserAccess(
@@ -53,17 +54,17 @@ class GlobalAPI {
 
           return userAccessList;
         } else {
-          return userAccessList;
+          return [];
         }
       } else {}
-      return userAccessList;
+      return [];
     } catch (e) {
       print(e.toString());
-      return userAccessList;
+      return [];
     }
   }
 
-  static Future<List<ModelBranches>> getBranchShop(
+  static Future<List<ModelBranches>> getSISBranchShop(
     String userId,
     String companyId,
   ) async {
@@ -105,7 +106,7 @@ class GlobalAPI {
     }
   }
 
-  static Future<List<ModelDriver>> getDrivers(
+  static Future<List<ModelDriver>> getSISDrivers(
     String companyId, {
     String branchId = '',
     String shopId = '',
@@ -156,6 +157,257 @@ class GlobalAPI {
     }
   }
 
+  // ~:NEW:~
+  static Future<List<SipSalesBranchesModel>> getSipSalesBranches(
+    String userId,
+  ) async {
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/api/SIPSales/SIPSalesBranch',
+    );
+
+    Map mapGetSipSalesBranches = {"UserID": userId};
+
+    List<SipSalesBranchesModel> branchesList = [];
+
+    try {
+      final response = await http
+          .post(url, body: jsonEncode(mapGetSipSalesBranches), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      if (response.statusCode <= 200) {
+        var jsonBranches = jsonDecode(response.body);
+        if (jsonBranches['code'] == '100' && jsonBranches['msg'] == 'Sukses') {
+          branchesList.add(SipSalesBranchesModel(
+            branchCode: '',
+            branchName: '',
+          ));
+          branchesList.addAll((jsonBranches['data'] as List)
+              .map<SipSalesBranchesModel>(
+                  (list) => SipSalesBranchesModel.fromJson(list))
+              .toList());
+
+          return branchesList;
+        } else {
+          return branchesList;
+        }
+      }
+      return branchesList;
+    } catch (e) {
+      print('Error: ${e.toString()}');
+      return branchesList;
+    }
+  }
+
+  static Future<List<SipSalesShopsModel>> getSipSalesShops(
+    String userId,
+    String branchCode,
+  ) async {
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/api/SIPSales/SIPSalesBranchShop',
+    );
+
+    Map mapGetSipSalesShops = {
+      "UserID": userId,
+      "Branch": branchCode,
+    };
+
+    print(mapGetSipSalesShops);
+
+    List<SipSalesShopsModel> shopsList = [];
+
+    try {
+      final response =
+          await http.post(url, body: jsonEncode(mapGetSipSalesShops), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      if (response.statusCode <= 200) {
+        var jsonBranches = jsonDecode(response.body);
+        if (jsonBranches['code'] == '100' && jsonBranches['msg'] == 'Sukses') {
+          shopsList.add(SipSalesShopsModel(
+            branchCode: '',
+            shopCode: '',
+            shopName: '',
+          ));
+          shopsList.addAll((jsonBranches['data'] as List)
+              .map<SipSalesShopsModel>(
+                  (list) => SipSalesShopsModel.fromJson(list))
+              .toList());
+
+          return shopsList;
+        } else {
+          return shopsList;
+        }
+      }
+      return shopsList;
+    } catch (e) {
+      print('Error: ${e.toString()}');
+      return shopsList;
+    }
+  }
+
+  static Future<List<SipSalesLocationModel>> getSipSalesLocation(
+    String userId,
+    String branchCode,
+    String shopCode,
+  ) async {
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/api/SIPSales/SIPSalesLocation',
+    );
+
+    Map mapGetSipSalesLocation = {
+      "UserID": userId,
+      "Branch": branchCode,
+      "Shop": shopCode,
+    };
+
+    List<SipSalesLocationModel> locationList = [];
+
+    try {
+      final response = await http
+          .post(url, body: jsonEncode(mapGetSipSalesLocation), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      if (response.statusCode <= 200) {
+        var jsonBranches = jsonDecode(response.body);
+        if (jsonBranches['code'] == '100' && jsonBranches['msg'] == 'Sukses') {
+          locationList.add(SipSalesLocationModel(
+            branchCode: '',
+            shopCode: '',
+            locationId: '',
+            locationName: '',
+          ));
+          locationList.addAll((jsonBranches['data'] as List)
+              .map<SipSalesLocationModel>(
+                  (list) => SipSalesLocationModel.fromJson(list))
+              .toList());
+
+          return locationList;
+        } else {
+          return locationList;
+        }
+      }
+      return locationList;
+    } catch (e) {
+      print('Error: ${e.toString()}');
+      return locationList;
+    }
+  }
+
+  static Future<List<SipSalesmanModel>> getSipSalesman(
+    String userId,
+    String branchCode,
+    String shopCode,
+    String locationId,
+  ) async {
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/api/SIPSales/SIPSalesman',
+    );
+
+    Map mapGetSipSalesman = {
+      "UserID": userId,
+      "Branch": branchCode,
+      "Shop": shopCode,
+      "LocationID": locationId,
+    };
+
+    List<SipSalesmanModel> salesmanList = [];
+
+    try {
+      final response =
+          await http.post(url, body: jsonEncode(mapGetSipSalesman), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      if (response.statusCode <= 200) {
+        var jsonBranches = jsonDecode(response.body);
+        if (jsonBranches['code'] == '100' && jsonBranches['msg'] == 'Sukses') {
+          salesmanList.add(SipSalesmanModel(
+            locationName: '',
+            employeeID: '',
+            employeeName: '',
+            position: '',
+            idNumber: '',
+          ));
+          salesmanList.addAll((jsonBranches['data'] as List)
+              .map<SipSalesmanModel>((list) => SipSalesmanModel.fromJson(list))
+              .toList());
+
+          return salesmanList;
+        } else {
+          return salesmanList;
+        }
+      }
+      return salesmanList;
+    } catch (e) {
+      print('Error: ${e.toString()}');
+      return salesmanList;
+    }
+  }
+
+  static Future<List<SipSalesmanHistoryModel>> getSipSalesmanHistory(
+    String userId,
+    String branchCode,
+    String shopCode,
+    String locationId,
+    String employeeId,
+    String beginDate,
+    String endDate,
+  ) async {
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/api/SIPSales/AttendanceHistory',
+    );
+
+    Map mapGetSipSalesmanHistory = {
+      "UserID": userId,
+      "Branch": branchCode,
+      "Shop": shopCode,
+      "LocationID": locationId,
+      "EmployeeID": employeeId,
+      "BeginDate": beginDate,
+      "EndDate": endDate,
+    };
+
+    print(mapGetSipSalesmanHistory);
+
+    List<SipSalesmanHistoryModel> salesmanHistoryList = [];
+
+    try {
+      final response = await http
+          .post(url, body: jsonEncode(mapGetSipSalesmanHistory), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      // print(response.body);
+
+      if (response.statusCode <= 200) {
+        var jsonBranches = jsonDecode(response.body);
+        if (jsonBranches['Code'] == '100' && jsonBranches['Msg'] == 'Sukses') {
+          salesmanHistoryList.addAll((jsonBranches['Data'] as List)
+              .map<SipSalesmanHistoryModel>(
+                  (list) => SipSalesmanHistoryModel.fromJson(list))
+              .toList());
+
+          return salesmanHistoryList;
+        } else {
+          return salesmanHistoryList;
+        }
+      }
+      return salesmanHistoryList;
+    } catch (e) {
+      print('Error: ${e.toString()}');
+      return salesmanHistoryList;
+    }
+  }
+  // ~:NEW:~
+
   static Future<List<DeliveryModel>> fetchDeliveryList(
     String companyId,
     String branchId,
@@ -176,7 +428,7 @@ class GlobalAPI {
       "CurrentDate": currentDate,
     };
 
-    // print(mapDelivery);
+    print('Delivery map: $mapDelivery');
 
     List<DeliveryModel> deliveryList = [];
 
@@ -311,7 +563,13 @@ class GlobalAPI {
       if (response.statusCode <= 200) {
         var jsonBranches = jsonDecode(response.body);
         print('JSON Branches stage passed');
-        if (jsonBranches['data'] != null) {
+        // if (jsonBranches['data'] != null) {
+        //   log('jsonBranches is not null');
+        // } else {
+        //   log('jsonBranches is null');
+        //   return 'null';
+        // }
+        if (jsonBranches['data'][0]['image1'] != '') {
           log('Fetch data succeed, data available');
           return jsonBranches['data'][0]['image1'];
         } else {

@@ -4,11 +4,11 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:simple_grid/simple_grid.dart';
 import 'package:stsj/core/controller/Login_controller.dart';
 import 'package:stsj/core/models/AuthModel/Auth_Model.dart';
 import 'package:stsj/core/models/AuthModel/DataAuth.dart';
 import 'package:stsj/core/providers/Provider.dart';
+import 'package:stsj/global/font.dart';
 
 import 'package:stsj/router/router_const.dart';
 
@@ -16,12 +16,6 @@ class LoginPages extends StatefulWidget {
   const LoginPages({Key? key}) : super(key: key);
 
   static const String route = '/login'; // Define the route name
-
-  // static var versi = "";
-
-  // static List<DataPrivilege> listdataprivilege = [];
-
-  // static bool CekLoadPrivilege = false;
 
   @override
   State<LoginPages> createState() => _LoginPagesState();
@@ -32,9 +26,6 @@ class _LoginPagesState extends State<LoginPages> {
 
   final idController = TextEditingController();
   final passwordController = TextEditingController();
-
-  // late Function handle;
-  // String release = "";
 
   bool _passwordVisible = false; // Initialize _passwordVisible as a hook
 
@@ -53,9 +44,6 @@ class _LoginPagesState extends State<LoginPages> {
   }
 
   Future<void> fetchData(MenuState state) async {
-    // setState(() {
-    //   isLoading = true;
-    // });
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -68,24 +56,22 @@ class _LoginPagesState extends State<LoginPages> {
         state.password = prefs.getString("Password") ?? '';
         state.companyName = prefs.getString('CompanyName') ?? '';
 
-        // Check for null values and provide default values if needed
+        // ~:Load All Static Data:~
         state.fetchSalesmanList();
-        // print('Salesman List length: ${state.getSalesmanList.length}');
-        state.fetchDriver();
+        state.fetchSISDriver();
         state.fetchProvinces();
-        state.fetchBranches();
-        // .then((_) => state.fetchAreas());
-        // print('Provinces List length: ${state.getProvinceList.length}');
+        // Added before go to menu page too to make sure branch name changed
+        state.fetchSISBranches();
         state
-            .fetchUserAccess(
-          state.getCompanyName,
-          state.getEntryLevelId,
-        )
+            .fetchUserAccess(state.getCompanyName, state.getEntryLevelId)
             .then((data) async {
           state.userAccessList.addAll(data);
 
-          // Note --> disable for a while to display dashboard menu as the initial page
-          // Delivery Page is still considered as global page who can be accessed by all users
+          // SIP - Salesman
+          state.fetchSipSalesBranches();
+          state.fetchSipSalesman();
+
+          // ~:Header Privillage Preprocessing:~
           String category = data.first.category;
           if (category == 'DASHBOARD') {
             state.setStaticMenuNotifier('dashboard');
@@ -103,7 +89,6 @@ class _LoginPagesState extends State<LoginPages> {
 
           state.headerList.clear();
           state.headerList.addAll(data.map((e) => e.category).toSet().toList());
-          print('Header list length: ${state.headerList.length}');
           if (state.headerList.isEmpty) {
             state.headerList.add('dashboard');
           }
@@ -117,12 +102,10 @@ class _LoginPagesState extends State<LoginPages> {
             }
           }).toList());
 
+          // ~:Subheader Privillage Preprocessing:~
           state.subHeaderList.clear();
           state.subHeaderList.addAll(data.map((e) => e.menuNumber).toList());
           await prefs.setStringList('subheader', state.subHeaderList);
-
-          // print('Menu Initialization Value: ${state.staticMenuNotifier.value}');
-          // print('Header length: ${state.headerList.length}');
         });
       } else {
         // Handle the case where "Status" is not true or data is missing
@@ -132,18 +115,13 @@ class _LoginPagesState extends State<LoginPages> {
       // Handle any exceptions here
       print('Error: ${e.toString()}');
     }
-    // finally {
-    //   setState(() {
-    //     isLoading = false;
-    //   });
-    // }
   }
 
   void loginHandler(
     BuildContext context,
     MenuState state,
   ) async {
-    // print("LoginHanlder");
+    print("LoginHanlder");
     // set laodng
 
     setState(() {
@@ -152,12 +130,15 @@ class _LoginPagesState extends State<LoginPages> {
     });
 
     try {
+      print('Start Login Process');
       List<DataLogin> listdatalogin = await DataLoginController.login(
-          idController.text, passwordController.text);
+        idController.text,
+        passwordController.text,
+      );
 
       if (listdatalogin.isNotEmpty &&
           listdatalogin[0].memo == "LOGIN BERHASIL") {
-        // Login was successful
+        // ~:Login succeed:~
         await DataLoginController.setIntoSharedPreferences(
           listdatalogin[0].userID,
           listdatalogin[0].entryLevelID,
@@ -166,6 +147,7 @@ class _LoginPagesState extends State<LoginPages> {
         );
 
         Auth.saveDataToSharedPreferences(listdatalogin[0].dataDT);
+        state.userCompanyAccList.addAll(listdatalogin[0].dataDT);
 
         canEntered = true;
 
@@ -185,7 +167,7 @@ class _LoginPagesState extends State<LoginPages> {
           if (context.mounted) context.replaceNamed(RoutesConstant.homepage);
         }
       } else {
-        // login failure
+        // ~:Login failed:~
         setState(() {
           canEntered = false;
           isloading = false;
@@ -193,40 +175,33 @@ class _LoginPagesState extends State<LoginPages> {
         });
 
         Fluttertoast.showToast(
-            msg: "Invalid Credential", // message
-            toastLength: Toast.LENGTH_LONG, // length
-            gravity: ToastGravity.CENTER, // location
-            webPosition: "center",
-            webBgColor: "linear-gradient(to right, #dc1c13, #dc1c13)",
-            timeInSecForIosWeb: 2 // duration
-            );
-      }
-
-      debugPrint('loginData: $listdatalogin');
-    } catch (error) {
-      Fluttertoast.showToast(
-          msg: "$error", // message
+          msg: "Invalid Credential", // message
           toastLength: Toast.LENGTH_LONG, // length
           gravity: ToastGravity.CENTER, // location
           webPosition: "center",
           webBgColor: "linear-gradient(to right, #dc1c13, #dc1c13)",
-          timeInSecForIosWeb: 2 // duration
-          );
+          timeInSecForIosWeb: 2, // duration
+        );
+      }
+
+      // debugPrint('loginData: $listdatalogin');
+    } catch (error) {
+      // ~:Error occured during login:~
+      Fluttertoast.showToast(
+        msg: "$error", // message
+        toastLength: Toast.LENGTH_LONG, // length
+        gravity: ToastGravity.CENTER, // location
+        webPosition: "center",
+        webBgColor: "linear-gradient(to right, #dc1c13, #dc1c13)",
+        timeInSecForIosWeb: 2, // duration
+      );
+
       setState(() {
         statuslogin = -1;
         isloading = false;
       });
 
-      Fluttertoast.showToast(
-          msg: "$error", // message
-          toastLength: Toast.LENGTH_LONG, // length
-          gravity: ToastGravity.CENTER, // location
-          webPosition: "center",
-          webBgColor: "linear-gradient(to right, #dc1c13, #dc1c13)",
-          timeInSecForIosWeb: 2 // duration
-          );
-
-      debugPrint('loginData: $error');
+      // debugPrint('loginData: $error');
     }
   }
 
@@ -239,166 +214,174 @@ class _LoginPagesState extends State<LoginPages> {
 
   @override
   Widget build(BuildContext context) {
-    /// login handler
-    // final loginModel = context.read<UserIDmodel>();
     final state = Provider.of<MenuState>(context);
 
     return Scaffold(
       body: Center(
-        child: SpGrid(alignment: WrapAlignment.center, children: [
-          SpGridItem(
-            xs: 12,
-            md: 4,
-            sm: 12,
-            lg: 4,
-            child: Container(
-              height: 550,
-              margin: const EdgeInsets.symmetric(horizontal: 30),
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.all(Radius.circular(15.0)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2), // Warna bayangan
-                    spreadRadius: 5, // Menyebar lebar bayangan
-                    blurRadius: 7, // Blur bayangan
-                    offset: Offset(0, 3), // Offset bayangan
-                  ),
-                ],
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.3,
+          height: MediaQuery.of(context).size.height * 0.7,
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(15),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.3), // Warna bayangan
+                spreadRadius: 3, // Menyebar lebar bayangan
+                blurRadius: 7, // Blur bayangan
               ),
-              padding: EdgeInsets.all(25),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Form(
-                      key: formKey,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(
-                            margin: EdgeInsets.only(bottom: 15),
-                            height: 100.0,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: AssetImage('assets/images/stsj.png'),
-                              ),
-                            ),
-                          ),
-                          // const Text(
-                          //   'UserID',
-                          //   style: TextStyle(
-                          //     fontSize: 16.0,
-                          //   ),
-                          // ),
-                          SizedBox(height: 5.0),
-                          TextFormField(
-                            controller: idController,
-                            autofocus: true,
-                            inputFormatters: [UppercaseTextInputFormatter()],
-                            decoration: InputDecoration(
-                              filled: true, //<-- SEE HERE
-                              fillColor: Colors.white70,
-                              labelText: "Username", //babel text
-                              hintText: 'Masukan username perusahaan',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                                borderSide: BorderSide(width: 0.5),
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter userid';
-                              }
-                              return null;
-                            },
-                          ),
-                          SizedBox(height: 15.0),
-                          // const Text(
-                          //   'Password',
-                          //   style: TextStyle(
-                          //     fontSize: 16.0,
-                          //   ),
-                          // ),
-                          SizedBox(height: 5.0),
-                          TextFormField(
-                            inputFormatters: [UppercaseTextInputFormatter()],
-                            controller: passwordController,
-                            obscureText: !_passwordVisible,
-                            decoration: InputDecoration(
-                              labelText: "Password", //babel text
-                              hintText: 'Masukan password perusahaan',
+            ],
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: MediaQuery.of(context).size.width * 0.015,
+            vertical: MediaQuery.of(context).size.height * 0.015,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.5,
+                child: Wrap(
+                  runAlignment: WrapAlignment.center,
+                  children: [
+                    // Company Logo
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.15,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('assets/images/stsj.png'),
+                        ),
+                      ),
+                    ),
 
-                              filled: true, //<-- SEE HERE
-                              fillColor: Colors.white70,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                                borderSide: BorderSide(width: 0.5),
-                              ),
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  // Based on passwordVisible state choose the icon
-                                  _passwordVisible
-                                      ? Icons.visibility
-                                      : Icons.visibility_off,
-                                  color: Theme.of(context).primaryColorDark,
+                    // User Text Fields
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.2,
+                      padding: EdgeInsets.only(
+                        top: MediaQuery.of(context).size.height * 0.01,
+                      ),
+                      child: Form(
+                        key: formKey,
+                        child: Column(
+                          children: <Widget>[
+                            // Username Text Field
+                            Expanded(
+                              child: TextFormField(
+                                textAlignVertical: TextAlignVertical.center,
+                                controller: idController,
+                                autofocus: true,
+                                inputFormatters: [
+                                  UppercaseTextInputFormatter()
+                                ],
+                                decoration: InputDecoration(
+                                  filled: true, //<-- SEE HERE
+                                  fillColor: Colors.white70,
+                                  labelText: "Username", //babel text
+                                  hintText: 'Masukan username perusahaan',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    borderSide: BorderSide(width: 0.5),
+                                  ),
                                 ),
-                                onPressed: () {
-                                  // Update the state i.e. toogle the state of passwordVisible variable
-                                  setState(() {
-                                    _passwordVisible = !_passwordVisible;
-                                  });
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter userid';
+                                  }
+                                  return null;
                                 },
                               ),
                             ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter password';
-                              }
 
-                              return null;
-                            },
-                          ),
-                          SizedBox(height: 20),
-                        ],
-                      ),
-                    ),
-                    AnimatedSwitcher(
-                      duration: Duration(
-                          milliseconds: 500), // Set the animation duration
-                      child: isloading
-                          ? FadeTransition(
-                              opacity: Tween<double>(begin: 0, end: 1)
-                                  .animate(CurvedAnimation(
-                                parent: AlwaysStoppedAnimation<double>(1),
-                                curve: Curves.easeInOut,
-                              )),
-                              child: CircularProgressIndicator(
-                                backgroundColor:
-                                    Color.fromARGB(255, 4, 101, 237),
-                                strokeWidth: 10,
-                              ),
-                            )
-                          : ElevatedButton(
-                              style: ButtonStyle(
-                                padding: WidgetStateProperty.all(
-                                  EdgeInsets.symmetric(
-                                    horizontal: 40,
-                                    vertical: 20,
+                            // Password Text Field
+                            Expanded(
+                              child: TextFormField(
+                                inputFormatters: [
+                                  UppercaseTextInputFormatter()
+                                ],
+                                controller: passwordController,
+                                obscureText: !_passwordVisible,
+                                decoration: InputDecoration(
+                                  labelText: "Password", //babel text
+                                  hintText: 'Masukan password perusahaan',
+
+                                  filled: true, //<-- SEE HERE
+                                  fillColor: Colors.white70,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    borderSide: BorderSide(width: 0.5),
+                                  ),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      // Based on passwordVisible state choose the icon
+                                      _passwordVisible
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                      color: Theme.of(context).primaryColorDark,
+                                    ),
+                                    onPressed: () {
+                                      // Update the state i.e. toogle the state of passwordVisible variable
+                                      setState(() {
+                                        _passwordVisible = !_passwordVisible;
+                                      });
+                                    },
                                   ),
                                 ),
-                                backgroundColor: WidgetStateProperty.all(
-                                  Theme.of(context).primaryColorLight,
-                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter password';
+                                  }
+
+                                  return null;
+                                },
                               ),
-                              onPressed: () {
-                                if (formKey.currentState!.validate()) {
-                                  formKey.currentState!.save();
-                                  loginHandler(context, state);
-                                }
-                              },
-                              child: Row(
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // Login Button
+                    ElevatedButton(
+                      style: ButtonStyle(
+                        padding: WidgetStateProperty.all(
+                          EdgeInsets.symmetric(
+                            horizontal:
+                                MediaQuery.of(context).size.width * 0.05,
+                            vertical:
+                                MediaQuery.of(context).size.height * 0.025,
+                          ),
+                        ),
+                        backgroundColor: WidgetStateProperty.all(
+                          Theme.of(context).primaryColorLight,
+                        ),
+                      ),
+                      onPressed: () {
+                        if (formKey.currentState!.validate()) {
+                          formKey.currentState!.save();
+                          loginHandler(context, state);
+                        }
+                      },
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        child: Builder(
+                          builder: (context) {
+                            if (isloading) {
+                              return Center(
+                                heightFactor: 1,
+                                widthFactor: 1,
+                                child: SizedBox(
+                                  width: 25,
+                                  height: 25,
+                                  child: CircularProgressIndicator(
+                                    backgroundColor:
+                                        Color.fromARGB(255, 4, 101, 237),
+                                    strokeWidth: 5,
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: const [
                                   Icon(Icons.login, color: Colors.black),
@@ -410,32 +393,29 @@ class _LoginPagesState extends State<LoginPages> {
                                     style: TextStyle(color: Colors.black),
                                   )
                                 ],
-                              ),
-                            ),
+                              );
+                            }
+                          },
+                        ),
+                      ),
                     ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height * 0.095,
-                      child: Center(
-                          child: Text(
-                        statuslogin == 0
-                            ? ""
-                            : statuslogin == 1
-                                ? "Loading..."
-                                : "",
-                        style: TextStyle(
-                            fontFamily: "fontdashboard",
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blueGrey,
-                            fontSize: 14),
-                      )),
-                    )
                   ],
                 ),
               ),
-            ),
-          )
-        ]),
+
+              // ~:Website Version:~
+              Container(
+                width: MediaQuery.of(context).size.width,
+                height: 25,
+                alignment: Alignment.center,
+                child: Text(
+                  'v1.0.1',
+                  style: GlobalFont.mediumbigfontR,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

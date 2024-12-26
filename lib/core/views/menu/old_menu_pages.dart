@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:stsj/core/providers/Provider.dart';
 import 'package:stsj/core/views/components/dashboard_menu.dart';
 import 'package:stsj/core/views/components/activity_menu.dart';
-import 'package:stsj/global/widget/static_menu_dropdown.dart';
+import 'package:stsj/global/widget/dropdown/static_menu_dropdown.dart';
 import 'package:stsj/router/router_const.dart';
 import 'package:stsj/global/widget/app_bar.dart';
 

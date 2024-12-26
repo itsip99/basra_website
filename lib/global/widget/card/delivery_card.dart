@@ -5,361 +5,61 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stsj/core/models/Dashboard/delivery.dart';
-import 'package:stsj/core/models/Dashboard/delivery_memo.dart';
 import 'package:stsj/core/providers/Provider.dart';
-import 'package:stsj/global/datagrid_table.dart';
 import 'package:stsj/global/font.dart';
-import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+import 'package:stsj/global/function.dart';
 
 class DeliveryCard extends StatefulWidget {
   const DeliveryCard(
     this.deliveryDetails, {
+    this.destinationTime = '',
     super.key,
   });
 
   final CheckListDetailsModel deliveryDetails;
+  final String destinationTime;
 
   @override
   State<DeliveryCard> createState() => _DeliveryCardState();
 }
 
 class _DeliveryCardState extends State<DeliveryCard> {
-  // ~:Image Preview Function:~
-  void viewImage(
-    BuildContext parentContext,
-    MenuState state,
-    String activityNumber,
-    String shippingNumber,
-    double shopLat,
-    double shopLng,
-    // String img,
-    double deliveryLat,
-    double deliveryLng,
-  ) async {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (context) => FutureBuilder<String>(
-        future: state.fetchDeliveryHDImage(
-          'DETAIL',
-          activityNumber,
-          shippingNumber,
-        ),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Align(
-              alignment: Alignment.topCenter,
-              child: LinearProgressIndicator(
-                minHeight: 5.0,
-                color: Colors.black,
-              ),
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
-          } else if (!snapshot.hasData) {
-            return Center(
-              child: Text('Data not found'),
-            );
-          } else {
-            return Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              backgroundColor: Colors.blue.shade50,
-              elevation: 16,
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.35,
-                height: MediaQuery.of(context).size.height * 0.9,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                padding: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width * 0.0175,
-                  vertical: MediaQuery.of(context).size.height * 0.025,
-                ),
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(15.0),
-                          topRight: Radius.circular(15.0),
-                        ),
-                        child: Image.memory(
-                          base64Decode(snapshot.data!),
-                          fit: BoxFit.cover,
-                          width: MediaQuery.of(context).size.width * 0.325,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.01,
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(15.0),
-                          bottomRight: Radius.circular(15.0),
-                        ),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: MediaQuery.of(context).size.width * 0.01,
-                        vertical: MediaQuery.of(context).size.height * 0.01,
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(child: Text('Koordinat toko')),
-                              Expanded(
-                                flex: 2,
-                                child: Text(
-                                  '${shopLat.toString()}, ${shopLng.toString()}',
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Expanded(child: Text('Koordinat pengiriman')),
-                              Expanded(
-                                flex: 2,
-                                child: Text(
-                                  '${deliveryLat.toString()}, ${deliveryLng.toString()}',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-        },
-      ),
+  // ~:Calculate Time Difference between 2 set of time:~
+  String timeDiffCalculation(String time1, String time2) {
+    final now = DateTime.now();
+    final year = now.year;
+    final month = now.month;
+    final day = now.day;
+
+    DateTime dateTime1 = DateTime(
+      year,
+      month,
+      day,
+      int.parse(time1.split(':')[0]),
+      int.parse(time1.split(':')[1]),
     );
-  }
 
-  // ~:Delivery Memo:~
-  void viewMemo(MenuState state) {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        backgroundColor: Colors.blue.shade50,
-        elevation: 16,
-        child: Container(
-          // width: MediaQuery.of(context).size.width * 0.35,
-          height: MediaQuery.of(context).size.height * 0.9,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(15.0),
-          ),
-          padding: EdgeInsets.symmetric(
-            horizontal: MediaQuery.of(context).size.width * 0.0125,
-            vertical: MediaQuery.of(context).size.height * 0.025,
-          ),
-          child: FutureBuilder(
-            future: state.fetchDeliveryMemo(
-              state.getBranchId,
-              state.getShopId,
-              widget.deliveryDetails.transNumber,
-            ),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CircularProgressIndicator(color: Colors.black),
-                      SizedBox(height: 10),
-                      Text(
-                        'Loading...',
-                        style: GlobalFont.bigfontR,
-                      ),
-                    ],
-                  ),
-                );
-              } else if (snapshot.hasError) {
-                return Center(
-                  child: Text('terjadi kesalahan, mohon coba lagi.'),
-                );
-              } else if (!snapshot.hasData) {
-                return Center(child: Text('Data tidak ditemukan'));
-              } else {
-                final List<DeliveryMemoModel> memos = snapshot.data![0];
-                final String status = snapshot.data![1];
-
-                if (status == 'failed') {
-                  return Center(child: Text('Gagal memuat data.'));
-                } else if (status == 'not found' || status == 'error') {
-                  return Center(
-                    child: Text('terjadi kesalahan, mohon coba lagi.'),
-                  );
-                } else {
-                  // return Column(
-                  //   children: memos.map((e) {
-                  //     DeliveryMemoModel memo = e;
-                  //
-                  //     return Text(
-                  //       '${memo.transNumber}, ${memo.transDate}, ${memo.casing.length}',
-                  //     );
-                  //   }).toList(),
-                  // );
-
-                  return SfDataGrid(
-                    source: DeliveryDataSource(deliveryData: memos),
-                    columnWidthMode: ColumnWidthMode.fill,
-                    checkboxShape: RoundedRectangleBorder(
-                      side: BorderSide(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(15.0),
-                    ),
-                    columns: <GridColumn>[
-                      GridColumn(
-                        columnName: 'transId',
-                        width: MediaQuery.of(context).size.width * 0.1,
-                        label: Container(
-                          padding: EdgeInsets.all(16.0),
-                          alignment: Alignment.center,
-                          child: Text('ID Transaksi'),
-                        ),
-                      ),
-                      GridColumn(
-                        columnName: 'date',
-                        width: MediaQuery.of(context).size.width * 0.075,
-                        label: Container(
-                          padding: EdgeInsets.all(8.0),
-                          alignment: Alignment.center,
-                          child: Text('Tanggal'),
-                        ),
-                      ),
-                      GridColumn(
-                        columnName: 'duNumber',
-                        width: MediaQuery.of(context).size.width * 0.075,
-                        label: Container(
-                          padding: EdgeInsets.all(8.0),
-                          alignment: Alignment.center,
-                          child: Text(
-                            'Nomor DU',
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                      GridColumn(
-                        columnName: 'casingNo',
-                        width: MediaQuery.of(context).size.width * 0.1,
-                        label: Container(
-                          padding: EdgeInsets.all(8.0),
-                          alignment: Alignment.center,
-                          child: Text(
-                            'ID Casing',
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                      GridColumn(
-                        columnName: 'koli',
-                        width: MediaQuery.of(context).size.width * 0.05,
-                        label: Container(
-                          padding: EdgeInsets.all(8.0),
-                          alignment: Alignment.center,
-                          child: Text(
-                            'Koli',
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                      GridColumn(
-                        columnName: 'caseQty',
-                        width: MediaQuery.of(context).size.width * 0.075,
-                        label: Container(
-                          padding: EdgeInsets.all(8.0),
-                          alignment: Alignment.center,
-                          child: Text(
-                            'Jumlah Casing',
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                      GridColumn(
-                        columnName: 'unitId',
-                        width: MediaQuery.of(context).size.width * 0.145,
-                        label: Container(
-                          padding: EdgeInsets.all(8.0),
-                          alignment: Alignment.center,
-                          child: Text(
-                            'ID Unit',
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                      GridColumn(
-                        columnName: 'itemName',
-                        label: Container(
-                          padding: EdgeInsets.all(8.0),
-                          alignment: Alignment.center,
-                          child: Text(
-                            'Nama Barang',
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                      GridColumn(
-                        columnName: 'itemQty',
-                        width: MediaQuery.of(context).size.width * 0.1,
-                        label: Container(
-                          padding: EdgeInsets.all(8.0),
-                          alignment: Alignment.center,
-                          child: Text(
-                            'Jumlah Barang',
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                    ],
-                    stackedHeaderRows: [
-                      StackedHeaderRow(
-                        cells: [
-                          StackedHeaderCell(
-                            columnNames: ['casingNo', 'koli', 'caseQty'],
-                            child: Center(
-                              child: Text(
-                                'Casing',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                          StackedHeaderCell(
-                            columnNames: ['unitId', 'itemName', 'itemQty'],
-                            child: Center(
-                              child: Text(
-                                'Keterangan Casing',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  );
-                }
-              }
-            },
-          ),
-        ),
-      ),
+    DateTime dateTime2 = DateTime(
+      year,
+      month,
+      day,
+      int.parse(time2.split(':')[0]),
+      int.parse(time2.split(':')[1]),
     );
+
+    // Calculate the difference as a Duration
+    Duration diff = dateTime2.difference(dateTime1);
+
+    // Get the absolute values for hours and minutes
+    int hoursDifference = diff.inHours.abs();
+    int minutesDifference = diff.inMinutes.abs() % 60;
+
+    // Format the result as a string
+    if (hoursDifference == 0) {
+      return '$minutesDifference menit';
+    } else {
+      return '$hoursDifference jam, $minutesDifference menit';
+    }
   }
 
   @override
@@ -518,19 +218,22 @@ class _DeliveryCardState extends State<DeliveryCard> {
                                         right: 5.0,
                                         bottom: 5.0,
                                         child: InkWell(
-                                          onTap: () => viewImage(
+                                          onTap: () => GlobalFunction.viewImage(
                                             context,
                                             menuState,
+                                            'DETAIL',
                                             menuState.getDeliveryList.isNotEmpty
                                                 ? menuState.getDeliveryList[0]
                                                     .activityNumber
                                                 : '',
                                             widget.deliveryDetails.transNumber,
-                                            widget.deliveryDetails.lat,
-                                            widget.deliveryDetails.lng,
+                                            shopLat: widget.deliveryDetails.lat,
+                                            shopLng: widget.deliveryDetails.lng,
                                             // deliveryDetails.deliveryImageThumb,
-                                            widget.deliveryDetails.deliveryLat,
-                                            widget.deliveryDetails.deliveryLng,
+                                            deliveryLat: widget
+                                                .deliveryDetails.deliveryLat,
+                                            deliveryLng: widget
+                                                .deliveryDetails.deliveryLng,
                                           ),
                                           child: Icon(
                                             Icons.fullscreen_rounded,
@@ -571,6 +274,8 @@ class _DeliveryCardState extends State<DeliveryCard> {
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Expanded(child: Text('ID pengiriman')),
                                         SizedBox(width: 5.0),
@@ -597,6 +302,8 @@ class _DeliveryCardState extends State<DeliveryCard> {
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Expanded(child: Text('ID pelanggan')),
                                         SizedBox(width: 5.0),
@@ -623,6 +330,8 @@ class _DeliveryCardState extends State<DeliveryCard> {
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Expanded(child: Text('Pukul')),
                                         SizedBox(width: 5.0),
@@ -647,8 +356,43 @@ class _DeliveryCardState extends State<DeliveryCard> {
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Expanded(child: Text('Note')),
+                                        Expanded(
+                                          child: Text('Durasi'),
+                                        ),
+                                        SizedBox(width: 5.0),
+                                        Expanded(
+                                          flex: 2,
+                                          child: Builder(
+                                            builder: (context) {
+                                              if (widget
+                                                  .destinationTime.isNotEmpty) {
+                                                return Text(
+                                                  timeDiffCalculation(
+                                                    widget.deliveryDetails
+                                                        .deliveryTime,
+                                                    widget.destinationTime,
+                                                  ),
+                                                );
+                                              } else {
+                                                return Text('-');
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Expanded(
+                                          child: Text('Note'),
+                                        ),
                                         SizedBox(width: 5.0),
                                         Expanded(
                                           flex: 2,
@@ -731,8 +475,12 @@ class _DeliveryCardState extends State<DeliveryCard> {
                 // ~:Delivery Details:~
                 Align(
                   alignment: Alignment.centerRight,
-                  child: GestureDetector(
-                    onTap: () => viewMemo(menuState),
+                  child: InkWell(
+                    onTap: () => GlobalFunction.viewMemo(
+                      context,
+                      menuState,
+                      widget.deliveryDetails.transNumber,
+                    ),
                     child: Text(
                       'Lihat Detail Pengiriman',
                       style: GlobalFont.mediumbigfontRBoldBlue,

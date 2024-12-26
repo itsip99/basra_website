@@ -67,7 +67,7 @@ dependencies:
   get: ^4.6.6
   scrollable_positioned_list: ^0.3.8
   flutter_spinkit: ^5.2.1
-  flutter_map: ^6.2.1
+  flutter_map: ^7.0.2
   latlong2: ^0.9.1
   # carousel_slider: ^4.2.1
   flutter_carousel_widget: ^3.1.0
@@ -75,7 +75,7 @@ dependencies:
   photo_view: ^0.15.0
   flutter_slidable: ^3.1.0
   info_popup: ^4.3.1
-  flutter_map_cancellable_tile_provider: ^2.0.0
+  flutter_map_cancellable_tile_provider: ^3.0.2
   syncfusion_flutter_datagrid: ^23.2.7
 
 dev_dependencies:

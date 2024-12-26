@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stsj/core/providers/Provider.dart';
 import 'package:stsj/core/models/AuthModel/Auth_Model.dart';
+import 'package:stsj/global/function.dart';
 import 'package:stsj/router/router_const.dart';
 
 class HomeMenuComponent extends HookWidget {
@@ -24,7 +25,7 @@ class HomeMenuComponent extends HookWidget {
 
     final loadingmenu = useState(true);
 
-    void fetchDataDT() async {
+    Future<void> fetchDataDT() async {
       try {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         print('fetchDataDT');
@@ -40,13 +41,13 @@ class HomeMenuComponent extends HookWidget {
         loadingmenu.value = false;
       } catch (e) {
         Fluttertoast.showToast(
-            msg: "Terjadi Kesalahan $e", // message
-            toastLength: Toast.LENGTH_LONG, // length
-            gravity: ToastGravity.CENTER, // location
-            webPosition: "center",
-            webBgColor: "linear-gradient(to right, #dc1c13, #dc1c13)",
-            timeInSecForIosWeb: 2 // duration
-            );
+          msg: "Terjadi Kesalahan $e", // message
+          toastLength: Toast.LENGTH_LONG, // length
+          gravity: ToastGravity.CENTER, // location
+          webPosition: "center",
+          webBgColor: "linear-gradient(to right, #dc1c13, #dc1c13)",
+          timeInSecForIosWeb: 2, // duration
+        );
       }
     }
 
@@ -66,10 +67,14 @@ class HomeMenuComponent extends HookWidget {
     // const double height = 10;
     final homeMenuState = Provider.of<MenuState>(context);
 
-    return Center(
-      child: loadingmenu.value
-          ? CircularProgressIndicator()
-          : Wrap(
+    return FutureBuilder(
+      future: fetchDataDT(),
+      builder: (context, _) {
+        if (loadingmenu.value) {
+          return CircularProgressIndicator();
+        } else {
+          return SingleChildScrollView(
+            child: Wrap(
               runSpacing: 30,
               // Atur jarak antara menu ikon di sini
 
@@ -140,7 +145,91 @@ class HomeMenuComponent extends HookWidget {
                 ),
               ],
             ),
+          );
+        }
+      },
     );
+  }
+
+  void permissionCheck(
+    BuildContext context,
+    PtModel loginpt,
+    MenuState state,
+    String route,
+    String companyName,
+  ) async {
+    state.setStaticMenuNotifier('');
+    loginpt.setPT(companyName);
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('CompanyName', companyName);
+    print('Company Name: ${prefs.getString('CompanyName')}');
+    for (var data in state.getUserCompanyAccList) {
+      print('${data.pt} - $companyName');
+      if (data.pt == companyName) {
+        state.entryLevelId = data.accessId;
+        prefs.setString('EntryLevelID', data.accessId);
+        prefs.setString('EntryLevelName', data.accessName);
+        prefs.setString('CompanyName', companyName);
+      }
+    }
+
+    state.entryLevelId = prefs.getString('EntryLevelID') ?? '';
+    state.entryLevelName = prefs.getString('EntryLevelName') ?? '';
+    state.companyName = prefs.getString('CompanyName') ?? '';
+
+    state
+        .fetchUserAccess(companyName, state.getEntryLevelId)
+        .then((access) async {
+      if (access.isNotEmpty) {
+        state.userAccessList.addAll(access);
+
+        // Note --> disable for a while to display dashboard menu as the initial page
+        // Delivery Page is still considered as global page who can be accessed by all users
+        String category = access.first.category;
+        if (category == 'DASHBOARD') {
+          state.setStaticMenuNotifier('dashboard');
+        } else if (category == 'SALES ACTIVITY') {
+          state.setStaticMenuNotifier('activity');
+        } else if (category == 'AUTHORIZATION') {
+          state.setStaticMenuNotifier('authorization');
+        } else if (category == 'INFORMATION') {
+          state.setStaticMenuNotifier('report');
+        } else if (category == 'TOOLS') {
+          state.setStaticMenuNotifier('tools');
+        } else {
+          state.setStaticMenuNotifier('');
+        }
+
+        state.headerList.clear();
+        state.headerList.addAll(access.map((e) => e.category).toSet().toList());
+        // print('Header list length: ${state.headerList.length}');
+        if (state.headerList.isEmpty) {
+          state.headerList.add('dashboard');
+        }
+        await prefs.setStringList('header', state.headerList);
+
+        state.headerStateList.addAll(access.map((e) {
+          if (e.isAllow == 1) {
+            return true;
+          } else {
+            return false;
+          }
+        }).toList());
+
+        state.subHeaderList.clear();
+        state.subHeaderList.addAll(access.map((e) => e.menuNumber).toList());
+        await prefs.setStringList('subheader', state.subHeaderList);
+
+        if (context.mounted) context.goNamed(route);
+      } else {
+        if (context.mounted) {
+          GlobalFunction.showSnackbar(
+            context,
+            'Menu belum tersedia.',
+          );
+        }
+      }
+    });
   }
 
   Widget _buildMenuIcon(
@@ -169,6 +258,7 @@ class HomeMenuComponent extends HookWidget {
         valueListenable: isHovered,
         builder: (context, hovered, child) {
           final loginpt = context.read<PtModel>();
+          final menuState = context.read<MenuState>();
 
           return SizedBox(
             width: 200,
@@ -187,11 +277,13 @@ class HomeMenuComponent extends HookWidget {
                         imagePath,
                       ),
                       // tooltip: tooltip,
-                      onPressed: () {
-                        context.goNamed(route);
-                        state.setStaticMenuNotifier('');
-                        loginpt.setPT(tooltip);
-                      },
+                      onPressed: () => permissionCheck(
+                        context,
+                        loginpt,
+                        menuState,
+                        route,
+                        tooltip,
+                      ),
                     ),
                   ),
                 ),

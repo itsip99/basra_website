@@ -33,7 +33,7 @@ class ReportMenuComponent extends HookWidget {
                           'Report',
                           RoutesConstant.report,
                         ),
-                        const Text('Report')
+                        const Text('Report'),
                       ],
                     ),
                   );
@@ -42,6 +42,103 @@ class ReportMenuComponent extends HookWidget {
                 }
               },
             ),
+
+            // Absent Report
+            Builder(
+              builder: (context) {
+                if (state.getSubHeaderList.contains('304')) {
+                  return Container(
+                    margin: EdgeInsets.only(right: 50.0),
+                    child: Column(
+                      children: [
+                        _buildMenuIcon(
+                          context,
+                          'assets/images/img_dailytask.png',
+                          'Report',
+                          RoutesConstant.absentHistory,
+                        ),
+                        const Text('Riwayat Absensi'),
+                      ],
+                    ),
+                  );
+                } else {
+                  return const SizedBox();
+                }
+              },
+            ),
+
+            // Coming Soon
+            // // Bikes History
+            // Builder(
+            //   builder: (context) {
+            //     if (state.getSubHeaderList.contains('301')) {
+            //       return Container(
+            //         margin: EdgeInsets.only(right: 50.0),
+            //         child: Column(
+            //           children: [
+            //             _buildMenuIcon(
+            //               context,
+            //               'assets/images/progress-report.png',
+            //               'Report',
+            //               RoutesConstant.bikesHistory,
+            //             ),
+            //             const Text('Bikes History'),
+            //           ],
+            //         ),
+            //       );
+            //     } else {
+            //       return const SizedBox();
+            //     }
+            //   },
+            // ),
+            //
+            // // Service History
+            // Builder(
+            //   builder: (context) {
+            //     if (state.getSubHeaderList.contains('302')) {
+            //       return Container(
+            //         margin: EdgeInsets.only(right: 50.0),
+            //         child: Column(
+            //           children: [
+            //             _buildMenuIcon(
+            //               context,
+            //               'assets/images/progress-report.png',
+            //               'Report',
+            //               RoutesConstant.serviceHistory,
+            //             ),
+            //             const Text('Service History'),
+            //           ],
+            //         ),
+            //       );
+            //     } else {
+            //       return const SizedBox();
+            //     }
+            //   },
+            // ),
+            //
+            // // MDS Sparepart Stock
+            // Builder(
+            //   builder: (context) {
+            //     if (state.getSubHeaderList.contains('303')) {
+            //       return Container(
+            //         margin: EdgeInsets.only(right: 50.0),
+            //         child: Column(
+            //           children: [
+            //             _buildMenuIcon(
+            //               context,
+            //               'assets/images/progress-report.png',
+            //               'Report',
+            //               RoutesConstant.mdsSparepartStock,
+            //             ),
+            //             const Text('MDS Sparepart Stock'),
+            //           ],
+            //         ),
+            //       );
+            //     } else {
+            //       return const SizedBox();
+            //     }
+            //   },
+            // ),
           ],
         ),
       ),

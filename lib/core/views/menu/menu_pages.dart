@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stsj/core/providers/Provider.dart';
 import 'package:stsj/core/views/components/authorization_menu.dart';
 import 'package:stsj/core/views/components/dashboard_menu.dart';
@@ -365,7 +366,7 @@ class _MenuPagesState extends State<MenuPages>
                                       ),
                                     ),
                                     child: Text(
-                                      'Report',
+                                      'Information',
                                       style:
                                           GlobalFont.mediumgiantfontRBoldWhite,
                                     ),
@@ -396,7 +397,7 @@ class _MenuPagesState extends State<MenuPages>
                                       ),
                                     ),
                                     child: Text(
-                                      'Report',
+                                      'Information',
                                       style:
                                           GlobalFont.mediumgiantfontRBoldWhite,
                                     ),
@@ -1029,6 +1030,11 @@ class _MenuPagesState extends State<MenuPages>
     );
   }
 
+  void getCompany() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    print('Company Name: ${prefs.getString('CompanyName') ?? ''}');
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -1036,10 +1042,14 @@ class _MenuPagesState extends State<MenuPages>
 
     Provider.of<MenuState>(context, listen: false).loadHeader();
     Provider.of<MenuState>(context, listen: false).loadSubHeader();
+    getCompany();
   }
 
   @override
   Widget build(BuildContext context) {
+    // final companyState = Provider.of<PtModel>(context);
+    // final menuState = Provider.of<MenuState>(context);
+
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth >= 1024) {

@@ -69,8 +69,8 @@ class STUBYAreaController {
         for (int day = startDay; day <= endDay; day++) {
           tanggalapi += "$day,";
         }
-        bulan = "${startDate?.month}" ?? "${monthNow}";
-        tahun = "${startDate?.year}" ?? "${YearNow}";
+        bulan = "${startDate?.month}" ?? "$monthNow";
+        tahun = "${startDate?.year}" ?? "$YearNow";
       }
     } else {
       List<int> hariList = selectedDates['hari'];
@@ -87,8 +87,8 @@ class STUBYAreaController {
       for (int day = DayNow; DayNow <= DayNow; day++) {
         tanggalapi += "$day,";
       }
-      bulan = "${monthNow}";
-      tahun = "${YearNow}";
+      bulan = "$monthNow";
+      tahun = "$YearNow";
     }
 
     for (var i = 0; i <= KategoriFilter.length - 1; i++) {
@@ -201,8 +201,8 @@ class STUBYAreaController {
         for (int day = startDay; day <= endDay; day++) {
           tanggalapi += "$day,";
         }
-        bulan = "${startDate?.month}" ?? "${monthNow}";
-        tahun = "${startDate?.year}" ?? "${YearNow}";
+        bulan = "${startDate.month}" ?? "$monthNow";
+        tahun = "${startDate?.year}" ?? "$YearNow";
       }
     } else {
       List<int> hariList = selectedDates['hari'];

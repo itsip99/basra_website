@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stsj/core/controller/Login_controller.dart';
 import 'package:stsj/core/providers/Provider.dart';
+import 'package:stsj/global/font.dart';
 import 'package:stsj/global/globalVar.dart';
 import 'package:stsj/router/router_const.dart';
 
@@ -43,6 +45,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
     // final loginModel = context.read<LoginModel>();
 
     final router = GoRouterState.of(context).name;
+    final state = Provider.of<MenuState>(context);
 
     if (widget.isRoutes) {
       return AppBar(
@@ -56,6 +59,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
                       size: widget.returnButtonSize,
                     ), // Icon panah kembali
                     onPressed: () {
+                      if (router == RoutesConstant.absentHistory) {
+                        state.resetAbsentHistory();
+                      }
+
                       context.goNamed(widget.goBack!);
                     },
                   )
@@ -65,20 +72,29 @@ class _CustomAppBarState extends State<CustomAppBar> {
           width: widget.imageSize,
         ),
         actions: [
-          Text(
-            GlobalVar.username,
-            style: TextStyle(fontWeight: FontWeight.bold),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                GlobalVar.username,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Text(
+                'v1.0.1',
+                style: GlobalFont.smallfontR,
+              ),
+            ],
           ),
-          SizedBox(
-            width: 10,
-          ),
+          SizedBox(width: 10),
           Container(
             margin: EdgeInsets.only(right: 5),
             child: Stack(
               children: [
                 CircleAvatar(
                   backgroundImage: NetworkImage(
-                      'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg'), // Gambar profil
+                    'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg',
+                  ), // Profile Picture
                   radius: widget.profileRadius,
                 ),
                 Positioned(
@@ -95,10 +111,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
                     },
                     itemBuilder: (BuildContext context) =>
                         <PopupMenuEntry<String>>[
-                      // PopupMenuItem<String>(
-                      //     value: 'settings',
-                      //     child: Text(entryLevelName ?? ''),
-                      //     onTap: () => ()),
                       PopupMenuItem<String>(
                           value: 'logout',
                           child: Text('Logout'),
@@ -114,14 +126,14 @@ class _CustomAppBarState extends State<CustomAppBar> {
                             context.go(RoutesConstant.login);
 
                             Fluttertoast.showToast(
-                                msg: "Anda telah Logout", // message
-                                toastLength: Toast.LENGTH_LONG, // length
-                                gravity: ToastGravity.CENTER, // location
-                                webPosition: "center",
-                                webBgColor:
-                                    "linear-gradient(to right, #00FF00, #00FF00)",
-                                timeInSecForIosWeb: 2 // duration
-                                );
+                              msg: "Anda telah Logout", // message
+                              toastLength: Toast.LENGTH_LONG, // length
+                              gravity: ToastGravity.CENTER, // location
+                              webPosition: "center",
+                              webBgColor:
+                                  "linear-gradient(to right, #00FF00, #00FF00)",
+                              timeInSecForIosWeb: 2, // duration
+                            );
                           }),
                     ],
                   ),
@@ -147,20 +159,29 @@ class _CustomAppBarState extends State<CustomAppBar> {
           width: widget.imageSize,
         ),
         actions: [
-          Text(
-            GlobalVar.username,
-            style: TextStyle(fontWeight: FontWeight.bold),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                GlobalVar.username,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Text(
+                'v1.0.1',
+                style: GlobalFont.smallfontR,
+              ),
+            ],
           ),
-          SizedBox(
-            width: 10,
-          ),
+          SizedBox(width: 10),
           Container(
             margin: EdgeInsets.only(right: 5),
             child: Stack(
               children: [
                 CircleAvatar(
                   backgroundImage: NetworkImage(
-                      'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg'), // Gambar profil
+                    'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg',
+                  ), // Profile Picture
                   radius: widget.profileRadius,
                 ),
                 Positioned(
@@ -182,25 +203,26 @@ class _CustomAppBarState extends State<CustomAppBar> {
                       //     child: Text(entryLevelName ?? ''),
                       //     onTap: () => ()),
                       PopupMenuItem<String>(
-                          value: 'logout',
-                          child: Text('Logout'),
-                          onTap: () {
-                            DataLoginController.removeDataUser();
+                        value: 'logout',
+                        child: Text('Logout'),
+                        onTap: () {
+                          DataLoginController.removeDataUser();
 
-                            // loginModel.setLogin(false);
+                          // loginModel.setLogin(false);
 
-                            context.go(RoutesConstant.login);
+                          context.go(RoutesConstant.login);
 
-                            Fluttertoast.showToast(
-                                msg: "Anda telah Logout", // message
-                                toastLength: Toast.LENGTH_LONG, // length
-                                gravity: ToastGravity.CENTER, // location
-                                webPosition: "center",
-                                webBgColor:
-                                    "linear-gradient(to right, #00FF00, #00FF00)",
-                                timeInSecForIosWeb: 2 // duration
-                                );
-                          }),
+                          Fluttertoast.showToast(
+                            msg: "Anda telah Logout", // message
+                            toastLength: Toast.LENGTH_LONG, // length
+                            gravity: ToastGravity.CENTER, // location
+                            webPosition: "center",
+                            webBgColor:
+                                "linear-gradient(to right, #00FF00, #00FF00)",
+                            timeInSecForIosWeb: 2, // duration
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ),

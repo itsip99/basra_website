@@ -20,12 +20,14 @@ import 'package:stsj/core/models/Activities/salesman.dart';
 import 'package:stsj/core/models/Activities/salesman_activities.dart';
 import 'package:stsj/core/models/Activities/weekly_report.dart';
 import 'package:stsj/core/models/Activities/weekly_report_type.dart';
+import 'package:stsj/core/models/AuthModel/DataAuth.dart';
 import 'package:stsj/core/models/AuthModel/user_access.dart';
 import 'package:stsj/core/models/Dashboard/branch_shop.dart';
 import 'package:stsj/core/models/Dashboard/delivery.dart';
 import 'package:stsj/core/models/Dashboard/delivery_memo.dart';
 import 'package:stsj/core/models/Dashboard/delivery_history.dart';
 import 'package:stsj/core/models/Dashboard/driver.dart';
+import 'package:stsj/core/models/Report/absent_history.dart';
 import 'package:stsj/global/api.dart';
 import 'package:stsj/router/router_const.dart';
 
@@ -105,6 +107,9 @@ class MenuState with ChangeNotifier {
   String shopId = '';
   String get getShopId => shopId;
 
+  List<DataDT> userCompanyAccList = [];
+  List<DataDT> get getUserCompanyAccList => userCompanyAccList;
+
   // ================================================================
   // ======================== User Access ===========================
   // ================================================================
@@ -138,6 +143,9 @@ class MenuState with ChangeNotifier {
     String companyName,
     String entryLevelId,
   ) async {
+    print('Company Name: $companyName');
+    print('Entry Level ID: $entryLevelId');
+
     List<ModelUserAccess> temp = [];
     temp.addAll(await GlobalAPI.fetchUserAccess(
       companyName,
@@ -175,7 +183,7 @@ class MenuState with ChangeNotifier {
 
   List<ModelDriver> get getDriverList => driverList;
 
-  Future<void> loadBranches() async {
+  Future<void> loadSisBranches() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     log('Branch Name List (before): ${getBranchNameList.length}');
     if (branchNameList.isNotEmpty) {
@@ -188,16 +196,16 @@ class MenuState with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchBranches() async {
+  Future<void> fetchSISBranches() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('UserID') ?? '';
     final companyId = prefs.getString('CompanyName') ?? '';
 
-    print('User ID: $userId');
-    print('Company ID: $companyId');
+    // print('User ID: $userId');
+    // print('Company ID: $companyId');
 
     branchShopList.clear();
-    branchShopList.addAll(await GlobalAPI.getBranchShop(userId, companyId));
+    branchShopList.addAll(await GlobalAPI.getSISBranchShop(userId, companyId));
 
     if (prefs.getStringList('branches') == null) {
       await prefs.setStringList(
@@ -207,30 +215,19 @@ class MenuState with ChangeNotifier {
     }
   }
 
-  // Future<void> loadDrivers() async {
-  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  //
-  //   branchShopList.clear();
-  //   branchShopList.addAll(prefs.getStringList('branches') ?? []);
-  //   print('Branch Shop List: ${branchShopList.length}');
-  //   notifyListeners();
-  //
-  //   print('Load Branches: ${branchShopList.length}');
-  // }
-
-  Future<void> fetchDriver() async {
+  Future<void> fetchSISDriver() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final companyId = prefs.getString('CompanyName') ?? '';
 
-    print('Company ID: $companyId');
+    // print('Company ID: $companyId');
 
     driverList = [];
-    driverList.addAll(await GlobalAPI.getDrivers(companyId));
-    print('Driver List: ${driverList.length}');
+    driverList.addAll(await GlobalAPI.getSISDrivers(companyId));
+    // print('Driver List: ${driverList.length}');
 
     filteredDriverList = [];
     filteredDriverList.addAll(driverList);
-    print('Filtered Driver List: ${filteredDriverList.length}');
+    // print('Filtered Driver List: ${filteredDriverList.length}');
   }
 
   List<ModelDriver> filteredDriverList = [];
@@ -239,17 +236,17 @@ class MenuState with ChangeNotifier {
 
   Future<void> filterDriver(String selectedBranch) async {
     if (branchShopList.isEmpty) {
-      await fetchBranches();
+      await fetchSISBranches();
     }
     List<ModelBranches> temp = [];
-    log('Branch Shop (before): ${branchShopList.length}');
+    // log('Branch Shop (before): ${branchShopList.length}');
     temp.addAll(branchShopList.where((e) => e.name == selectedBranch));
-    log('Branch Shop (after): ${temp.length}');
+    // log('Branch Shop (after): ${temp.length}');
 
     if (driverList.isEmpty) {
-      await fetchDriver();
+      await fetchSISDriver();
     }
-    log('Driver List (before): ${filteredDriverList.length}');
+    // log('Driver List (before): ${filteredDriverList.length}');
     filteredDriverList = [];
     filteredDriverList.addAll(
       driverList
@@ -257,10 +254,32 @@ class MenuState with ChangeNotifier {
               (e.shopId == temp[0].shopId && e.branchId == temp[0].branchId))
           .toList(),
     );
-    log('Driver List (after): ${filteredDriverList.length}');
+    // log('Driver List (after): ${filteredDriverList.length}');
     notifyListeners();
-    log('filterDriver called. New filtered list length: ${filteredDriverList.length}');
+    // log('filterDriver called. New filtered list length: ${filteredDriverList.length}');
   }
+
+  bool isTruckCameraFocus = true;
+
+  bool get getIsTruckCameraFocus => isTruckCameraFocus;
+
+  void setTruckCameraFocus() {
+    isTruckCameraFocus = !isTruckCameraFocus;
+    notifyListeners();
+  }
+
+  bool isMovementPaused = false;
+
+  bool get getIsMovementPaused => isMovementPaused;
+
+  void setMovementPaused() {
+    isMovementPaused = !isMovementPaused;
+    notifyListeners();
+  }
+
+  int deliveryHistoryLength = 0;
+
+  int get getDeliveryHistoryLength => deliveryHistoryLength;
 
   List<DeliveryModel> deliveryList = [];
 
@@ -275,8 +294,28 @@ class MenuState with ChangeNotifier {
     String branchId,
     String shopId,
     String employeeId,
-    String currentDate,
-  ) async {
+    String currentDate, {
+    bool onDeliveryPage = false,
+  }) async {
+    if (onDeliveryPage) {
+      // Saved as Cache Data
+      log('Save Delivery Checklist');
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString('branchId', branchId);
+      prefs.setString('shopId', shopId);
+      prefs.setString('employeeId', employeeId);
+      prefs.setString('currentDate', currentDate);
+    } else {
+      // Fetch from Cache Data
+      log('Fetch Delivery Checklist');
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      companyId = prefs.getString('CompanyName') ?? '';
+      branchId = prefs.getString('branchId') ?? '';
+      shopId = prefs.getString('shopId') ?? '';
+      employeeId = prefs.getString('employeeId') ?? '';
+      currentDate = prefs.getString('currentDate') ?? '';
+    }
+
     log('Fetch Delivery Checklist');
     print('Company ID: $companyId');
     print('Employee ID: $employeeId');
@@ -296,7 +335,7 @@ class MenuState with ChangeNotifier {
     );
 
     print('Delivery length: ${deliveryList.length}');
-    print('Delivery Details length: ${deliveryList[0].deliveryDetail.length}');
+    // print('Delivery Details length: ${deliveryList[0].deliveryDetail.length}');
 
     deliveryHistoryList.clear();
     deliveryHistoryList.addAll(
@@ -307,7 +346,12 @@ class MenuState with ChangeNotifier {
       ),
     );
 
-    print('Delivery History length: ${deliveryHistoryList.length}');
+    // print('Delivery History length: ${deliveryHistoryList.length}');
+
+    // deliveryHistoryLength = deliveryHistoryList.length;
+    // print('Delivery History length: ${deliveryHistoryList.length}');
+
+    notifyListeners();
 
     return deliveryList;
   }
@@ -341,6 +385,9 @@ class MenuState with ChangeNotifier {
       shippingNumber,
     );
     // print('HD Image: $highDefinitionImage');
+    if (highDefinitionImage.isEmpty) {
+      print('HD image is not available, $highDefinitionImage');
+    }
 
     return highDefinitionImage;
   }
@@ -1181,4 +1228,321 @@ class MenuState with ChangeNotifier {
 
     return returnResult;
   }
+
+  // ~:NEW:~
+  // ==================================================================
+  // ====================== Absent History ============================
+  // ==================================================================
+  ValueNotifier<bool> searchTriggerNotifier = ValueNotifier(false);
+  ValueNotifier<bool> get getSearchTriggerNotifier => searchTriggerNotifier;
+
+  void setSearchTriggerNotifier(bool value) {
+    searchTriggerNotifier.value = value;
+    // print('Search Trigger new value: ${searchTriggerNotifier.value}');
+    notifyListeners();
+  }
+
+  bool isAbsentLoading = false;
+
+  bool get getIsAbsentLoading => isAbsentLoading;
+
+  void setIsAbsentLoading(bool value) {
+    isAbsentLoading = value;
+    notifyListeners();
+  }
+
+  // ~:Reset Absent History:~
+  void resetAbsentHistory() {
+    // log('Reset Absent History');
+    setSelectedBranch('');
+    setSelectedShop('');
+    setSelectedLocation('');
+    setSelectedSalesman('');
+    sipSalesmanHistoryList = [];
+    searchTriggerNotifier.value = false;
+    // notifyListeners();
+  }
+
+  String selectedBranch = '';
+  String selectedShop = '';
+  String selectedLocation = '';
+  String selectedSalesman = '';
+
+  String get getSelectedBranch => selectedBranch;
+  String get getSelectedShop => selectedShop;
+  String get getSelectedLocation => selectedLocation;
+  String get getSelectedSalesman => selectedSalesman;
+
+  void setSelectedBranch(String value) {
+    selectedBranch = value;
+    searchTriggerNotifier.value = false;
+    notifyListeners();
+  }
+
+  void setSelectedShop(String value) {
+    selectedShop = value;
+    searchTriggerNotifier.value = false;
+    notifyListeners();
+  }
+
+  void setSelectedLocation(String value) {
+    selectedLocation = value;
+    searchTriggerNotifier.value = false;
+    notifyListeners();
+  }
+
+  void setSelectedSalesman(String value) {
+    print('Set Salesman');
+    selectedSalesman = value;
+    searchTriggerNotifier.value = false;
+    print(selectedSalesman);
+    print(searchTriggerNotifier.value);
+    notifyListeners();
+  }
+
+  List<SipSalesBranchesModel> sipBranchList = [];
+  List<SipSalesBranchesModel> get getSipBranchList => sipBranchList;
+  List<String> sipBranchNameList = [];
+  List<String> get getSipBranchNameList => sipBranchNameList;
+
+  Future<void> loadSipBranches() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    // log('SIP Branch Name List (before): ${getSipBranchNameList.length}');
+    if (sipBranchNameList.isNotEmpty) {
+      // log('SIP Branch Name List is not empty');
+      sipBranchNameList = [];
+      // log('SIP Branch Name List: ${getSipBranchNameList.length}');
+    }
+
+    sipBranchNameList.addAll(prefs.getStringList('sipBranches') ?? []);
+    // log('SIP Branch Name List (after): ${getSipBranchNameList.length}');
+    notifyListeners();
+  }
+
+  Future<void> fetchSipSalesBranches() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('UserID') ?? '';
+    // print('SIP Branches User Id: $userId');
+
+    sipBranchList.clear();
+    sipBranchList.addAll(await GlobalAPI.getSipSalesBranches(userId));
+    // print('SIP Branch List: ${sipBranchList.length}');
+
+    if (prefs.getStringList('sipBranches') == null) {
+      // log('SIP Branch Name List is empty');
+      await prefs.setStringList(
+        'sipBranches',
+        sipBranchList.map((e) => e.branchName).toList(),
+      );
+    } else {
+      // log('SIP Branch Name List is not empty');
+    }
+  }
+
+  List<SipSalesShopsModel> sipShopList = [];
+  List<SipSalesShopsModel> get getSipShopList => sipShopList;
+  List<String> sipShopNameList = [];
+  List<String> get getSipShopNameList => sipShopNameList;
+
+  Future<void> loadSipShops({String branch = ''}) async {
+    // print('Branch: $branch');
+    // log('SIP Branch Name List (before): ${getSipShopList.length}');
+    if (sipShopNameList.isNotEmpty) {
+      // log('SIP Branch Name List is not empty');
+      sipShopNameList.clear();
+      // log('SIP Branch Name List: ${getSipShopList.length}');
+    }
+
+    await fetchSipSalesShops(branch).then((list) {
+      sipShopNameList.addAll(list.map((e) => e.shopName).toList());
+      notifyListeners();
+    });
+    // log('SIP Branch Name List (after): ${getSipShopList.length}');
+  }
+
+  Future<List<SipSalesShopsModel>> fetchSipSalesShops(String branch) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('UserID') ?? '';
+    // print('User ID: $userId');
+
+    if (sipBranchList.isEmpty) {
+      // print('SIP Branch List is empty');
+      sipBranchList.addAll(await GlobalAPI.getSipSalesBranches(userId));
+    }
+
+    sipShopList.clear();
+    sipShopList.addAll(await GlobalAPI.getSipSalesShops(
+      userId,
+      sipBranchList.where((e) => e.branchName == branch).first.branchCode,
+    ));
+    // print('SIP Shop List: ${sipShopList.length}');
+
+    return sipShopList;
+  }
+
+  List<SipSalesLocationModel> sipLocationList = [];
+  List<SipSalesLocationModel> get getSipLocationList => sipLocationList;
+  List<String> sipLocationNameList = [];
+  List<String> get getSipLocationNameList => sipLocationNameList;
+
+  Future<void> loadSipLocation({String branch = '', String shop = ''}) async {
+    // print('Branch: $branch');
+    // print('Shop: $shop');
+    // log('SIP Branch Name List (before): ${getSipShopList.length}');
+    if (sipLocationNameList.isNotEmpty) {
+      // log('SIP Branch Name List is not empty');
+      sipLocationNameList.clear();
+      // log('SIP Branch Name List: ${getSipShopList.length}');
+    }
+
+    await fetchSipSalesLocation(branch, shop).then((list) {
+      sipLocationNameList.addAll(list.map((e) => e.locationName).toList());
+      notifyListeners();
+    });
+  }
+
+  Future<List<SipSalesLocationModel>> fetchSipSalesLocation(
+    String branch,
+    String shop,
+  ) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('UserID') ?? '';
+    // print('User ID: $userId');
+
+    if (sipBranchList.isEmpty) {
+      // print('SIP Branch List is empty');
+      sipBranchList.addAll(await GlobalAPI.getSipSalesBranches(userId));
+    }
+
+    sipLocationList.clear();
+    sipLocationList.addAll(await GlobalAPI.getSipSalesLocation(
+      userId,
+      sipBranchList.where((e) => e.branchName == branch).first.branchCode,
+      sipShopList.where((e) => e.shopName == shop).first.shopCode,
+    ));
+    // print('SIP Shop List: ${sipShopList.length}');
+
+    return sipLocationList;
+  }
+
+  List<SipSalesmanModel> sipSalesmanList = [];
+  List<SipSalesmanModel> get getSipSalesmanList => sipSalesmanList;
+
+  Future<void> filterSipSalesman() async {
+    if (sipSalesmanList.isEmpty) {
+      await fetchSipSalesman();
+    }
+
+    sipSalesmanList.clear();
+    sipSalesmanList.addAll(await fetchSipSalesman(
+      branch: getSelectedBranch,
+      shop: getSelectedShop,
+      location: getSelectedLocation,
+    ));
+
+    // log('filter Salesman List: ${sipSalesmanList.length}');
+    notifyListeners();
+  }
+
+  Future<List<SipSalesmanModel>> fetchSipSalesman({
+    String branch = '',
+    String shop = '',
+    String location = '',
+  }) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('UserID') ?? '';
+
+    // print('UserID: $userId');
+    if (branch.isNotEmpty && shop.isNotEmpty && location.isNotEmpty) {
+      branch =
+          sipBranchList.where((e) => e.branchName == branch).first.branchCode;
+      shop = sipShopList.where((e) => e.shopName == shop).first.shopCode;
+      location = sipLocationList
+          .where((e) => e.locationName == location)
+          .first
+          .locationId;
+    }
+    // print('Branch: $branch');
+    // print('Shop: $shop');
+    // print('Location: $location');
+
+    List<SipSalesmanModel> temp = [];
+    // Note --> fix the parameter passed to API again!
+    temp.addAll(await GlobalAPI.getSipSalesman(
+      userId,
+      branch,
+      shop,
+      location,
+    ));
+    // log('fetch Salesman List: ${temp.length}');
+
+    return temp;
+  }
+
+  List<SipSalesmanHistoryModel> sipSalesmanHistoryList = [];
+
+  List<SipSalesmanHistoryModel> get getSipSalesmanHistoryList =>
+      sipSalesmanHistoryList;
+
+  Future<Map<String, dynamic>> fetchSipSalesmanHistory(
+    String branch,
+    String shop,
+    String location,
+    String employee,
+    String beginDate,
+    String endDate,
+  ) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('UserID') ?? '';
+
+    // print('Fetch Sip Salesman History Parameters');
+    // print('UserID: $userId');
+    // print(
+    //     'Branch: ${sipBranchList.where((e) => e.branchName == branch).first.branchCode}');
+    // print(
+    //     'Shop: ${sipShopList.where((e) => e.shopName == shop).first.shopCode}');
+    // print(
+    //     'Location: ${sipLocationList.where((e) => e.locationName == location).first.locationId}');
+    // print('Employee Name: $employee');
+    // print('Begin Date: $beginDate');
+    // print('End Date: $endDate');
+
+    try {
+      sipSalesmanHistoryList.clear();
+      sipSalesmanHistoryList.addAll(await GlobalAPI.getSipSalesmanHistory(
+        userId,
+        sipBranchList.where((e) => e.branchName == branch).first.branchCode,
+        sipShopList.where((e) => e.shopName == shop).first.shopCode,
+        sipLocationList
+            .where((e) => e.locationName == location)
+            .first
+            .locationId,
+        employee,
+        beginDate,
+        endDate,
+      ));
+      // print('Salesman History length: ${sipSalesmanHistoryList.length}');
+
+      if (sipSalesmanHistoryList.isNotEmpty) {
+        // print('Salesman History length: ${sipSalesmanHistoryList.length}');
+        return {
+          'status': 'success',
+          'data': sipSalesmanHistoryList,
+        };
+      } else {
+        // print('Salesman History is empty');
+        return {
+          'status': 'failed',
+          'data': [],
+        };
+      }
+    } catch (e) {
+      // print('FetchSipSalesmanHistory Error: $e');
+      return {
+        'status': 'error',
+        'data': [],
+      };
+    }
+  }
+  // ~:NEW:~
 }

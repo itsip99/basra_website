@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -11,9 +10,9 @@ import 'package:stsj/core/providers/Provider.dart';
 import 'package:stsj/global/font.dart';
 import 'package:stsj/global/function.dart';
 import 'package:stsj/global/widget/app_bar.dart';
-import 'package:stsj/global/widget/branch_shop_dropdown.dart';
-import 'package:stsj/global/widget/delivery_card.dart';
-import 'package:stsj/global/widget/driver_auto_complete.dart';
+import 'package:stsj/global/widget/dropdown/sis_branch_shop_dropdown.dart';
+import 'package:stsj/global/widget/card/delivery_card.dart';
+import 'package:stsj/global/widget/autocomplete/driver.dart';
 import 'package:stsj/global/widget/text_display.dart';
 import 'package:stsj/router/router_const.dart';
 
@@ -139,59 +138,59 @@ class _DeliveryPageState extends State<DeliveryPage> {
   }
 
   // ~:Image Preview Function:~
-  void viewImage(
-    BuildContext parentContext,
-    MenuState state,
-    String img,
-  ) async {
-    if (img.isNotEmpty) {
-      showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (context) => Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          backgroundColor: Colors.blue.shade50,
-          elevation: 16,
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.35,
-            height: MediaQuery.of(context).size.height * 0.9,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-            padding: EdgeInsets.symmetric(
-              horizontal: MediaQuery.of(context).size.width * 0.0175,
-              vertical: MediaQuery.of(context).size.height * 0.025,
-            ),
-            child: Column(
-              children: [
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(15.0),
-                      topRight: Radius.circular(15.0),
-                    ),
-                    child: Image.memory(
-                      base64Decode(img),
-                      fit: BoxFit.cover,
-                      width: MediaQuery.of(context).size.width * 0.325,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    } else {
-      GlobalFunction.showSnackbar(
-        context,
-        'Gambar tidak tersedia.',
-      );
-    }
-  }
+  // void viewImage(
+  //   BuildContext parentContext,
+  //   MenuState state,
+  //   String img,
+  // ) async {
+  //   if (img.isNotEmpty) {
+  //     showDialog(
+  //       context: context,
+  //       barrierDismissible: true,
+  //       builder: (context) => Dialog(
+  //         shape: RoundedRectangleBorder(
+  //           borderRadius: BorderRadius.circular(20),
+  //         ),
+  //         backgroundColor: Colors.blue.shade50,
+  //         elevation: 16,
+  //         child: Container(
+  //           width: MediaQuery.of(context).size.width * 0.35,
+  //           height: MediaQuery.of(context).size.height * 0.9,
+  //           decoration: BoxDecoration(
+  //             color: Colors.white,
+  //             borderRadius: BorderRadius.circular(15.0),
+  //           ),
+  //           padding: EdgeInsets.symmetric(
+  //             horizontal: MediaQuery.of(context).size.width * 0.0175,
+  //             vertical: MediaQuery.of(context).size.height * 0.025,
+  //           ),
+  //           child: Column(
+  //             children: [
+  //               Expanded(
+  //                 child: ClipRRect(
+  //                   borderRadius: BorderRadius.only(
+  //                     topLeft: Radius.circular(15.0),
+  //                     topRight: Radius.circular(15.0),
+  //                   ),
+  //                   child: Image.memory(
+  //                     base64Decode(img),
+  //                     fit: BoxFit.cover,
+  //                     width: MediaQuery.of(context).size.width * 0.325,
+  //                   ),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     );
+  //   } else {
+  //     GlobalFunction.showSnackbar(
+  //       context,
+  //       'Gambar tidak tersedia.',
+  //     );
+  //   }
+  // }
 
   void getFilterData(
     BuildContext context,
@@ -216,6 +215,11 @@ class _DeliveryPageState extends State<DeliveryPage> {
         break;
       }
     }
+
+    await prefs.setString('branchId', menuState.getBranchId);
+    await prefs.setString('shopId', menuState.getShopId);
+    await prefs.setString('employeeId', employeeId);
+    await prefs.setString('date', date);
 
     // Get Filter Data --> Succeed
     // print('Get Filter Data');
@@ -314,7 +318,7 @@ class _DeliveryPageState extends State<DeliveryPage> {
 
     searchTriggerNotifier.value = false;
     Provider.of<MenuState>(context, listen: false).resetDeliveryData();
-    Provider.of<MenuState>(context, listen: false).loadBranches();
+    Provider.of<MenuState>(context, listen: false).loadSisBranches();
   }
 
   @override
@@ -416,7 +420,7 @@ class _DeliveryPageState extends State<DeliveryPage> {
                                           MediaQuery.of(context).size.height *
                                               0.01,
                                     ),
-                                    child: BranchShopDropdown(
+                                    child: SisBranchShopDropdown(
                                       listData: const [],
                                       inputan: '',
                                       hint: 'Cabang',
@@ -444,7 +448,7 @@ class _DeliveryPageState extends State<DeliveryPage> {
                                           MediaQuery.of(context).size.height *
                                               0.01,
                                     ),
-                                    child: BranchShopDropdown(
+                                    child: SisBranchShopDropdown(
                                       listData: value.getBranchNameList,
                                       inputan: branchShop,
                                       hint: 'Cabang',
@@ -520,6 +524,7 @@ class _DeliveryPageState extends State<DeliveryPage> {
                                 ),
                               ),
                             ),
+                            // ~:Come back later:~
                             // SizedBox(width: 10.0),
                             // InkWell(
                             //   onTap: () => resetData(menuState),
@@ -590,8 +595,7 @@ class _DeliveryPageState extends State<DeliveryPage> {
                           List<CheckListDetailsModel> deliveryDetail =
                               menuState.getDeliveryList[0].deliveryDetail;
 
-                          return ListView(
-                            physics: BouncingScrollPhysics(),
+                          return Column(
                             children: [
                               // ===============================================
                               // ============= Driver Identity =================
@@ -739,13 +743,24 @@ class _DeliveryPageState extends State<DeliveryPage> {
                                                       : '-',
                                                   style: GlobalFont.bigfontR,
                                                 ),
-                                                GestureDetector(
-                                                  onTap: () => viewImage(
+                                                InkWell(
+                                                  onTap: () =>
+                                                      GlobalFunction.viewImage(
                                                     context,
                                                     menuState,
-                                                    menuState.getDeliveryList[0]
-                                                        .startImageThumb,
+                                                    'START',
+                                                    menuState.getDeliveryList
+                                                            .isNotEmpty
+                                                        ? menuState
+                                                            .getDeliveryList[0]
+                                                            .activityNumber
+                                                        : '',
+                                                    '',
                                                   ),
+                                                  hoverColor:
+                                                      Colors.transparent,
+                                                  focusColor:
+                                                      Colors.transparent,
                                                   child: Text(
                                                     'Lihat Gambar',
                                                     style:
@@ -781,13 +796,24 @@ class _DeliveryPageState extends State<DeliveryPage> {
                                                       : '-',
                                                   style: GlobalFont.bigfontR,
                                                 ),
-                                                GestureDetector(
-                                                  onTap: () => viewImage(
+                                                InkWell(
+                                                  onTap: () =>
+                                                      GlobalFunction.viewImage(
                                                     context,
                                                     menuState,
-                                                    menuState.getDeliveryList[0]
-                                                        .endImageThumb,
+                                                    'END',
+                                                    menuState.getDeliveryList
+                                                            .isNotEmpty
+                                                        ? menuState
+                                                            .getDeliveryList[0]
+                                                            .activityNumber
+                                                        : '',
+                                                    '',
                                                   ),
+                                                  hoverColor:
+                                                      Colors.transparent,
+                                                  focusColor:
+                                                      Colors.transparent,
                                                   child: Text(
                                                     'Lihat Gambar',
                                                     style:
@@ -803,21 +829,39 @@ class _DeliveryPageState extends State<DeliveryPage> {
                                   ],
                                 ),
                               ),
+
+                              // Devider
+                              SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.01,
+                              ),
+
                               // ===============================================
                               // =========== Delivery Activities ===============
                               // ===============================================
-                              SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.825,
+                              Expanded(
                                 child: GridView.count(
                                   crossAxisCount: 2,
-                                  childAspectRatio: 2.75,
+                                  childAspectRatio: 2.65,
                                   children: deliveryDetail.asMap().entries.map(
                                     (details) {
+                                      int index = details.key;
                                       CheckListDetailsModel detail =
                                           details.value;
 
-                                      return DeliveryCard(detail);
+                                      if (deliveryDetail.length - 1 != index &&
+                                          deliveryDetail[index + 1]
+                                              .deliveryTime
+                                              .isNotEmpty) {
+                                        return DeliveryCard(
+                                          detail,
+                                          destinationTime:
+                                              deliveryDetail[index + 1]
+                                                  .deliveryTime,
+                                        );
+                                      } else {
+                                        return DeliveryCard(detail);
+                                      }
                                     },
                                   ).toList(),
                                 ),
@@ -833,6 +877,7 @@ class _DeliveryPageState extends State<DeliveryPage> {
                               menuState.getShopId,
                               employeeId,
                               date,
+                              onDeliveryPage: true,
                             ),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
@@ -871,8 +916,7 @@ class _DeliveryPageState extends State<DeliveryPage> {
                                 List<CheckListDetailsModel> deliveryDetail =
                                     snapshot.data![0].deliveryDetail;
 
-                                return ListView(
-                                  physics: BouncingScrollPhysics(),
+                                return Column(
                                   children: [
                                     // ===============================================
                                     // ============= Driver Identity =================
@@ -883,7 +927,6 @@ class _DeliveryPageState extends State<DeliveryPage> {
                                         horizontal:
                                             MediaQuery.of(context).size.height *
                                                 0.005,
-                                        vertical: 15,
                                       ),
                                       decoration: BoxDecoration(
                                         color: Colors.white,
@@ -1036,13 +1079,27 @@ class _DeliveryPageState extends State<DeliveryPage> {
                                                         style:
                                                             GlobalFont.bigfontR,
                                                       ),
-                                                      GestureDetector(
-                                                        onTap: () => viewImage(
+                                                      InkWell(
+                                                        onTap: () =>
+                                                            GlobalFunction
+                                                                .viewImage(
                                                           context,
                                                           menuState,
-                                                          snapshot.data![0]
-                                                              .startImageThumb,
+                                                          'START',
+                                                          menuState
+                                                                  .getDeliveryList
+                                                                  .isNotEmpty
+                                                              ? menuState
+                                                                  .getDeliveryList[
+                                                                      0]
+                                                                  .activityNumber
+                                                              : '',
+                                                          '',
                                                         ),
+                                                        hoverColor:
+                                                            Colors.transparent,
+                                                        focusColor:
+                                                            Colors.transparent,
                                                         child: Text(
                                                           'Lihat Gambar',
                                                           style: GlobalFont
@@ -1083,13 +1140,27 @@ class _DeliveryPageState extends State<DeliveryPage> {
                                                         style:
                                                             GlobalFont.bigfontR,
                                                       ),
-                                                      GestureDetector(
-                                                        onTap: () => viewImage(
+                                                      InkWell(
+                                                        onTap: () =>
+                                                            GlobalFunction
+                                                                .viewImage(
                                                           context,
                                                           menuState,
-                                                          snapshot.data![0]
-                                                              .endImageThumb,
+                                                          'END',
+                                                          menuState
+                                                                  .getDeliveryList
+                                                                  .isNotEmpty
+                                                              ? menuState
+                                                                  .getDeliveryList[
+                                                                      0]
+                                                                  .activityNumber
+                                                              : '',
+                                                          '',
                                                         ),
+                                                        hoverColor:
+                                                            Colors.transparent,
+                                                        focusColor:
+                                                            Colors.transparent,
                                                         child: Text(
                                                           'Lihat Gambar',
                                                           style: GlobalFont
@@ -1105,25 +1176,44 @@ class _DeliveryPageState extends State<DeliveryPage> {
                                         ],
                                       ),
                                     ),
-                                    // ===============================================
-                                    // =========== Delivery Activities ===============
-                                    // ===============================================
+
+                                    // Devider
                                     SizedBox(
                                       height:
                                           MediaQuery.of(context).size.height *
-                                              0.825,
+                                              0.01,
+                                    ),
+
+                                    // ===============================================
+                                    // =========== Delivery Activities ===============
+                                    // ===============================================
+                                    Expanded(
                                       child: GridView.count(
                                         crossAxisCount: 2,
-                                        childAspectRatio: 2.75,
+                                        childAspectRatio: 2.65,
                                         padding: EdgeInsets.zero,
                                         physics: BouncingScrollPhysics(),
                                         children:
                                             deliveryDetail.asMap().entries.map(
                                           (details) {
+                                            int index = details.key;
                                             CheckListDetailsModel detail =
                                                 details.value;
 
-                                            return DeliveryCard(detail);
+                                            if (deliveryDetail.length - 1 !=
+                                                    index &&
+                                                deliveryDetail[index + 1]
+                                                    .deliveryTime
+                                                    .isNotEmpty) {
+                                              return DeliveryCard(
+                                                detail,
+                                                destinationTime:
+                                                    deliveryDetail[index + 1]
+                                                        .deliveryTime,
+                                              );
+                                            } else {
+                                              return DeliveryCard(detail);
+                                            }
                                           },
                                         ).toList(),
                                       ),
@@ -1141,8 +1231,7 @@ class _DeliveryPageState extends State<DeliveryPage> {
                           List<CheckListDetailsModel> deliveryDetail =
                               menuState.getDeliveryList[0].deliveryDetail;
 
-                          return ListView(
-                            physics: BouncingScrollPhysics(),
+                          return Column(
                             children: [
                               // ===============================================
                               // ============= Driver Identity =================
@@ -1290,13 +1379,24 @@ class _DeliveryPageState extends State<DeliveryPage> {
                                                       : '-',
                                                   style: GlobalFont.bigfontR,
                                                 ),
-                                                GestureDetector(
-                                                  onTap: () => viewImage(
+                                                InkWell(
+                                                  onTap: () =>
+                                                      GlobalFunction.viewImage(
                                                     context,
                                                     menuState,
-                                                    menuState.getDeliveryList[0]
-                                                        .startImageThumb,
+                                                    'START',
+                                                    menuState.getDeliveryList
+                                                            .isNotEmpty
+                                                        ? menuState
+                                                            .getDeliveryList[0]
+                                                            .activityNumber
+                                                        : '',
+                                                    '',
                                                   ),
+                                                  hoverColor:
+                                                      Colors.transparent,
+                                                  focusColor:
+                                                      Colors.transparent,
                                                   child: Text(
                                                     'Lihat Gambar',
                                                     style:
@@ -1332,13 +1432,24 @@ class _DeliveryPageState extends State<DeliveryPage> {
                                                       : '-',
                                                   style: GlobalFont.bigfontR,
                                                 ),
-                                                GestureDetector(
-                                                  onTap: () => viewImage(
+                                                InkWell(
+                                                  onTap: () =>
+                                                      GlobalFunction.viewImage(
                                                     context,
                                                     menuState,
-                                                    menuState.getDeliveryList[0]
-                                                        .endImageThumb,
+                                                    'END',
+                                                    menuState.getDeliveryList
+                                                            .isNotEmpty
+                                                        ? menuState
+                                                            .getDeliveryList[0]
+                                                            .activityNumber
+                                                        : '',
+                                                    '',
                                                   ),
+                                                  hoverColor:
+                                                      Colors.transparent,
+                                                  focusColor:
+                                                      Colors.transparent,
                                                   child: Text(
                                                     'Lihat Gambar',
                                                     style:
@@ -1354,21 +1465,39 @@ class _DeliveryPageState extends State<DeliveryPage> {
                                   ],
                                 ),
                               ),
+
+                              // Devider
+                              SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.01,
+                              ),
+
                               // ===============================================
                               // =========== Delivery Activities ===============
                               // ===============================================
-                              SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.825,
+                              Expanded(
                                 child: GridView.count(
                                   crossAxisCount: 2,
-                                  childAspectRatio: 2.75,
+                                  childAspectRatio: 2.65,
                                   children: deliveryDetail.asMap().entries.map(
                                     (details) {
+                                      int index = details.key;
                                       CheckListDetailsModel detail =
                                           details.value;
 
-                                      return DeliveryCard(detail);
+                                      if (deliveryDetail.length - 1 != index &&
+                                          deliveryDetail[index + 1]
+                                              .deliveryTime
+                                              .isNotEmpty) {
+                                        return DeliveryCard(
+                                          detail,
+                                          destinationTime:
+                                              deliveryDetail[index + 1]
+                                                  .deliveryTime,
+                                        );
+                                      } else {
+                                        return DeliveryCard(detail);
+                                      }
                                     },
                                   ).toList(),
                                 ),

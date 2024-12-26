@@ -27,17 +27,20 @@ class DataLoginController {
 
       final response = await http
           .post(
-              Uri.parse(
-                'https://wsip.yamaha-jatim.co.id:2448/api/Login/Login',
-              ),
-              headers: headers,
-              body: jsonBody)
+            Uri.parse(
+              'https://wsip.yamaha-jatim.co.id:2448/api/Login/Login',
+            ),
+            headers: headers,
+            body: jsonBody,
+          )
           .timeout(const Duration(seconds: 20));
 
-      if (response.statusCode == 200) {
-        var jsonDecode = json.decode(response.body);
+      print('Login Response: ${response.body}');
 
-        List<DataLogin> listlogin = (jsonDecode as Map<String, dynamic>)['Data']
+      if (response.statusCode == 200) {
+        var jsonLogin = jsonDecode(response.body);
+
+        List<DataLogin> listlogin = (jsonLogin['Data'] as List)
             .map<DataLogin>((data) => DataLogin.fromJson(data))
             .toList();
 
@@ -46,6 +49,7 @@ class DataLoginController {
         throw Exception("Terjadi kesalahan");
       }
     } catch (error) {
+      print('Error: $error');
       throw Exception("Terjadi kesalahan saat memuat data.");
     }
   }

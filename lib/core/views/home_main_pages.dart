@@ -58,9 +58,10 @@ class _HomePagesState extends State<HomePages>
         // Check for null values and provide default values if needed
         state.fetchSalesmanList();
         // print('Salesman List length: ${state.getSalesmanList.length}');
-        state.fetchDriver();
+        state.fetchSISDriver();
         state.fetchProvinces();
-        state.fetchBranches();
+        // Added before go to menu page too to make sure branch name changed
+        state.fetchSISBranches();
         // .then((_) => state.fetchAreas());
         // print('Provinces List length: ${state.getProvinceList.length}');
         state
@@ -87,7 +88,7 @@ class _HomePagesState extends State<HomePages>
 
           state.headerList.clear();
           state.headerList.addAll(data.map((e) => e.category).toSet().toList());
-          print('Header list length: ${state.headerList.length}');
+          // print('Header list length: ${state.headerList.length}');
           if (state.headerList.isEmpty) {
             state.headerList.add('dashboard');
           }
@@ -147,87 +148,86 @@ class _HomePagesState extends State<HomePages>
         child: CustomAppBar(),
       ),
       body: Center(
-        child: SingleChildScrollView(
-          child: SpGrid(
-            spacing: 50,
-            runSpacing: 50,
-            alignment: WrapAlignment.center,
-            width: MediaQuery.of(context).size.width,
-            children: [
-              SpGridItem(
-                xs: 12,
-                sm: 5,
-                md: 5,
-                lg: 3,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  height: screen ? 400 : 250,
-                  child: FutureBuilder(
-                    future: fetchData(state),
-                    builder: (context, snapshot) {
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            CircleAvatar(
-                              radius: screen ? 100 : 80,
-                              backgroundImage: NetworkImage(
-                                'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg',
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            Text(
-                              state.getUserId,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 25,
-                              ),
-                            ),
-                            Text(state.getEntryLevelName),
-                          ],
+        child: FutureBuilder(
+          future: fetchData(state),
+          builder: (context, snapshot) {
+            return SpGrid(
+              spacing: 50,
+              runSpacing: 50,
+              alignment: WrapAlignment.center,
+              width: MediaQuery.of(context).size.width,
+              children: [
+                SpGridItem(
+                  xs: 12,
+                  sm: 5,
+                  md: 5,
+                  lg: 3,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          spreadRadius: 5,
+                          blurRadius: 7,
+                          offset: Offset(0, 3),
                         ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-              SpGridItem(
-                xs: 12,
-                sm: 7,
-                md: 7,
-                lg: 8,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: Offset(0, 3),
+                      ],
+                    ),
+                    height: screen ? 400 : 250,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          CircleAvatar(
+                            radius: screen ? 100 : 80,
+                            backgroundImage: NetworkImage(
+                              'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg',
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            state.getUserId,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 25,
+                            ),
+                          ),
+                          Text(state.getEntryLevelName),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                  height: screen ? 400 : 250,
-                  child: HomeMenuComponent(),
                 ),
-              ),
-            ],
-          ),
+                SpGridItem(
+                  xs: 12,
+                  sm: 7,
+                  md: 7,
+                  lg: 8,
+                  child: Container(
+                    height: screen ? 400 : 250,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          spreadRadius: 5,
+                          blurRadius: 7,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: HomeMenuComponent(),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

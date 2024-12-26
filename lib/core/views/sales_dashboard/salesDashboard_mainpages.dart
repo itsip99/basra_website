@@ -1,7 +1,5 @@
 import 'package:countup/countup.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:stsj/core/controller/SalesDashboardController/STUbypages1_controller.dart';
 import 'package:stsj/core/models/SalesDashboardModel/STUModelbypage1.dart';
 import 'package:stsj/core/service/ReusableService.dart';
@@ -18,8 +16,6 @@ import 'package:stsj/static/dataArea.const.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:stsj/core/views/Sales_Dashboard/subpages/STUpages1_pages/listSTU_mainpages.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
-
-import 'package:mccounting_text/mccounting_text.dart';
 
 class CurrencyFormat {
   static String convertToIdr(dynamic number, int decimalDigit) {

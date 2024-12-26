@@ -1,10 +1,12 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stsj/core/providers/Provider.dart';
 import 'package:stsj/global/font.dart';
 
-class BranchShopDropdown extends StatefulWidget {
-  const BranchShopDropdown({
+class SipLocationDropdown extends StatefulWidget {
+  const SipLocationDropdown({
     required this.listData,
     required this.inputan,
     required this.hint,
@@ -22,10 +24,10 @@ class BranchShopDropdown extends StatefulWidget {
   final bool isMobile;
 
   @override
-  State<BranchShopDropdown> createState() => _BranchShopDropdownState();
+  State<SipLocationDropdown> createState() => _SipLocationDropdownState();
 }
 
-class _BranchShopDropdownState extends State<BranchShopDropdown> {
+class _SipLocationDropdownState extends State<SipLocationDropdown> {
   String teksDisable = '';
   String value = '';
 
@@ -46,8 +48,8 @@ class _BranchShopDropdownState extends State<BranchShopDropdown> {
   @override
   Widget build(BuildContext context) {
     final state = Provider.of<MenuState>(context);
-    // print('Dropdown provider: ${state.getFilteredDriverList.length}');
-    // print('Dropdown data: ${widget.listData.length}');
+    // print('SIP Dropdown provider: ${state.getSipLocationList.length}');
+    // print('SIP Dropdown data: ${widget.listData.length}');
 
     if (!widget.isMobile) {
       return DropdownButtonHideUnderline(
@@ -75,12 +77,12 @@ class _BranchShopDropdownState extends State<BranchShopDropdown> {
               ? null
               : widget.listData.asMap().entries.map((entry) {
                   // final index = entry.key;
-                  final branchName = entry.value;
+                  final data = entry.value;
 
                   return DropdownMenuItem(
-                    value: branchName,
+                    value: data,
                     child: Text(
-                      branchName,
+                      data,
                       textAlign: TextAlign.center,
                       style: GlobalFont.mediumfontR,
                       overflow: TextOverflow.ellipsis,
@@ -89,14 +91,11 @@ class _BranchShopDropdownState extends State<BranchShopDropdown> {
                 }).toList(),
           onChanged: (newValues) async {
             if (value != newValues) {
-              setState(() => value = newValues.toString());
-              // print('Province Dropdown value: $value');
-              state.setBranchNameNotifier(value);
-
-              // Note -> Not working perfectly yet
-              state.filterDriver(newValues.toString());
-
+              setState(() {
+                value = newValues.toString();
+              });
               await widget.handle(newValues);
+              state.filterSipSalesman();
             }
           },
         ),
@@ -123,12 +122,12 @@ class _BranchShopDropdownState extends State<BranchShopDropdown> {
               ? null
               : widget.listData.asMap().entries.map((entry) {
                   // final int index = entry.key;
-                  final branchName = entry.value;
+                  final data = entry.value;
 
                   return DropdownMenuItem(
-                    value: branchName,
+                    value: data,
                     child: Text(
-                      branchName,
+                      data,
                       textAlign: TextAlign.center,
                       style: GlobalFont.smallfontRBold,
                       overflow: TextOverflow.ellipsis,
@@ -137,14 +136,11 @@ class _BranchShopDropdownState extends State<BranchShopDropdown> {
                 }).toList(),
           onChanged: (newValues) async {
             if (value != newValues) {
-              setState(() => value = newValues.toString());
-              // print('Province Dropdown value: $value');
-              state.setBranchNameNotifier(value);
-
-              // Note -> Not working perfectly yet
-              state.filterDriver(newValues.toString());
-
+              setState(() {
+                value = newValues.toString();
+              });
               await widget.handle(newValues);
+              state.filterSipSalesman();
             }
           },
         ),

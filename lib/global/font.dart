@@ -260,6 +260,12 @@ class GlobalFont {
     color: Colors.black,
     fontFamily: GlobalFontFamily.fontRubik,
     fontSize: GlobalSize.mediumbigfont,
+  );
+
+  static TextStyle mediumfontRBold = TextStyle(
+    color: Colors.black,
+    fontFamily: GlobalFontFamily.fontRubik,
+    fontSize: GlobalSize.mediumbigfont,
     fontWeight: FontWeight.w600,
   );
 
@@ -296,6 +302,7 @@ class GlobalFont {
     fontWeight: FontWeight.bold,
   );
 
+  // bigfontRBlue
   static TextStyle mediumbigfontRBoldBlue = TextStyle(
     color: Colors.blue,
     fontFamily: GlobalFontFamily.fontRubik,
@@ -335,6 +342,7 @@ class GlobalFont {
     color: Colors.blue,
     fontFamily: GlobalFontFamily.fontRubik,
     fontSize: GlobalSize.bigfont,
+    backgroundColor: Colors.transparent,
   );
 
   static TextStyle bigfontRBold = TextStyle(

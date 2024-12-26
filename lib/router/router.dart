@@ -17,6 +17,10 @@ import 'package:stsj/core/views/activities/image_preview.dart';
 import 'package:stsj/core/views/activities/map.dart';
 import 'package:stsj/core/views/activities/route_details.dart';
 import 'package:stsj/core/views/activities/weekly_activities_report.dart';
+import 'package:stsj/core/views/report/absent_history.dart';
+import 'package:stsj/core/views/report/bike_history.dart';
+import 'package:stsj/core/views/report/mds_sparepart_stock.dart';
+import 'package:stsj/core/views/report/service_history.dart';
 import 'package:stsj/core/views/sales_dashboard/delivery.dart';
 import 'package:stsj/core/views/sales_dashboard/delivery_map.dart';
 import 'package:stsj/global/globalVar.dart';
@@ -86,6 +90,36 @@ class RouterSettings {
               return MaterialPage(child: ReportPages());
             },
           ),
+          // ~:NEW:~
+          GoRoute(
+            name: RoutesConstant.absentHistory,
+            path: 'absentHistory',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: AbsentHistoryPage());
+            },
+          ),
+          GoRoute(
+            name: RoutesConstant.bikesHistory,
+            path: 'bikesHistory',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: BikesHistoryPage());
+            },
+          ),
+          GoRoute(
+            name: RoutesConstant.serviceHistory,
+            path: 'serviceHistory',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: ServiceHistoryPage());
+            },
+          ),
+          GoRoute(
+            name: RoutesConstant.mdsSparepartStock,
+            path: 'mdsSparepartStock',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: MdsSparepartStockPage());
+            },
+          ),
+          // ~:NEW:~
           GoRoute(
             name: RoutesConstant.menu,
             path: 'menu',
