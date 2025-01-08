@@ -1,7 +1,7 @@
 # BASRA Website
 An online platform for data monitoring and access
 
-# Update Notes
+## Update Notes
 v1.0.1
 - New page! Absent History
 - Absent History export button is not available yet
