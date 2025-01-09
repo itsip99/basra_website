@@ -10,6 +10,12 @@ v1.0.2
 - Absent History export button can be access by User
 - New pages! Picking and Packing
 - Packing page is still in development process
+- Picking and Packing user access is set to global user
+
+v1.0.3
+- Packing page is ready to use
+- New Design! Picking and Packing have a new page design layout
+- Picking and Packing have a limited user access
 
 ## Getting Started
 
