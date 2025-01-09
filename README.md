@@ -1,6 +1,15 @@
-# stsj
+# BASRA Website
+An online platform for data monitoring and access
 
-A new Flutter project.
+## Update Notes
+v1.0.1
+- New page! Absent History
+- Absent History export button is not available yet
+
+v1.0.2
+- Absent History export button can be access by User
+- New pages! Picking and Packing
+- Packing page is still in development process
 
 ## Getting Started
 
