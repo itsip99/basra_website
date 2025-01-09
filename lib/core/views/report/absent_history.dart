@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:stsj/core/models/Report/absent_history.dart';
 import 'package:stsj/core/providers/Provider.dart';
+import 'package:stsj/global/api.dart';
 import 'package:stsj/global/font.dart';
 import 'package:stsj/global/function.dart';
 import 'package:stsj/global/widget/app_bar.dart';
@@ -100,6 +101,32 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
         getFilter(context, state);
         state.setSearchTriggerNotifier(true);
       }
+    }
+  }
+
+  void exportHistory(
+    MenuState state,
+    String branch,
+    String shop,
+    String location,
+    String employee,
+    String startDate,
+    String endDate,
+  ) {
+    if (branch.isEmpty) {
+      GlobalFunction.showSnackbar(
+        context,
+        'Mohon periksa kembali filter cabang anda.',
+      );
+    } else {
+      state.getExportFile(
+        branch,
+        shop,
+        location,
+        employee,
+        startDate,
+        endDate,
+      );
     }
   }
 
@@ -473,12 +500,15 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
 
                             // ~:Export to Download Button:~
                             InkWell(
-                              onTap: () {
-                                GlobalFunction.showSnackbar(
-                                  context,
-                                  'Coming Soon.',
-                                );
-                              },
+                              onTap: () => exportHistory(
+                                state,
+                                branch,
+                                shop,
+                                location,
+                                employee,
+                                startDate,
+                                endDate,
+                              ),
                               child: Container(
                                 height:
                                     MediaQuery.of(context).size.height * 0.05,
@@ -575,7 +605,7 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
                               } else if (snapshot.hasError) {
                                 isLoading = false;
                                 return Center(
-                                  child: Text('Terjadi kesaalahan.'),
+                                  child: Text('Terjadi kesalahan.'),
                                 );
                               } else if (!snapshot.hasData) {
                                 isLoading = false;

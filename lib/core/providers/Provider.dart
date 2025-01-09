@@ -27,9 +27,11 @@ import 'package:stsj/core/models/Dashboard/delivery.dart';
 import 'package:stsj/core/models/Dashboard/delivery_memo.dart';
 import 'package:stsj/core/models/Dashboard/delivery_history.dart';
 import 'package:stsj/core/models/Dashboard/driver.dart';
+import 'package:stsj/core/models/Dashboard/picking_packing.dart';
 import 'package:stsj/core/models/Report/absent_history.dart';
 import 'package:stsj/global/api.dart';
 import 'package:stsj/router/router_const.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoadingModel with ChangeNotifier {
   bool _isLoading = true;
@@ -1429,19 +1431,23 @@ class MenuState with ChangeNotifier {
   List<SipSalesmanModel> get getSipSalesmanList => sipSalesmanList;
 
   Future<void> filterSipSalesman() async {
-    if (sipSalesmanList.isEmpty) {
-      await fetchSipSalesman();
+    try {
+      if (sipSalesmanList.isEmpty) {
+        await fetchSipSalesman();
+      }
+
+      sipSalesmanList.clear();
+      sipSalesmanList.addAll(await fetchSipSalesman(
+        branch: getSelectedBranch,
+        shop: getSelectedShop,
+        location: getSelectedLocation,
+      ));
+
+      log('filter Salesman List: ${sipSalesmanList.length}');
+      notifyListeners();
+    } catch (e) {
+      log('FilterSipSalesman Error: $e');
     }
-
-    sipSalesmanList.clear();
-    sipSalesmanList.addAll(await fetchSipSalesman(
-      branch: getSelectedBranch,
-      shop: getSelectedShop,
-      location: getSelectedLocation,
-    ));
-
-    // log('filter Salesman List: ${sipSalesmanList.length}');
-    notifyListeners();
   }
 
   Future<List<SipSalesmanModel>> fetchSipSalesman({
@@ -1495,28 +1501,37 @@ class MenuState with ChangeNotifier {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('UserID') ?? '';
 
-    // print('Fetch Sip Salesman History Parameters');
-    // print('UserID: $userId');
-    // print(
-    //     'Branch: ${sipBranchList.where((e) => e.branchName == branch).first.branchCode}');
-    // print(
-    //     'Shop: ${sipShopList.where((e) => e.shopName == shop).first.shopCode}');
-    // print(
-    //     'Location: ${sipLocationList.where((e) => e.locationName == location).first.locationId}');
-    // print('Employee Name: $employee');
-    // print('Begin Date: $beginDate');
-    // print('End Date: $endDate');
+    print('Fetch Sip Salesman History Parameters');
+    print('UserID: $userId');
+    print(
+        'Branch: ${sipBranchList.where((e) => e.branchName == branch).first.branchCode}');
+
+    String shopCode = '';
+    if (shop.isNotEmpty) {
+      shopCode = sipShopList.where((e) => e.shopName == shop).first.shopCode;
+      print('Shop: $shopCode');
+    }
+
+    String locationCode = '';
+    if (location.isNotEmpty) {
+      locationCode = sipLocationList
+          .where((e) => e.locationName == location)
+          .first
+          .locationId;
+      print('Location: $locationCode');
+    }
+
+    print('Employee Name: $employee');
+    print('Begin Date: $beginDate');
+    print('End Date: $endDate');
 
     try {
       sipSalesmanHistoryList.clear();
       sipSalesmanHistoryList.addAll(await GlobalAPI.getSipSalesmanHistory(
         userId,
         sipBranchList.where((e) => e.branchName == branch).first.branchCode,
-        sipShopList.where((e) => e.shopName == shop).first.shopCode,
-        sipLocationList
-            .where((e) => e.locationName == location)
-            .first
-            .locationId,
+        shopCode,
+        locationCode,
         employee,
         beginDate,
         endDate,
@@ -1524,25 +1539,272 @@ class MenuState with ChangeNotifier {
       // print('Salesman History length: ${sipSalesmanHistoryList.length}');
 
       if (sipSalesmanHistoryList.isNotEmpty) {
-        // print('Salesman History length: ${sipSalesmanHistoryList.length}');
+        print('Salesman History length: ${sipSalesmanHistoryList.length}');
         return {
           'status': 'success',
           'data': sipSalesmanHistoryList,
         };
       } else {
-        // print('Salesman History is empty');
+        print('Salesman History is empty');
         return {
           'status': 'failed',
           'data': [],
         };
       }
     } catch (e) {
-      // print('FetchSipSalesmanHistory Error: $e');
+      print('FetchSipSalesmanHistory Error: $e');
       return {
         'status': 'error',
         'data': [],
       };
     }
+  }
+
+  Future<void> getExportFile(
+    String branch,
+    String shop,
+    String locationId,
+    String employeeId,
+    String startDate,
+    String endDate,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    String userId = prefs.getString('UserID') ?? '';
+
+    branch =
+        sipBranchList.where((e) => e.branchName == branch).first.branchCode;
+
+    if (shop.isNotEmpty) {
+      shop = sipShopList.where((e) => e.shopName == shop).first.shopCode;
+      print('Shop: $shop');
+    }
+
+    if (locationId.isNotEmpty) {
+      locationId = sipLocationList
+          .where((e) => e.locationName == locationId)
+          .first
+          .locationId;
+      print('Location: $locationId');
+    }
+
+    String baseUrl =
+        "https://wsip.yamaha-jatim.co.id:2449/Report/ExportPDF?PT=BASRA&Param={'PT':'BASRA','ReportName':'ATTENDANCE HISTORY','Filter1':'$userId','Filter2':'$branch','Filter3':'$shop','Filter4':'$locationId','Filter5':'$employeeId','Filter6':'$startDate','Filter7':'$endDate','Filter8':'','Filter9':'','Filter10':'','Filter11':'','Filter12':'','Filter13':'','Filter14':'','Filter15':''}";
+    print('Base URL: $baseUrl');
+
+    try {
+      await launchUrl(Uri.parse(baseUrl));
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  // ====================================================================
+  // ======================== Picking & Packing =========================
+  // ====================================================================
+  List<String> pickingPicList = [];
+  List<String> get getPickingPicList => pickingPicList;
+
+  Future<void> fetchPickingPIC(String branchName) async {
+    await GlobalAPI.fetchPickingPIC(
+      branchShopList.where((e) => e.name == branchName).first.branchId,
+      branchShopList.where((e) => e.name == branchName).first.shopId,
+    ).then((res) {
+      if (res['status'] == 'success') {
+        pickingPicList.clear();
+        pickingPicList.addAll(res['data']);
+        print('PIC List length: ${pickingPicList.length}');
+      } else {
+        pickingPicList.clear();
+        print('PIC List is empty');
+      }
+    });
+  }
+
+  String ppBranchName = '';
+  String get getPPBranchName => ppBranchName;
+
+  void setPpBranchName(String value) {
+    ppBranchName = value;
+    notifyListeners();
+  }
+
+  List<PickPackModel> pickingList = [];
+  List<PickPackModel> get getPickingList => pickingList;
+
+  Future<Map<String, dynamic>> fetchPickingData(
+    String date,
+    String pic,
+  ) async {
+    print('Branch Shop name: $getPPBranchName');
+    print(
+        'Branch Id: ${branchShopList.where((e) => e.name == getPPBranchName).first.branchId}');
+    print(
+        'Shop Id: ${branchShopList.where((e) => e.name == getPPBranchName).first.shopId}');
+
+    Map<String, dynamic> res = {
+      'status': 'not found',
+      'data': [],
+    };
+
+    await GlobalAPI.fetchPickingData(
+      branchShopList.where((e) => e.name == getPPBranchName).first.branchId,
+      branchShopList.where((e) => e.name == getPPBranchName).first.shopId,
+      date,
+      pic,
+    ).then((results) {
+      res.update('status', (_) => results['status']);
+      if (results['status'] == 'success') {
+        pickingList.clear();
+        pickingList.addAll(results['data']);
+
+        res.update('data', (_) => pickingList);
+      } else {
+        pickingList.clear();
+      }
+
+      return res;
+    });
+
+    return res;
+  }
+
+  List<PickPackDetailsModel> pickingDetailsList = [];
+  List<PickPackDetailsModel> get getPickingDetailsList => pickingDetailsList;
+
+  Future<Map<String, dynamic>> fetchPickingDetails(
+    String date,
+    String pic,
+  ) async {
+    print('Branch Shop name: $getPPBranchName');
+    print(
+        'Branch Id: ${branchShopList.where((e) => e.name == getPPBranchName).first.branchId}');
+    print(
+        'Shop Id: ${branchShopList.where((e) => e.name == getPPBranchName).first.shopId}');
+
+    Map<String, dynamic> res = {
+      'status': 'not found',
+      'data': [],
+    };
+
+    await GlobalAPI.fetchPickingDetails(
+      branchShopList.where((e) => e.name == getPPBranchName).first.branchId,
+      branchShopList.where((e) => e.name == getPPBranchName).first.shopId,
+      date,
+      pic,
+    ).then((results) {
+      res.update('status', (_) => results['status']);
+      if (results['status'] == 'success') {
+        pickingDetailsList.clear();
+        pickingDetailsList.addAll(results['data']);
+
+        res.update('data', (_) => pickingDetailsList);
+      } else {
+        pickingDetailsList.clear();
+      }
+
+      return res;
+    });
+
+    return res;
+  }
+
+  List<String> packingPicList = [];
+  List<String> get getPackingPicList => packingPicList;
+
+  Future<void> fetchPackingPIC(String branchName) async {
+    await GlobalAPI.fetchPackingPIC(
+      branchShopList.where((e) => e.name == branchName).first.branchId,
+      branchShopList.where((e) => e.name == branchName).first.shopId,
+    ).then((res) {
+      if (res['status'] == 'success') {
+        packingPicList.clear();
+        packingPicList.addAll(res['data']);
+        print('PIC List length: ${packingPicList.length}');
+      } else {
+        packingPicList.clear();
+        print('PIC List is empty');
+      }
+    });
+  }
+
+  List<PickPackModel> packingList = [];
+  List<PickPackModel> get getPackingList => packingList;
+
+  Future<Map<String, dynamic>> fetchPackingData(
+    String date,
+    String pic,
+  ) async {
+    print('Branch Shop name: $getPPBranchName');
+    print(
+        'Branch Id: ${branchShopList.where((e) => e.name == getPPBranchName).first.branchId}');
+    print(
+        'Shop Id: ${branchShopList.where((e) => e.name == getPPBranchName).first.shopId}');
+
+    Map<String, dynamic> res = {
+      'status': 'not found',
+      'data': [],
+    };
+
+    await GlobalAPI.fetchPackingData(
+      branchShopList.where((e) => e.name == getPPBranchName).first.branchId,
+      branchShopList.where((e) => e.name == getPPBranchName).first.shopId,
+      date,
+      pic,
+    ).then((results) {
+      res.update('status', (_) => results['status']);
+      if (results['status'] == 'success') {
+        packingList.clear();
+        packingList.addAll(results['data']);
+
+        res.update('data', (_) => packingList);
+      } else {
+        packingList.clear();
+      }
+
+      return res;
+    });
+
+    return res;
+  }
+
+  List<PickPackDetailsModel> packingDetailsList = [];
+  List<PickPackDetailsModel> get getPackingDetailsList => packingDetailsList;
+
+  Future<Map<String, dynamic>> fetchPackingDetails(
+    String date,
+    String pic,
+  ) async {
+    print('Branch Shop name: $getPPBranchName');
+    print(
+        'Branch Id: ${branchShopList.where((e) => e.name == getPPBranchName).first.branchId}');
+    print(
+        'Shop Id: ${branchShopList.where((e) => e.name == getPPBranchName).first.shopId}');
+
+    Map<String, dynamic> res = {
+      'status': 'not found',
+      'data': [],
+    };
+
+    await GlobalAPI.fetchPackingDetails(
+      branchShopList.where((e) => e.name == getPPBranchName).first.branchId,
+      branchShopList.where((e) => e.name == getPPBranchName).first.shopId,
+      date,
+      pic,
+    ).then((results) {
+      res.update('status', (_) => results['status']);
+      if (results['status'] == 'success') {
+        packingDetailsList.clear();
+        packingDetailsList.addAll(results['data']);
+
+        res.update('data', (_) => packingDetailsList);
+      } else {
+        packingDetailsList.clear();
+      }
+
+      return res;
+    });
+
+    return res;
   }
   // ~:NEW:~
 }

@@ -24,7 +24,7 @@ class DashboardMenuComponent extends HookWidget {
       child: SingleChildScrollView(
         child: Wrap(
           children: [
-            // Sales Dashboard
+            // ~:Sales Dashboard:~
             Builder(
               builder: (context) {
                 if (state.getSubHeaderList.contains('000')) {
@@ -48,7 +48,7 @@ class DashboardMenuComponent extends HookWidget {
               },
             ),
 
-            // Service Dashboard
+            // ~:Service Dashboard:~
             Builder(
               builder: (context) {
                 if (state.getSubHeaderList.contains('002')) {
@@ -72,7 +72,7 @@ class DashboardMenuComponent extends HookWidget {
               },
             ),
 
-            // Delivery
+            // ~:Delivery:~
             Builder(
               builder: (context) {
                 // With User Access
@@ -94,22 +94,54 @@ class DashboardMenuComponent extends HookWidget {
                 } else {
                   return const SizedBox();
                 }
+              },
+            ),
 
-                // Without User Access
-                // return Container(
-                //   margin: EdgeInsets.only(right: 50.0),
-                //   child: Column(
-                //     children: [
-                //       _buildMenuIcon(
-                //         context,
-                //         'assets/images/delivery.png',
-                //         'Delivery',
-                //         RoutesConstant.delivery,
-                //       ),
-                //       const Text('Delivery'),
-                //     ],
-                //   ),
-                // );
+            // ~:Picking PIC:~
+            Builder(
+              builder: (context) {
+                if (state.getSubHeaderList.contains('004')) {
+                  return Container(
+                    margin: EdgeInsets.only(right: 50.0),
+                    child: Column(
+                      children: [
+                        _buildMenuIcon(
+                          context,
+                          'assets/images/picking.png',
+                          'Delivery',
+                          RoutesConstant.picking,
+                        ),
+                        const Text('Picking'),
+                      ],
+                    ),
+                  );
+                } else {
+                  return const SizedBox();
+                }
+              },
+            ),
+
+            // ~:Packing PIC:~
+            Builder(
+              builder: (context) {
+                if (state.getSubHeaderList.contains('005')) {
+                  return Container(
+                    margin: EdgeInsets.only(right: 50.0),
+                    child: Column(
+                      children: [
+                        _buildMenuIcon(
+                          context,
+                          'assets/images/packing.png',
+                          'Delivery',
+                          RoutesConstant.packing,
+                        ),
+                        const Text('Packing'),
+                      ],
+                    ),
+                  );
+                } else {
+                  return const SizedBox();
+                }
               },
             ),
           ],

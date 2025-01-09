@@ -23,6 +23,8 @@ import 'package:stsj/core/views/report/mds_sparepart_stock.dart';
 import 'package:stsj/core/views/report/service_history.dart';
 import 'package:stsj/core/views/sales_dashboard/delivery.dart';
 import 'package:stsj/core/views/sales_dashboard/delivery_map.dart';
+import 'package:stsj/core/views/sales_dashboard/packing.dart';
+import 'package:stsj/core/views/sales_dashboard/picking.dart';
 import 'package:stsj/global/globalVar.dart';
 import 'package:stsj/global/widget/open_map.dart';
 
@@ -163,6 +165,20 @@ class RouterSettings {
                 },
               ),
             ],
+          ),
+          GoRoute(
+            name: RoutesConstant.picking,
+            path: 'picking',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: PickingPage());
+            },
+          ),
+          GoRoute(
+            name: RoutesConstant.packing,
+            path: 'packing',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: PackingPage());
+            },
           ),
           GoRoute(
             name: RoutesConstant.service,

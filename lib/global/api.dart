@@ -19,6 +19,7 @@ import 'package:stsj/core/models/Dashboard/delivery.dart';
 import 'package:stsj/core/models/Dashboard/delivery_history.dart';
 import 'package:stsj/core/models/Dashboard/delivery_memo.dart';
 import 'package:stsj/core/models/Dashboard/driver.dart';
+import 'package:stsj/core/models/Dashboard/picking_packing.dart';
 import 'package:stsj/core/models/Report/absent_history.dart';
 
 class GlobalAPI {
@@ -404,6 +405,388 @@ class GlobalAPI {
     } catch (e) {
       print('Error: ${e.toString()}');
       return salesmanHistoryList;
+    }
+  }
+
+  static Future<Map<String, dynamic>> fetchPickingPIC(
+    String branch,
+    String shop,
+  ) async {
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/api/MDPart/PickingPIC',
+    );
+
+    Map mapFetchPickingPIC = {
+      "Branch": branch,
+      "Shop": shop,
+    };
+
+    print(mapFetchPickingPIC);
+
+    List<String> list = [];
+
+    try {
+      final response =
+          await http.post(url, body: jsonEncode(mapFetchPickingPIC), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      // print(response.body);
+
+      if (response.statusCode <= 200) {
+        var jsonBranches = jsonDecode(response.body);
+        print(jsonBranches);
+        if (jsonBranches['code'] == '100' && jsonBranches['msg'] == 'Sukses') {
+          list.addAll((jsonBranches['data'] as List)
+              .map<String>((element) => element['pic'])
+              .toList());
+
+          print('success');
+          return {
+            'status': 'success',
+            'data': list,
+          };
+        } else {
+          print('failed');
+          return {
+            'status': 'failed',
+            'data': list,
+          };
+        }
+      }
+
+      print('Not found');
+      return {
+        'status': 'not found',
+        'data': list,
+      };
+    } catch (e) {
+      print('Error: ${e.toString()}');
+      return {
+        'status': 'error',
+        'data': list,
+      };
+    }
+  }
+
+  static Future<Map<String, dynamic>> fetchPickingData(
+    String branch,
+    String shop,
+    String date,
+    String pic,
+  ) async {
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/api/MDPart/DashboardPicking01',
+    );
+
+    Map mapFetchPackingData = {
+      "Branch": branch,
+      "Shop": shop,
+      "CurrentDate": date,
+      "PIC": pic,
+    };
+
+    print(mapFetchPackingData);
+
+    List<PickPackModel> list = [];
+
+    try {
+      final response =
+          await http.post(url, body: jsonEncode(mapFetchPackingData), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      // print(response.body);
+
+      if (response.statusCode <= 200) {
+        var jsonBranches = jsonDecode(response.body);
+        if (jsonBranches['code'] == '100' && jsonBranches['msg'] == 'Sukses') {
+          list.addAll((jsonBranches['data'] as List)
+              .map<PickPackModel>((list) => PickPackModel.fromJson(list))
+              .toList());
+
+          print('success');
+          return {
+            'status': 'success',
+            'data': list,
+          };
+        } else {
+          print('failed');
+          return {
+            'status': 'failed',
+            'data': list,
+          };
+        }
+      }
+
+      print('Not found');
+      return {
+        'status': 'not found',
+        'data': list,
+      };
+    } catch (e) {
+      print('Error: ${e.toString()}');
+      return {
+        'status': 'error',
+        'data': list,
+      };
+    }
+  }
+
+  static Future<Map<String, dynamic>> fetchPickingDetails(
+    String branch,
+    String shop,
+    String date,
+    String pic,
+  ) async {
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/api/MDPart/DashboardPicking02',
+    );
+
+    Map mapFetchPackingdata = {
+      "Branch": branch,
+      "Shop": shop,
+      "CurrentDate": date,
+      "PIC": pic,
+    };
+
+    print(mapFetchPackingdata);
+
+    List<PickPackDetailsModel> list = [];
+
+    try {
+      final response =
+          await http.post(url, body: jsonEncode(mapFetchPackingdata), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      // print(response.body);
+
+      if (response.statusCode <= 200) {
+        var jsonBranches = jsonDecode(response.body);
+        if (jsonBranches['code'] == '100' && jsonBranches['msg'] == 'Sukses') {
+          list.addAll((jsonBranches['data'] as List)
+              .map<PickPackDetailsModel>(
+                  (list) => PickPackDetailsModel.fromJson(list))
+              .toList());
+
+          print('success');
+          return {
+            'status': 'success',
+            'data': list,
+          };
+        } else {
+          print('failed');
+          return {
+            'status': 'failed',
+            'data': list,
+          };
+        }
+      }
+
+      print('Not found');
+      return {
+        'status': 'not found',
+        'data': list,
+      };
+    } catch (e) {
+      print('Error: ${e.toString()}');
+      return {
+        'status': 'error',
+        'data': list,
+      };
+    }
+  }
+
+  static Future<Map<String, dynamic>> fetchPackingPIC(
+    String branch,
+    String shop,
+  ) async {
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/api/MDPart/PackingPIC',
+    );
+
+    Map mapFetchPackingPIC = {
+      "Branch": branch,
+      "Shop": shop,
+    };
+
+    print(mapFetchPackingPIC);
+
+    List<String> list = [];
+
+    try {
+      final response =
+          await http.post(url, body: jsonEncode(mapFetchPackingPIC), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      // print(response.body);
+
+      if (response.statusCode <= 200) {
+        var jsonBranches = jsonDecode(response.body);
+        print(jsonBranches);
+        if (jsonBranches['code'] == '100' && jsonBranches['msg'] == 'Sukses') {
+          list.addAll((jsonBranches['data'] as List)
+              .map<String>((element) => element['pic'])
+              .toList());
+
+          print('success');
+          return {
+            'status': 'success',
+            'data': list,
+          };
+        } else {
+          print('failed');
+          return {
+            'status': 'failed',
+            'data': list,
+          };
+        }
+      }
+
+      print('Not found');
+      return {
+        'status': 'not found',
+        'data': list,
+      };
+    } catch (e) {
+      print('Error: ${e.toString()}');
+      return {
+        'status': 'error',
+        'data': list,
+      };
+    }
+  }
+
+  static Future<Map<String, dynamic>> fetchPackingData(
+    String branch,
+    String shop,
+    String date,
+    String pic,
+  ) async {
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/api/MDPart/DashboardPacking01',
+    );
+
+    Map mapGetSipSalesmanHistory = {
+      "Branch": branch,
+      "Shop": shop,
+      "CurrentDate": date,
+      "PIC": pic,
+    };
+
+    print(mapGetSipSalesmanHistory);
+
+    List<PickPackModel> list = [];
+
+    try {
+      final response = await http
+          .post(url, body: jsonEncode(mapGetSipSalesmanHistory), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      // print(response.body);
+
+      if (response.statusCode <= 200) {
+        var jsonBranches = jsonDecode(response.body);
+        if (jsonBranches['code'] == '100' && jsonBranches['msg'] == 'Sukses') {
+          list.addAll((jsonBranches['data'] as List)
+              .map<PickPackModel>((list) => PickPackModel.fromJson(list))
+              .toList());
+
+          return {
+            'status': 'success',
+            'data': list,
+          };
+        } else {
+          return {
+            'status': 'failed',
+            'data': list,
+          };
+        }
+      }
+      return {
+        'status': 'not found',
+        'data': list,
+      };
+    } catch (e) {
+      print('Error: ${e.toString()}');
+      return {
+        'status': 'error',
+        'data': list,
+      };
+    }
+  }
+
+  static Future<Map<String, dynamic>> fetchPackingDetails(
+    String branch,
+    String shop,
+    String date,
+    String pic,
+  ) async {
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/api/MDPart/DashboardPacking02',
+    );
+
+    Map mapFetchPickingdata = {
+      "Branch": branch,
+      "Shop": shop,
+      "CurrentDate": date,
+      "PIC": pic,
+    };
+
+    print(mapFetchPickingdata);
+
+    List<PickPackDetailsModel> list = [];
+
+    try {
+      final response =
+          await http.post(url, body: jsonEncode(mapFetchPickingdata), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      // print(response.body);
+
+      if (response.statusCode <= 200) {
+        var jsonBranches = jsonDecode(response.body);
+        if (jsonBranches['code'] == '100' && jsonBranches['msg'] == 'Sukses') {
+          list.addAll((jsonBranches['data'] as List)
+              .map<PickPackDetailsModel>(
+                  (list) => PickPackDetailsModel.fromJson(list))
+              .toList());
+
+          print('success');
+          return {
+            'status': 'success',
+            'data': list,
+          };
+        } else {
+          print('failed');
+          return {
+            'status': 'failed',
+            'data': list,
+          };
+        }
+      }
+
+      print('Not found');
+      return {
+        'status': 'not found',
+        'data': list,
+      };
+    } catch (e) {
+      print('Error: ${e.toString()}');
+      return {
+        'status': 'error',
+        'data': list,
+      };
     }
   }
   // ~:NEW:~

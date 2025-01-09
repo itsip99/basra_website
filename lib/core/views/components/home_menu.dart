@@ -225,7 +225,7 @@ class HomeMenuComponent extends HookWidget {
         if (context.mounted) {
           GlobalFunction.showSnackbar(
             context,
-            'Menu belum tersedia.',
+            'Mohon maaf, menu ini tidak dapat anda akses.',
           );
         }
       }

@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stsj/core/cleanArc/dashboard_service/helpers/format.dart';
-import 'package:stsj/core/models/Report/absent_history.dart';
 import 'package:stsj/core/providers/Provider.dart';
 import 'package:stsj/global/font.dart';
 
-class SalesmanAutoComplete extends StatefulWidget {
-  const SalesmanAutoComplete(
+class PicAutoComplete extends StatefulWidget {
+  const PicAutoComplete(
     this.inputan,
     this.setFilter, {
+    this.isPicking = false,
     super.key,
   });
 
   final String inputan;
   final Function setFilter;
+  final bool isPicking;
 
   @override
-  State<SalesmanAutoComplete> createState() => _SalesmanAutoCompleteState();
+  State<PicAutoComplete> createState() => _PicAutoCompleteState();
 }
 
-class _SalesmanAutoCompleteState extends State<SalesmanAutoComplete> {
+class _PicAutoCompleteState extends State<PicAutoComplete> {
   late String nameInputan;
 
   @override
@@ -42,10 +43,16 @@ class _SalesmanAutoCompleteState extends State<SalesmanAutoComplete> {
     //   print('Driver Name: ${driver.employeeName}');
     // }
 
-    if (widget.inputan != '' && state.getSipSalesmanList.isNotEmpty) {
-      nameInputan = (state.getSipSalesmanList.firstWhere((element) {
-        return element.employeeID == widget.inputan;
-      })).employeeName;
+    if (widget.inputan != '') {
+      if (widget.isPicking) {
+        nameInputan = (state.pickingPicList.firstWhere((element) {
+          return element == widget.inputan;
+        }));
+      } else {
+        nameInputan = (state.packingPicList.firstWhere((element) {
+          return element == widget.inputan;
+        }));
+      }
     } else {
       nameInputan = '';
     }
@@ -58,9 +65,9 @@ class _SalesmanAutoCompleteState extends State<SalesmanAutoComplete> {
         color: Colors.grey[400],
         borderRadius: BorderRadius.circular(15.0),
       ),
-      child: Autocomplete<SipSalesmanModel>(
+      child: Autocomplete<String>(
         initialValue: TextEditingValue(text: nameInputan),
-        optionsViewBuilder: (context, onSelected, people) {
+        optionsViewBuilder: (context, onSelected, pics) {
           return Align(
             alignment: Alignment.topLeft,
             child: Material(
@@ -68,30 +75,23 @@ class _SalesmanAutoCompleteState extends State<SalesmanAutoComplete> {
               borderRadius: BorderRadius.circular(20.0),
               child: SizedBox(
                 width: 330,
-                height: people.length > 2 ? 150 : people.length * 135,
+                height: pics.length > 2 ? 150 : pics.length * 135,
                 child: ListView.separated(
                   shrinkWrap: false,
-                  itemCount: people.length,
+                  itemCount: pics.length,
                   separatorBuilder: (context, _) => const Divider(height: 5),
                   itemBuilder: (BuildContext context, int index) {
-                    final SipSalesmanModel salesman = people.elementAt(index);
+                    final String pic = pics.elementAt(index);
 
                     return ListTile(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                       title: Text(
-                        salesman.employeeName,
+                        pic,
                         style: const TextStyle(color: Colors.black),
                       ),
-                      subtitle: Text(
-                        '${salesman.employeeID}\n${salesman.locationName}',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      onTap: () => onSelected(salesman),
+                      onTap: () => onSelected(pic),
                     );
                   },
                 ),
@@ -107,6 +107,7 @@ class _SalesmanAutoCompleteState extends State<SalesmanAutoComplete> {
         ) {
           if (state.isReset) {
             textEditingController.text = '';
+            state.setIsReset();
           }
 
           return TextField(
@@ -135,21 +136,27 @@ class _SalesmanAutoCompleteState extends State<SalesmanAutoComplete> {
             ),
           );
         },
-        displayStringForOption: (SipSalesmanModel salesman) {
-          return salesman.employeeName;
+        displayStringForOption: (String pic) {
+          return pic;
         },
         optionsBuilder: (TextEditingValue textEditingValue) {
-          if (textEditingValue.text == '' || state.getSipSalesmanList.isEmpty) {
+          if (textEditingValue.text == '') {
             return [];
           }
 
-          return state.getSipSalesmanList.where((SipSalesmanModel salesman) {
-            return salesman.employeeName.startsWith(textEditingValue.text) ||
-                salesman.employeeID.contains(textEditingValue.text);
-          }).toList();
+          if (widget.isPicking) {
+            return state.pickingPicList.where((String pic) {
+              return pic.startsWith(textEditingValue.text) ||
+                  pic.contains(textEditingValue.text);
+            }).toList();
+          } else {
+            return state.packingPicList.where((String pic) {
+              return pic.startsWith(textEditingValue.text) ||
+                  pic.contains(textEditingValue.text);
+            }).toList();
+          }
         },
-        onSelected: (SipSalesmanModel selection) =>
-            widget.setFilter(selection.employeeID),
+        onSelected: (String selection) => widget.setFilter(selection),
       ),
     );
   }

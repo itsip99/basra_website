@@ -222,6 +222,9 @@ class _HomePagesState extends State<HomePages>
                         ),
                       ],
                     ),
+                    padding: EdgeInsets.symmetric(
+                      vertical: MediaQuery.of(context).size.height * 0.025,
+                    ),
                     child: HomeMenuComponent(),
                   ),
                 ),

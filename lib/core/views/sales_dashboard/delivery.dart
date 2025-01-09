@@ -426,6 +426,7 @@ class _DeliveryPageState extends State<DeliveryPage> {
                                       hint: 'Cabang',
                                       handle: () {},
                                       disable: true,
+                                      isDriver: true,
                                     ),
                                   );
                                 } else {
@@ -454,6 +455,7 @@ class _DeliveryPageState extends State<DeliveryPage> {
                                       hint: 'Cabang',
                                       handle: setBranchShop,
                                       disable: false,
+                                      isDriver: true,
                                     ),
                                   );
                                 }

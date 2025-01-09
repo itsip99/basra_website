@@ -11,6 +11,8 @@ class SisBranchShopDropdown extends StatefulWidget {
     required this.handle,
     this.disable = false,
     this.isMobile = false,
+    this.isDriver = false,
+    this.isPicking = false,
     super.key,
   });
 
@@ -20,6 +22,8 @@ class SisBranchShopDropdown extends StatefulWidget {
   final Function handle;
   final bool disable;
   final bool isMobile;
+  final bool isDriver;
+  final bool isPicking;
 
   @override
   State<SisBranchShopDropdown> createState() => _SisBranchShopDropdownState();
@@ -93,8 +97,15 @@ class _SisBranchShopDropdownState extends State<SisBranchShopDropdown> {
               // print('Province Dropdown value: $value');
               state.setBranchNameNotifier(value);
 
-              // Note -> Not working perfectly yet
-              state.filterDriver(newValues.toString());
+              if (widget.isDriver) {
+                state.filterDriver(newValues.toString());
+              } else {
+                if (widget.isPicking) {
+                  state.fetchPickingPIC(newValues.toString());
+                } else {
+                  state.fetchPackingPIC(newValues.toString());
+                }
+              }
 
               await widget.handle(newValues);
             }
@@ -141,8 +152,15 @@ class _SisBranchShopDropdownState extends State<SisBranchShopDropdown> {
               // print('Province Dropdown value: $value');
               state.setBranchNameNotifier(value);
 
-              // Note -> Not working perfectly yet
-              state.filterDriver(newValues.toString());
+              if (widget.isDriver) {
+                state.filterDriver(newValues.toString());
+              } else {
+                if (widget.isPicking) {
+                  state.fetchPickingPIC(newValues.toString());
+                } else {
+                  state.fetchPackingPIC(newValues.toString());
+                }
+              }
 
               await widget.handle(newValues);
             }

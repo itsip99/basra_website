@@ -26,6 +26,9 @@ class RoutesConstant {
   static String weeklyActivitiesReport = 'weeklyActivitiesReport';
   static String activitiesPoint = 'activitiesPoint';
   static String editActivitiesPoint = 'editActivitiesPoint';
+  // ~:Dashboard:~
+  static String picking = 'picking';
+  static String packing = 'packing';
   // ~:Information Section:~
   static String absentHistory = 'absentHistory';
   static String bikesHistory = 'bikesHistory';

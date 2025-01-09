@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:stsj/core/models/Dashboard/delivery_memo.dart';
+import 'package:stsj/core/models/Dashboard/picking_packing.dart';
 import 'package:stsj/core/providers/Provider.dart';
-import 'package:stsj/global/datagrid_table.dart';
 import 'package:stsj/global/font.dart';
+import 'package:stsj/global/widget/gridtable/delivery_data_source.dart';
+import 'package:stsj/global/widget/gridtable/picking_packing_data_source.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class GlobalFunction {
@@ -371,16 +373,6 @@ class GlobalFunction {
                     child: Text('terjadi kesalahan, mohon coba lagi.'),
                   );
                 } else {
-                  // return Column(
-                  //   children: memos.map((e) {
-                  //     DeliveryMemoModel memo = e;
-                  //
-                  //     return Text(
-                  //       '${memo.transNumber}, ${memo.transDate}, ${memo.casing.length}',
-                  //     );
-                  //   }).toList(),
-                  // );
-
                   return SfDataGrid(
                     source: DeliveryDataSource(deliveryData: memos),
                     columnWidthMode: ColumnWidthMode.fill,
@@ -524,4 +516,185 @@ class GlobalFunction {
       ),
     );
   }
+
+  // ~:Picking:~
+  // static void viewPicking(
+  //   BuildContext context,
+  //   MenuState state,
+  //   String dealerName,
+  //   String date,
+  //   String pic,
+  // ) {
+  //   showDialog(
+  //     context: context,
+  //     barrierDismissible: true,
+  //     builder: (context) => Dialog(
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(20),
+  //       ),
+  //       backgroundColor: Colors.blue.shade50,
+  //       elevation: 16,
+  //       child: Container(
+  //         // width: MediaQuery.of(context).size.width * 0.35,
+  //         height: MediaQuery.of(context).size.height * 0.9,
+  //         decoration: BoxDecoration(
+  //           color: Colors.white,
+  //           borderRadius: BorderRadius.circular(15.0),
+  //         ),
+  //         padding: EdgeInsets.symmetric(
+  //           horizontal: MediaQuery.of(context).size.width * 0.0125,
+  //           vertical: MediaQuery.of(context).size.height * 0.025,
+  //         ),
+  //         child: FutureBuilder(
+  //           future: state.fetchPickingData(date, pic),
+  //           builder: (context, snapshot) {
+  //             if (snapshot.connectionState == ConnectionState.waiting) {
+  //               return SizedBox(
+  //                 width: MediaQuery.of(context).size.width,
+  //                 child: Column(
+  //                   mainAxisAlignment: MainAxisAlignment.center,
+  //                   children: [
+  //                     CircularProgressIndicator(color: Colors.black),
+  //                     SizedBox(height: 10),
+  //                     Text(
+  //                       'Loading...',
+  //                       style: GlobalFont.bigfontR,
+  //                     ),
+  //                   ],
+  //                 ),
+  //               );
+  //             } else if (snapshot.hasError) {
+  //               return Center(
+  //                 child: Text('terjadi kesalahan, mohon coba lagi.'),
+  //               );
+  //             } else if (!snapshot.hasData) {
+  //               return Center(child: Text('Data tidak ditemukan'));
+  //             } else {
+  //               final List<PickPackModel> picking = snapshot.data![0];
+  //               final String status = snapshot.data![1];
+
+  //               if (status == 'failed') {
+  //                 return Center(child: Text('Gagal memuat data.'));
+  //               } else if (status == 'not found' || status == 'error') {
+  //                 return Center(
+  //                   child: Text('terjadi kesalahan, mohon coba lagi.'),
+  //                 );
+  //               } else {
+  //                 return SfDataGrid(
+  //                   source: PPDataSource(ppData: picking),
+  //                   columnWidthMode: ColumnWidthMode.fill,
+  //                   checkboxShape: RoundedRectangleBorder(
+  //                     side: BorderSide(color: Colors.grey),
+  //                     borderRadius: BorderRadius.circular(15.0),
+  //                   ),
+  //                   columns: <GridColumn>[
+  //                     GridColumn(
+  //                       columnName: 'header',
+  //                       width: MediaQuery.of(context).size.width * 0.1,
+  //                       label: Container(
+  //                         padding: EdgeInsets.all(16.0),
+  //                         alignment: Alignment.center,
+  //                         child: Text(''),
+  //                       ),
+  //                     ),
+  //                     GridColumn(
+  //                       columnName: 'tDu',
+  //                       width: MediaQuery.of(context).size.width * 0.1,
+  //                       label: Container(
+  //                         padding: EdgeInsets.all(16.0),
+  //                         alignment: Alignment.center,
+  //                         child: Text('Total'),
+  //                       ),
+  //                     ),
+  //                     GridColumn(
+  //                       columnName: 'tLine',
+  //                       width: MediaQuery.of(context).size.width * 0.075,
+  //                       label: Container(
+  //                         padding: EdgeInsets.all(8.0),
+  //                         alignment: Alignment.center,
+  //                         child: Text('On Going'),
+  //                       ),
+  //                     ),
+  //                     GridColumn(
+  //                       columnName: 'tLeadTime',
+  //                       width: MediaQuery.of(context).size.width * 0.075,
+  //                       label: Container(
+  //                         padding: EdgeInsets.all(8.0),
+  //                         alignment: Alignment.center,
+  //                         child: Text('On Going'),
+  //                       ),
+  //                     ),
+  //                     GridColumn(
+  //                       columnName: 'avgLeadTime',
+  //                       width: MediaQuery.of(context).size.width * 0.075,
+  //                       label: Container(
+  //                         padding: EdgeInsets.all(8.0),
+  //                         alignment: Alignment.center,
+  //                         child: Text('On Going'),
+  //                       ),
+  //                     ),
+  //                     GridColumn(
+  //                       columnName: 'diff',
+  //                       width: MediaQuery.of(context).size.width * 0.075,
+  //                       label: Container(
+  //                         padding: EdgeInsets.all(8.0),
+  //                         alignment: Alignment.center,
+  //                         child: Text('On Going'),
+  //                       ),
+  //                     ),
+  //                     GridColumn(
+  //                       columnName: 'avgDiff',
+  //                       width: MediaQuery.of(context).size.width * 0.1,
+  //                       label: Container(
+  //                         padding: EdgeInsets.all(16.0),
+  //                         alignment: Alignment.center,
+  //                         child: Text('Total'),
+  //                       ),
+  //                     ),
+  //                     GridColumn(
+  //                       columnName: 'tAmount',
+  //                       width: MediaQuery.of(context).size.width * 0.075,
+  //                       label: Container(
+  //                         padding: EdgeInsets.all(8.0),
+  //                         alignment: Alignment.center,
+  //                         child: Text('On Going'),
+  //                       ),
+  //                     ),
+  //                     GridColumn(
+  //                       columnName: 'onGoingDU',
+  //                       width: MediaQuery.of(context).size.width * 0.075,
+  //                       label: Container(
+  //                         padding: EdgeInsets.all(8.0),
+  //                         alignment: Alignment.center,
+  //                         child: Text('On Going'),
+  //                       ),
+  //                     ),
+  //                     GridColumn(
+  //                       columnName: 'onGoingLine',
+  //                       width: MediaQuery.of(context).size.width * 0.075,
+  //                       label: Container(
+  //                         padding: EdgeInsets.all(8.0),
+  //                         alignment: Alignment.center,
+  //                         child: Text('On Going'),
+  //                       ),
+  //                     ),
+  //                     GridColumn(
+  //                       columnName: 'onGoingAmount',
+  //                       width: MediaQuery.of(context).size.width * 0.075,
+  //                       label: Container(
+  //                         padding: EdgeInsets.all(8.0),
+  //                         alignment: Alignment.center,
+  //                         child: Text('On Going'),
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 );
+  //               }
+  //             }
+  //           },
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 }
