@@ -29,6 +29,7 @@ import 'package:stsj/core/models/Dashboard/delivery_history.dart';
 import 'package:stsj/core/models/Dashboard/driver.dart';
 import 'package:stsj/core/models/Dashboard/picking_packing.dart';
 import 'package:stsj/core/models/Report/absent_history.dart';
+import 'package:stsj/core/models/global_model.dart';
 import 'package:stsj/global/api.dart';
 import 'package:stsj/router/router_const.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -123,9 +124,13 @@ class MenuState with ChangeNotifier {
 
   List<String> get getHeaderList => headerList;
 
-  List<bool> headerStateList = [];
+  // List<bool> headerStateList = [];
 
-  List<bool> get getHeaderStateList => headerStateList;
+  // List<bool> get getHeaderStateList => headerStateList;
+
+  // List<UserAccessModel> subHeaderList = [];
+
+  // List<UserAccessModel> get getSubHeaderList => subHeaderList;
 
   List<String> subHeaderList = [];
 

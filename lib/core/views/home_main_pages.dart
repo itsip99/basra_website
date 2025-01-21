@@ -71,7 +71,13 @@ class _HomePagesState extends State<HomePages>
 
           // Note --> disable for a while to display dashboard menu as the initial page
           // Delivery Page is still considered as global page who can be accessed by all users
-          String category = data.first.category;
+          String category = '';
+          for (var userAccess in data) {
+            if (userAccess.isAllow == 1) {
+              category = userAccess.category;
+              break;
+            }
+          }
           if (category == 'DASHBOARD') {
             state.setStaticMenuNotifier('dashboard');
           } else if (category == 'SALES ACTIVITY') {
@@ -87,23 +93,39 @@ class _HomePagesState extends State<HomePages>
           }
 
           state.headerList.clear();
-          state.headerList.addAll(data.map((e) => e.category).toSet().toList());
+          // state.headerList.addAll(data.map((e) => e.category).toSet().toList());
+          state.headerList.addAll(data.map((e) {
+            if (e.isAllow == 1) {
+              return e.category;
+            } else {
+              return '-';
+            }
+          }).toList());
           // print('Header list length: ${state.headerList.length}');
           if (state.headerList.isEmpty) {
             state.headerList.add('dashboard');
           }
           await prefs.setStringList('header', state.headerList);
 
-          state.headerStateList.addAll(data.map((e) {
-            if (e.isAllow == 1) {
-              return true;
-            } else {
-              return false;
-            }
-          }).toList());
+          // state.headerStateList.addAll(data.map((e) {
+          //   if (e.isAllow == 1) {
+          //     return true;
+          //   } else {
+          //     return false;
+          //   }
+          // }).toList());
 
+          // state.subHeaderList.clear();
+          // state.subHeaderList.addAll(data.map((e) => e.menuNumber).toList());
+          // await prefs.setStringList('subheader', state.subHeaderList);
           state.subHeaderList.clear();
-          state.subHeaderList.addAll(data.map((e) => e.menuNumber).toList());
+          state.subHeaderList.addAll(data.map((e) {
+            if (e.isAllow == 1) {
+              return e.menuNumber;
+            } else {
+              return '-';
+            }
+          }));
           await prefs.setStringList('subheader', state.subHeaderList);
 
           // print('Menu Initialization Value: ${state.staticMenuNotifier.value}');

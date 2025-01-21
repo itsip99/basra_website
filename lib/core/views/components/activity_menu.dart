@@ -339,33 +339,33 @@ class ActivityMenuComponent extends HookWidget {
               ),
 
               // for UI purpose only
-              Expanded(
-                child: Builder(
-                  builder: (context) {
-                    if (state.getSubHeaderList.contains('0')) {
-                      print('112 is inside SubHeaderList');
-                      return Column(
-                        children: [
-                          // ~:NEW:~
-                          // Points
-                          _buildMenuIcon(
-                            context,
-                            'assets/images/coin.png',
-                            'Peta',
-                            RoutesConstant.activitiesPoint,
-                            state,
-                          ),
-                          const Text('Points'),
-                          // ~:NEW:~
-                        ],
-                      );
-                    } else {
-                      print('112 is not inside SubHeaderList');
-                      return const SizedBox();
-                    }
-                  },
-                ),
-              ),
+              // Expanded(
+              //   child: Builder(
+              //     builder: (context) {
+              //       if (state.getSubHeaderList.contains('0')) {
+              //         print('112 is inside SubHeaderList');
+              //         return Column(
+              //           children: [
+              //             // ~:NEW:~
+              //             // Points
+              //             _buildMenuIcon(
+              //               context,
+              //               'assets/images/coin.png',
+              //               'Peta',
+              //               RoutesConstant.activitiesPoint,
+              //               state,
+              //             ),
+              //             const Text('Points'),
+              //             // ~:NEW:~
+              //           ],
+              //         );
+              //       } else {
+              //         print('112 is not inside SubHeaderList');
+              //         return const SizedBox();
+              //       }
+              //     },
+              //   ),
+              // ),
             ],
           ),
         ],

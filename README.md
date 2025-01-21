@@ -17,6 +17,9 @@ v1.0.3
 - New Design! Picking and Packing have a new page design layout
 - Picking and Packing have a limited user access
 
+v1.0.4
+- User Access' bug fixes and performance improvements
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.

@@ -72,7 +72,14 @@ class _LoginPagesState extends State<LoginPages> {
           state.fetchSipSalesman();
 
           // ~:Header Privillage Preprocessing:~
-          String category = data.first.category;
+          String category = '';
+          for (var userAccess in data) {
+            if (userAccess.isAllow == 1) {
+              category = userAccess.category;
+              break;
+            }
+          }
+          print('First Category: $category');
           if (category == 'DASHBOARD') {
             state.setStaticMenuNotifier('dashboard');
           } else if (category == 'SALES ACTIVITY') {
@@ -88,24 +95,48 @@ class _LoginPagesState extends State<LoginPages> {
           }
 
           state.headerList.clear();
-          state.headerList.addAll(data.map((e) => e.category).toSet().toList());
+          state.headerList.addAll(data.map((e) {
+            if (e.isAllow == 1) {
+              return e.category;
+            } else {
+              return '-';
+            }
+          }).toList());
           if (state.headerList.isEmpty) {
             state.headerList.add('dashboard');
           }
           await prefs.setStringList('header', state.headerList);
+          print('~:List of Header:~');
+          for (var header in state.getHeaderList) {
+            print(header);
+          }
 
-          state.headerStateList.addAll(data.map((e) {
-            if (e.isAllow == 1) {
-              return true;
-            } else {
-              return false;
-            }
-          }).toList());
+          // state.headerStateList.addAll(data.map((e) {
+          //   if (e.isAllow == 1) {
+          //     return true;
+          //   } else {
+          //     return false;
+          //   }
+          // }).toList());
 
           // ~:Subheader Privillage Preprocessing:~
+          // state.subHeaderList.clear();
+          // state.subHeaderList.addAll(data.map((e) => e.menuNumber).toList());
+          // await prefs.setStringList('subheader', state.subHeaderList);
           state.subHeaderList.clear();
-          state.subHeaderList.addAll(data.map((e) => e.menuNumber).toList());
+          state.subHeaderList.addAll(data.map((e) {
+            if (e.isAllow == 1) {
+              return e.menuNumber;
+            } else {
+              return '-';
+            }
+          }));
           await prefs.setStringList('subheader', state.subHeaderList);
+
+          print('~:List of Sub Header:~');
+          for (var value in state.getSubHeaderList) {
+            print(value);
+          }
         });
       } else {
         // Handle the case where "Status" is not true or data is missing
@@ -409,7 +440,7 @@ class _LoginPagesState extends State<LoginPages> {
                 height: 25,
                 alignment: Alignment.center,
                 child: Text(
-                  'v1.0.3',
+                  'v1.0.4',
                   style: GlobalFont.mediumbigfontR,
                 ),
               ),
