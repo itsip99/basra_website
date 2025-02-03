@@ -1580,8 +1580,11 @@ class MenuState with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     String userId = prefs.getString('UserID') ?? '';
 
-    branch =
-        sipBranchList.where((e) => e.branchName == branch).first.branchCode;
+    if (branch.isNotEmpty) {
+      branch =
+          sipBranchList.where((e) => e.branchName == branch).first.branchCode;
+      print('Branch: $branch');
+    }
 
     if (shop.isNotEmpty) {
       shop = sipShopList.where((e) => e.shopName == shop).first.shopCode;

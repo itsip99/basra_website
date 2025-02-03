@@ -21,7 +21,7 @@ v1.0.4
 - User Access' bug fixes and performance improvements
 
 v1.0.5
-- Absent History's filter change, Branch is no longer mandatory and default Date range change from months to weeks
+- Absent History's filter change. Branch is no longer mandatory; default Date range change from months to weeks; and User can export without utilize data filter 
 
 ## Getting Started
 

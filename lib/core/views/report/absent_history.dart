@@ -116,21 +116,7 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
     String startDate,
     String endDate,
   ) {
-    if (branch.isEmpty) {
-      GlobalFunction.showSnackbar(
-        context,
-        'Mohon periksa kembali filter cabang anda.',
-      );
-    } else {
-      state.getExportFile(
-        branch,
-        shop,
-        location,
-        employee,
-        startDate,
-        endDate,
-      );
-    }
+    state.getExportFile(branch, shop, location, employee, startDate, endDate);
   }
 
   @override
