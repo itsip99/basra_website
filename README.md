@@ -20,6 +20,9 @@ v1.0.3
 v1.0.4
 - User Access' bug fixes and performance improvements
 
+v1.0.5
+- Absent History's filter change, Branch is no longer mandatory and default Date range change from months to weeks
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.

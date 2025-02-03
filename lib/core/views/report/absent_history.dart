@@ -34,7 +34,7 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
   String formattedStartDate = '';
   String formattedEndDate = '';
   DateTimeRange selectedRangeDate = DateTimeRange(
-    start: DateTime.now().subtract(const Duration(days: 31)),
+    start: DateTime.now().subtract(const Duration(days: 7)),
     end: DateTime.now(),
   );
 
@@ -91,16 +91,19 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
         'Mohon Tunggu.',
       );
     } else {
-      if (state.getSelectedBranch.isEmpty) {
-        GlobalFunction.showSnackbar(
-          context,
-          'Mohon periksa kembali filter cabang anda.',
-        );
-      } else {
-        state.setSearchTriggerNotifier(false);
-        getFilter(context, state);
-        state.setSearchTriggerNotifier(true);
-      }
+      state.setSearchTriggerNotifier(false);
+      getFilter(context, state);
+      state.setSearchTriggerNotifier(true);
+      // if (state.getSelectedBranch.isEmpty) {
+      //   GlobalFunction.showSnackbar(
+      //     context,
+      //     'Mohon periksa kembali filter cabang anda.',
+      //   );
+      // } else {
+      //   state.setSearchTriggerNotifier(false);
+      //   getFilter(context, state);
+      //   state.setSearchTriggerNotifier(true);
+      // }
     }
   }
 
@@ -558,7 +561,7 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
 
                           return GridView.count(
                             crossAxisCount: 4,
-                            childAspectRatio: 2.0,
+                            childAspectRatio: 1.6,
                             children: history.asMap().entries.map(
                               (details) {
                                 SipSalesmanHistoryModel detail = details.value;
@@ -620,7 +623,7 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
 
                                   return GridView.count(
                                     crossAxisCount: 4,
-                                    childAspectRatio: 2.0,
+                                    childAspectRatio: 1.6,
                                     children: history.asMap().entries.map(
                                       (details) {
                                         SipSalesmanHistoryModel detail =
@@ -662,7 +665,7 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
 
                           return GridView.count(
                             crossAxisCount: 4,
-                            childAspectRatio: 2.0,
+                            childAspectRatio: 1.6,
                             children: history.asMap().entries.map(
                               (details) {
                                 SipSalesmanHistoryModel detail = details.value;

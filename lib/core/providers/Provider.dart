@@ -1508,8 +1508,12 @@ class MenuState with ChangeNotifier {
 
     print('Fetch Sip Salesman History Parameters');
     print('UserID: $userId');
-    print(
-        'Branch: ${sipBranchList.where((e) => e.branchName == branch).first.branchCode}');
+
+    String branchCode = '';
+    if (branch.isNotEmpty) {
+      sipBranchList.where((e) => e.branchName == branch).first.branchCode;
+      print('Branch: $branchCode');
+    }
 
     String shopCode = '';
     if (shop.isNotEmpty) {
@@ -1534,7 +1538,7 @@ class MenuState with ChangeNotifier {
       sipSalesmanHistoryList.clear();
       sipSalesmanHistoryList.addAll(await GlobalAPI.getSipSalesmanHistory(
         userId,
-        sipBranchList.where((e) => e.branchName == branch).first.branchCode,
+        branchCode,
         shopCode,
         locationCode,
         employee,
