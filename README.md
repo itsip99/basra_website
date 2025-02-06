@@ -23,6 +23,9 @@ v1.0.4
 v1.0.5
 - Absent History's filter change. Branch is no longer mandatory; default Date range change from months to weeks; and User can export without utilize data filter 
 
+v1.0.6
+- Now, user can be able to export 2 types of report which are sales attendance report and meal transport allowance 
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.

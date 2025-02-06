@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:stsj/core/models/Report/absent_history.dart';
 import 'package:stsj/core/providers/Provider.dart';
-import 'package:stsj/global/api.dart';
 import 'package:stsj/global/font.dart';
 import 'package:stsj/global/function.dart';
 import 'package:stsj/global/widget/app_bar.dart';
@@ -39,6 +38,7 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
   );
 
   bool isLoading = false;
+  bool isHover = false;
 
   void preprocessingDate() {
     final startDay = selectedRangeDate.start;
@@ -114,9 +114,97 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
     String location,
     String employee,
     String startDate,
-    String endDate,
+    String endDate, {
+    bool isAttendance = false,
+  }) {
+    if (isAttendance) {
+      state.getExportData(
+        'ATTENDANCE HISTORY',
+        branch,
+        shop,
+        location,
+        employee,
+        startDate,
+        endDate,
+      );
+    } else {
+      state.getExportData(
+        'REKAP UANG MAKAN/TRANSPORT',
+        branch,
+        shop,
+        location,
+        employee,
+        startDate,
+        endDate,
+      );
+    }
+  }
+
+  // Function to show the floating popup
+  void showFloatingWidget(
+    BuildContext context,
+    MenuState state,
   ) {
-    state.getExportFile(branch, shop, location, employee, startDate, endDate);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.zero, // Remove default padding
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          content: Container(
+            width: 150,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min, // Make the dialog compact
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ListTile(
+                  title: Text('Jenis Laporan'),
+                ),
+                ListTile(
+                  title: Text('Absensi'),
+                  onTap: () {
+                    print('Absensi selected');
+                    exportHistory(
+                      state,
+                      branch,
+                      shop,
+                      location,
+                      employee,
+                      startDate,
+                      endDate,
+                      isAttendance: true,
+                    );
+                    Navigator.pop(context); // Close the dialog
+                  },
+                ),
+                ListTile(
+                  title: Text('Uang Makan & Transport'),
+                  onTap: () {
+                    print('Uang Makan selected');
+                    exportHistory(
+                      state,
+                      branch,
+                      shop,
+                      location,
+                      employee,
+                      startDate,
+                      endDate,
+                    );
+                    Navigator.pop(context); // Close the dialog
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -489,16 +577,18 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
 
                             // ~:Export to Download Button:~
                             InkWell(
-                              onTap: () => exportHistory(
-                                state,
-                                branch,
-                                shop,
-                                location,
-                                employee,
-                                startDate,
-                                endDate,
-                              ),
-                              child: Container(
+                              onTap: () => showFloatingWidget(context, state),
+                              // onTap: () => exportHistory(
+                              //   state,
+                              //   branch,
+                              //   shop,
+                              //   location,
+                              //   employee,
+                              //   startDate,
+                              //   endDate,
+                              // ),
+                              child: AnimatedContainer(
+                                duration: Duration(seconds: 1),
                                 height:
                                     MediaQuery.of(context).size.height * 0.05,
                                 alignment: Alignment.center,

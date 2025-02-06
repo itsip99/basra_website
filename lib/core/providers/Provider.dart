@@ -29,7 +29,6 @@ import 'package:stsj/core/models/Dashboard/delivery_history.dart';
 import 'package:stsj/core/models/Dashboard/driver.dart';
 import 'package:stsj/core/models/Dashboard/picking_packing.dart';
 import 'package:stsj/core/models/Report/absent_history.dart';
-import 'package:stsj/core/models/global_model.dart';
 import 'package:stsj/global/api.dart';
 import 'package:stsj/router/router_const.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -1569,7 +1568,8 @@ class MenuState with ChangeNotifier {
     }
   }
 
-  Future<void> getExportFile(
+  Future<void> getExportData(
+    String type,
     String branch,
     String shop,
     String locationId,
@@ -1579,6 +1579,7 @@ class MenuState with ChangeNotifier {
   ) async {
     final prefs = await SharedPreferences.getInstance();
     String userId = prefs.getString('UserID') ?? '';
+    String companyName = prefs.getString('CompanyName') ?? '';
 
     if (branch.isNotEmpty) {
       branch =
@@ -1600,7 +1601,7 @@ class MenuState with ChangeNotifier {
     }
 
     String baseUrl =
-        "https://wsip.yamaha-jatim.co.id:2449/Report/ExportXls?PT=BASRA&Param={'PT':'BASRA','ReportName':'ATTENDANCE HISTORY','Filter1':'$userId','Filter2':'$branch','Filter3':'$shop','Filter4':'$locationId','Filter5':'$employeeId','Filter6':'$startDate','Filter7':'$endDate','Filter8':'','Filter9':'','Filter10':'','Filter11':'','Filter12':'','Filter13':'','Filter14':'','Filter15':''}";
+        "https://wsip.yamaha-jatim.co.id:2449/Report/ExportXls?PT=BASRA&Param={'PT':'BASRA','ReportName':'$type','Filter1':'$companyName','Filter2':'$userId','Filter3':'$branch','Filter4':'$shop','Filter5':'$locationId','Filter6':'$employeeId','Filter7':'$startDate','Filter8':'$endDate','Filter9':'','Filter10':'','Filter11':'','Filter12':'','Filter13':'','Filter14':'','Filter15':''}";
     print('Base URL: $baseUrl');
 
     try {

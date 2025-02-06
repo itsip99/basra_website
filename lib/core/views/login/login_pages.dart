@@ -440,7 +440,7 @@ class _LoginPagesState extends State<LoginPages> {
                 height: 25,
                 alignment: Alignment.center,
                 child: Text(
-                  'v1.0.5',
+                  'v1.0.6',
                   style: GlobalFont.mediumbigfontR,
                 ),
               ),
