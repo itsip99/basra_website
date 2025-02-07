@@ -24,7 +24,10 @@ v1.0.5
 - Absent History's filter change. Branch is no longer mandatory; default Date range change from months to weeks; and User can export without utilize data filter 
 
 v1.0.6
-- Now, user can be able to export 2 types of report which are sales attendance report and meal transport allowance 
+- Now, user can be able to export 2 types of report which are sales attendance report and meal transport allowance
+
+v1.0.7
+- Absent History's branch filter section bug and performance fixes
 
 ## Getting Started
 

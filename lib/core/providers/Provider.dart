@@ -1332,16 +1332,17 @@ class MenuState with ChangeNotifier {
 
     sipBranchList.clear();
     sipBranchList.addAll(await GlobalAPI.getSipSalesBranches(userId));
-    // print('SIP Branch List: ${sipBranchList.length}');
+    print('SIP Branch List: ${sipBranchList.length}');
 
-    if (prefs.getStringList('sipBranches') == null) {
-      // log('SIP Branch Name List is empty');
+    if (prefs.getStringList('sipBranches') == null ||
+        prefs.getStringList('sipBranches')!.isEmpty) {
+      log('SIP Branch Name List is empty');
       await prefs.setStringList(
         'sipBranches',
         sipBranchList.map((e) => e.branchName).toList(),
       );
     } else {
-      // log('SIP Branch Name List is not empty');
+      log('SIP Branch Name List is not empty');
     }
   }
 
