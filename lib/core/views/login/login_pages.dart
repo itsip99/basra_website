@@ -15,7 +15,7 @@ import 'package:stsj/router/router_const.dart';
 class LoginPages extends StatefulWidget {
   const LoginPages({Key? key}) : super(key: key);
 
-  static const String route = '/login'; // Define the route name
+  // static const String route = '/login'; // Define the route name
 
   @override
   State<LoginPages> createState() => _LoginPagesState();
@@ -57,12 +57,12 @@ class _LoginPagesState extends State<LoginPages> {
         state.companyName = prefs.getString('CompanyName') ?? '';
 
         // ~:Load All Static Data:~
-        state.fetchSalesmanList();
-        state.fetchSISDriver();
-        state.fetchProvinces();
+        await state.fetchSalesmanList();
+        await state.fetchSISDriver();
+        await state.fetchProvinces();
         // Added before go to menu page too to make sure branch name changed
         state.fetchSISBranches();
-        state
+        await state
             .fetchUserAccess(state.getCompanyName, state.getEntryLevelId)
             .then((data) async {
           state.userAccessList.addAll(data);
@@ -177,7 +177,7 @@ class _LoginPagesState extends State<LoginPages> {
           listdatalogin[0].dataDT[0].pt,
         );
 
-        Auth.saveDataToSharedPreferences(listdatalogin[0].dataDT);
+        await Auth.saveDataToSharedPreferences(listdatalogin[0].dataDT);
         state.userCompanyAccList.addAll(listdatalogin[0].dataDT);
 
         canEntered = true;
@@ -195,7 +195,10 @@ class _LoginPagesState extends State<LoginPages> {
 
           await fetchData(state);
 
-          if (context.mounted) context.replaceNamed(RoutesConstant.homepage);
+          if (context.mounted) {
+            print('Current route: ${GoRouterState.of(context).name}');
+            context.pushReplacementNamed(RoutesConstant.homepage);
+          }
         }
       } else {
         // ~:Login failed:~
@@ -388,10 +391,11 @@ class _LoginPagesState extends State<LoginPages> {
                         ),
                       ),
                       onPressed: () {
-                        if (formKey.currentState!.validate()) {
-                          formKey.currentState!.save();
-                          loginHandler(context, state);
-                        }
+                        // if (formKey.currentState!.validate()) {
+                        //   formKey.currentState!.save();
+                        //   loginHandler(context, state);
+                        // }
+                        loginHandler(context, state);
                       },
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width,
@@ -440,7 +444,7 @@ class _LoginPagesState extends State<LoginPages> {
                 height: 25,
                 alignment: Alignment.center,
                 child: Text(
-                  'v1.0.7',
+                  'v1.0.8',
                   style: GlobalFont.mediumbigfontR,
                 ),
               ),

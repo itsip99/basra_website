@@ -56,16 +56,21 @@ class DataLoginController {
 
   static Future<void> setIntoSharedPreferences(
     String userID,
-    String EntryLevelID,
-    String EntryLevelName,
+    String levelID,
+    String levelName,
     String companyName,
   ) async {
-    SharedPreferences NamaLoginPref = await SharedPreferences.getInstance();
-    await NamaLoginPref.setBool("Status", true);
-    await NamaLoginPref.setString("UserID", userID);
-    await NamaLoginPref.setString("EntryLevelID", EntryLevelID);
-    await NamaLoginPref.setString("EntryLevelName", EntryLevelName);
-    await NamaLoginPref.setString("CompanyName", companyName);
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('Status', true);
+    print('Status: ${prefs.getBool('Status')}');
+    await prefs.setString('UserID', userID);
+    print('User ID: ${prefs.getString('UserID')}');
+    await prefs.setString('EntryLevelID', levelID);
+    print('Level ID: ${prefs.getString('EntryLevelID')}');
+    await prefs.setString('EntryLevelName', levelName);
+    print('Level Name: ${prefs.getString('EntryLevelName')}');
+    await prefs.setString('CompanyName', companyName);
+    print('Company Name: ${prefs.getString('CompanyName')}');
   }
 
   static void removeDataUser() async {

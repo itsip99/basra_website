@@ -30,13 +30,21 @@ class HomeMenuComponent extends HookWidget {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         print('fetchDataDT');
         stsjAuth.value = prefs.getBool('STSJ') ?? false;
+        // print('STSJ Access: ${sprAuth.value}');
         ssAuth.value = prefs.getBool('SS') ?? false;
+        // print('SS Access: ${ssAuth.value}');
         spAuth.value = prefs.getBool('SP') ?? false;
+        // print('SP Access: ${spAuth.value}');
         spaauth.value = prefs.getBool('SPAA') ?? false;
+        // print('SPAA Access: ${spaauth.value}');
         sampAuth.value = prefs.getBool('SAMP') ?? false;
+        // print('SAMP Access: ${sampAuth.value}');
         stAuth.value = prefs.getBool('ST') ?? false;
+        // print('ST Access: ${stAuth.value}');
         rssmAuth.value = prefs.getBool('RSSM') ?? false;
+        // print('RSSM Access: ${rssmAuth.value}');
         sprAuth.value = prefs.getBool('Spr') ?? false;
+        // print('Spr Access: ${sprAuth.value}');
 
         loadingmenu.value = false;
       } catch (e) {

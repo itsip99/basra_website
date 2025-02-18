@@ -29,6 +29,10 @@ v1.0.6
 v1.0.7
 - Absent History's branch filter section bug and performance fixes
 
+v1.0.8
+- Company authentication bug and performance fixes
+- Absent History - Absent History's branch filter section bug and performance fixes
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.

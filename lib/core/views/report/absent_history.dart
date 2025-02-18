@@ -77,6 +77,7 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
 
   void getFilter(BuildContext context, MenuState state) {
     branch = state.getSelectedBranch;
+    print('Selected Branch: ${state.getSelectedBranch}');
     shop = state.getSelectedShop;
     location = state.getSelectedLocation;
     employee = state.getSelectedSalesman;
@@ -94,6 +95,13 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
       state.setSearchTriggerNotifier(false);
       getFilter(context, state);
       state.setSearchTriggerNotifier(true);
+
+      print('Branch: $branch');
+      print('Shop: $shop');
+      print('Location: $location');
+      print('Employee: $employee');
+      print('Start date: $startDate');
+      print('End date: $endDate');
       // if (state.getSelectedBranch.isEmpty) {
       //   GlobalFunction.showSnackbar(
       //     context,

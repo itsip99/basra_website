@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stsj/core/controller/Login_controller.dart';
+import 'package:stsj/core/models/AuthModel/Auth_Model.dart';
 import 'package:stsj/core/providers/Provider.dart';
 import 'package:stsj/global/font.dart';
 import 'package:stsj/global/globalVar.dart';
@@ -46,6 +47,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
 
     final router = GoRouterState.of(context).name;
     final state = Provider.of<MenuState>(context);
+    print('CustomAppbar Current route: ${GoRouterState.of(context).name}');
 
     if (widget.isRoutes) {
       return AppBar(
@@ -81,7 +83,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(
-                'v1.0.7',
+                'v1.0.8',
                 style: GlobalFont.smallfontR,
               ),
             ],
@@ -112,29 +114,30 @@ class _CustomAppBarState extends State<CustomAppBar> {
                     itemBuilder: (BuildContext context) =>
                         <PopupMenuEntry<String>>[
                       PopupMenuItem<String>(
-                          value: 'logout',
-                          child: Text('Logout'),
-                          onTap: () async {
-                            DataLoginController.removeDataUser();
+                        value: 'logout',
+                        child: Text('Logout'),
+                        onTap: () async {
+                          // ~:Reset User Auth:~
+                          await Auth.resetAuth();
 
-                            final SharedPreferences prefs =
-                                await SharedPreferences.getInstance();
-                            prefs.clear();
+                          final SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+                          prefs.clear();
 
-                            // loginModel.setLogin(false);
+                          context.go(RoutesConstant.login);
 
-                            context.go(RoutesConstant.login);
-
-                            Fluttertoast.showToast(
-                              msg: "Anda telah Logout", // message
-                              toastLength: Toast.LENGTH_LONG, // length
-                              gravity: ToastGravity.CENTER, // location
-                              webPosition: "center",
-                              webBgColor:
-                                  "linear-gradient(to right, #00FF00, #00FF00)",
-                              timeInSecForIosWeb: 2, // duration
-                            );
-                          }),
+                          Fluttertoast.showToast(
+                            msg: 'Logout berhasil!', // message
+                            textColor: Colors.black,
+                            toastLength: Toast.LENGTH_LONG, // length
+                            gravity: ToastGravity.CENTER, // location
+                            webPosition: 'center',
+                            webBgColor:
+                                'linear-gradient(to right, #00FF00, #00FF00)',
+                            timeInSecForIosWeb: 2, // duration
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ),
@@ -168,7 +171,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(
-                'v1.0.7',
+                'v1.0.8',
                 style: GlobalFont.smallfontR,
               ),
             ],

@@ -1511,7 +1511,8 @@ class MenuState with ChangeNotifier {
 
     String branchCode = '';
     if (branch.isNotEmpty) {
-      sipBranchList.where((e) => e.branchName == branch).first.branchCode;
+      branchCode =
+          sipBranchList.where((e) => e.branchName == branch).first.branchCode;
       print('Branch: $branchCode');
     }
 

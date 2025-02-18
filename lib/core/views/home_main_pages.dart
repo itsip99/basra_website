@@ -1,6 +1,7 @@
 // ignore_for_file: use_key_in_widget_constructors, library_private_types_in_public_api, non_constant_identifier_names
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_grid/simple_grid.dart';
@@ -56,15 +57,15 @@ class _HomePagesState extends State<HomePages>
         state.companyName = prefs.getString('CompanyName') ?? '';
 
         // Check for null values and provide default values if needed
-        state.fetchSalesmanList();
+        await state.fetchSalesmanList();
         // print('Salesman List length: ${state.getSalesmanList.length}');
-        state.fetchSISDriver();
-        state.fetchProvinces();
+        await state.fetchSISDriver();
+        await state.fetchProvinces();
         // Added before go to menu page too to make sure branch name changed
-        state.fetchSISBranches();
+        await state.fetchSISBranches();
         // .then((_) => state.fetchAreas());
         // print('Provinces List length: ${state.getProvinceList.length}');
-        state
+        await state
             .fetchUserAccess(state.getCompanyName, state.getEntryLevelId)
             .then((data) async {
           state.userAccessList.addAll(data);
@@ -161,6 +162,7 @@ class _HomePagesState extends State<HomePages>
     double screenWidth = MediaQuery.of(context).size.width;
     bool screen = screenWidth >= screenHeight.screen;
     final state = Provider.of<MenuState>(context);
+    print('Current route: ${GoRouterState.of(context).name}');
 
     return Scaffold(
       appBar: PreferredSize(

@@ -6,7 +6,7 @@ class Auth {
   static Color primarycolor = Colors.blueAccent;
   static TextStyle fontdashboard = TextStyle(fontFamily: "fontdashboard");
 
-  static final List<String> DataListPT = [
+  static final List<String> companyList = [
     "STSJ",
     "SS",
     "SP",
@@ -17,7 +17,7 @@ class Auth {
     "SPr",
   ];
 
-  static final Map<String, bool> valueToBool = {
+  static Map<String, bool> accessGranted = {
     "STSJ": false,
     "SS": false,
     "SP": false,
@@ -49,50 +49,87 @@ class Auth {
   //   rssmAuth = prefs.getBool('RSSM') ?? false;
   // }
 
+  static Future<void> resetAuth() async {
+    accessGranted = {
+      "STSJ": false,
+      "SS": false,
+      "SP": false,
+      "SPAA": false,
+      "SAMP": false,
+      "ST": false,
+      "RSSM": false,
+      "SPr": false,
+    };
+
+    rssmAuth = false; // Roda Sakti Surya Megah
+    stsjAuth = false; // SURYA TIMUR SAKTI JATIM
+    spaauth = false; // SURYA PERKASA ANUGRAH ABADI
+    ssAuth = false; // SAPTA AJI MANUNGGAL PRIMA
+    sampAuth = false; // SAPTA AJI MANUNGGAL PRIMA
+    stAuth = false; //Surya Terang
+    spAuth = false; // Surya Prima
+    sprauth = false; //Surya Pratama
+  }
+
   static void updateBasedOnDataDT(List<DataDT> dataDT) {
     // Create a map to associate values with boolean variables
 
     for (var itemDt in dataDT) {
       final value = itemDt.pt;
-      if (DataListPT.contains(value)) {
-        valueToBool[value] = true;
+      if (companyList.contains(value)) {
+        accessGranted[value] = true;
+      } else {
+        accessGranted[value] = false;
       }
     }
 
-    print(valueToBool);
-    rssmAuth = valueToBool["RSSM"]!;
+    print(accessGranted);
+    rssmAuth = accessGranted["RSSM"] ?? false;
 
-    stsjAuth = valueToBool["STSJ"]!;
+    stsjAuth = accessGranted["STSJ"] ?? false;
 
-    spaauth = valueToBool["SPAA"]!;
-    sampAuth = valueToBool["SAMP"]!;
+    spaauth = accessGranted["SPAA"] ?? false;
+    sampAuth = accessGranted["SAMP"] ?? false;
 
-    stAuth = valueToBool["ST"]!;
-    ssAuth = valueToBool["SS"]!;
-    spAuth = valueToBool["SP"]!;
-    sprauth = valueToBool["SPr"]!;
+    stAuth = accessGranted["ST"] ?? false;
+    ssAuth = accessGranted["SS"] ?? false;
+    spAuth = accessGranted["SP"] ?? false;
+    sprauth = accessGranted["SPr"] ?? false;
   }
 
-  static void saveDataToSharedPreferences(List<DataDT> dataDT) async {
+  static Future<void> saveDataToSharedPreferences(List<DataDT> dataDT) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    print('Data DT');
+    for (var items in dataDT) {
+      print(items.pt);
+    }
 
     for (var itemDt in dataDT) {
       final value = itemDt.pt;
-      if (DataListPT.contains(value)) {
-        valueToBool[value] = true;
+      print('Company name: $value');
+      if (companyList.contains(value)) {
+        accessGranted[value] = true;
+      } else {
+        accessGranted[value] = false;
       }
     }
+    print('');
 
-    stsjAuth = valueToBool["STSJ"]!;
-    ssAuth = valueToBool["SS"]!;
-    spAuth = valueToBool["SP"]!;
-    spaauth = valueToBool["SPAA"]!;
-    sampAuth = valueToBool["SAMP"]!;
-    stAuth = valueToBool["ST"]!;
-    rssmAuth = valueToBool["RSSM"]!;
-    sprauth = valueToBool["SPr"]!;
+    accessGranted.forEach((key, value) {
+      print('$key, $value');
+    });
 
-// Simpan nilai baru ke SharedPreferences
+    stsjAuth = accessGranted["STSJ"] ?? false;
+    ssAuth = accessGranted["SS"] ?? false;
+    spAuth = accessGranted["SP"] ?? false;
+    spaauth = accessGranted["SPAA"] ?? false;
+    sampAuth = accessGranted["SAMP"] ?? false;
+    stAuth = accessGranted["ST"] ?? false;
+    rssmAuth = accessGranted["RSSM"] ?? false;
+    sprauth = accessGranted["SPr"] ?? false;
+
+    // Simpan nilai baru ke SharedPreferences
     await prefs.setBool('STSJ', stsjAuth);
     await prefs.setBool('SPAA', spaauth);
     await prefs.setBool('SAMP', sampAuth);
