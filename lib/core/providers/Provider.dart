@@ -29,6 +29,8 @@ import 'package:stsj/core/models/Dashboard/delivery_history.dart';
 import 'package:stsj/core/models/Dashboard/driver.dart';
 import 'package:stsj/core/models/Dashboard/picking_packing.dart';
 import 'package:stsj/core/models/Report/absent_history.dart';
+import 'package:stsj/core/models/Report/mbrowse_salesman.dart';
+import 'package:stsj/dashboard-fixup/utilities/utils.dart';
 import 'package:stsj/global/api.dart';
 import 'package:stsj/router/router_const.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -83,6 +85,26 @@ class MenuState with ChangeNotifier {
   void setIsLoading() {
     isLoading = !isLoading;
     notifyListeners();
+  }
+
+  // =================================================================
+  // ================= User Company Authorization ====================
+  // =================================================================
+
+  List<String> companyAuthorization = [];
+  List<String> get getCompanyAuthorization => companyAuthorization;
+
+  Future<void> readCompanyAuthorization() async {
+    final prefs = await SharedPreferences.getInstance();
+    companyAuthorization.clear();
+    if (prefs.getBool('STSJ')!) companyAuthorization.add('STSJ');
+    if (prefs.getBool('SS')!) companyAuthorization.add('SS');
+    if (prefs.getBool('SP')!) companyAuthorization.add('SP');
+    if (prefs.getBool('SPAA')!) companyAuthorization.add('SPAA');
+    if (prefs.getBool('SAMP')!) companyAuthorization.add('SAMP');
+    if (prefs.getBool('ST')!) companyAuthorization.add('ST');
+    if (prefs.getBool('RSSM')!) companyAuthorization.add('RSSM');
+    if (prefs.getBool('Spr')!) companyAuthorization.add('Spr');
   }
 
   // =================================================================
@@ -168,6 +190,52 @@ class MenuState with ChangeNotifier {
   }
 
   // ================================================================
+  // ============================ FPM ===============================
+  // ================================================================
+  List<Map<String, String>> filteredDashboardList = [];
+  List<Map<String, String>> get getFilteredDashboardList =>
+      filteredDashboardList;
+
+  void setFilteredDashboardList(List<Map<String, String>> value) {
+    filteredDashboardList = value;
+    notifyListeners();
+  }
+
+  Future<void> readDashboardList() async {
+    await loadSubHeader();
+    List<Map<String, String>> temp = [];
+    for (Map<String, String> e in dashboardList) {
+      if (getSubHeaderList.contains(e['acc']) && e['acc'] != '000') {
+        print('${e['acc']} added');
+        temp.add(e);
+      } else if (e['acc'] == '000') {
+        print('${e['acc']} added');
+        temp.add(e);
+      } else {
+        // do nothing
+      }
+    }
+    setFilteredDashboardList(temp);
+    notifyListeners();
+  }
+
+  String workshopName = '';
+  String get getWorkshopName => workshopName;
+
+  void setWorkshopName(String value) {
+    workshopName = value;
+    notifyListeners();
+  }
+
+  String fpmDateFilter = '';
+  String get getFpmDateFilter => fpmDateFilter;
+
+  void setFpmDateFilter(String value) {
+    fpmDateFilter = value;
+    notifyListeners();
+  }
+
+  // ================================================================
   // ========================= Dashboard ============================
   // ================================================================
   List<ModelBranches> branchShopList = [];
@@ -175,8 +243,16 @@ class MenuState with ChangeNotifier {
   List<ModelBranches> get getBranchShopList => branchShopList;
 
   List<String> branchNameList = [];
-
   List<String> get getBranchNameList => branchNameList;
+
+  ValueNotifier<List<String>> branchNameListNotifier = ValueNotifier([]);
+  ValueNotifier<List<String>> get getBranchNameListNotifier =>
+      branchNameListNotifier;
+
+  void setBranchNameListNotifier(List<String> value) {
+    branchNameListNotifier.value = value;
+    notifyListeners();
+  }
 
   ValueNotifier<String> branchNameNotifier = ValueNotifier('');
 
@@ -199,6 +275,7 @@ class MenuState with ChangeNotifier {
     }
     branchNameList.addAll(prefs.getStringList('branches') ?? []);
     log('Branch Name List (after): ${getBranchNameList.length}');
+    setBranchNameListNotifier(prefs.getStringList('branches') ?? []);
     notifyListeners();
   }
 
@@ -265,6 +342,25 @@ class MenuState with ChangeNotifier {
     // log('filterDriver called. New filtered list length: ${filteredDriverList.length}');
   }
 
+  List<String> filteredDriverNameList = [];
+  List<String> get getFilteredDriverNameList => filteredDriverNameList;
+
+  void setFilteredDriverNameList(List<String> value) {
+    filteredDriverNameList.add('');
+    filteredDriverNameList = value;
+    notifyListeners();
+  }
+
+  ValueNotifier<List<String>> filteredDriverNameListNotifier =
+      ValueNotifier<List<String>>([]);
+  ValueNotifier<List<String>> get getFilteredDriverNameListNotifier =>
+      filteredDriverNameListNotifier;
+
+  void setFilteredDriverNameListNotifier(List<String> value) {
+    filteredDriverNameListNotifier.value = value;
+    notifyListeners();
+  }
+
   bool isTruckCameraFocus = true;
 
   bool get getIsTruckCameraFocus => isTruckCameraFocus;
@@ -299,10 +395,18 @@ class MenuState with ChangeNotifier {
     String companyId,
     String branchId,
     String shopId,
-    String employeeId,
+    String driverName,
     String currentDate, {
     bool onDeliveryPage = false,
   }) async {
+    String employeeId = '';
+    for (ModelDriver driver in filteredDriverList) {
+      if (driver.employeeName == driverName) {
+        employeeId = driver.employeeId;
+        break;
+      }
+    }
+
     if (onDeliveryPage) {
       // Saved as Cache Data
       log('Save Delivery Checklist');
@@ -322,12 +426,14 @@ class MenuState with ChangeNotifier {
       currentDate = prefs.getString('currentDate') ?? '';
     }
 
+    print('');
     log('Fetch Delivery Checklist');
     print('Company ID: $companyId');
     print('Employee ID: $employeeId');
     print('Branch ID: $branchId');
     print('Shop ID: $shopId');
     print('Date: $currentDate');
+    print('');
 
     deliveryList.clear();
     deliveryList.addAll(
@@ -342,6 +448,7 @@ class MenuState with ChangeNotifier {
 
     print('Delivery length: ${deliveryList.length}');
     // print('Delivery Details length: ${deliveryList[0].deliveryDetail.length}');
+    print('IMEI Number: ${deliveryList[0].imeiNumber}');
 
     deliveryHistoryList.clear();
     deliveryHistoryList.addAll(
@@ -364,6 +471,8 @@ class MenuState with ChangeNotifier {
 
   void resetDeliveryData() {
     deliveryList.clear();
+    filteredDriverList.clear();
+    filteredDriverNameList.clear();
     // notifyListeners();
   }
 
@@ -1258,15 +1367,16 @@ class MenuState with ChangeNotifier {
   }
 
   // ~:Reset Absent History:~
-  void resetAbsentHistory() {
+  Future<void> resetAbsentHistory() async {
     // log('Reset Absent History');
     setSelectedBranch('');
     setSelectedShop('');
     setSelectedLocation('');
     setSelectedSalesman('');
-    sipSalesmanHistoryList = [];
+    setSipSalesmanHistoryList([]);
+    notifyListeners();
     searchTriggerNotifier.value = false;
-    // notifyListeners();
+    notifyListeners();
   }
 
   String selectedBranch = '';
@@ -1274,10 +1384,18 @@ class MenuState with ChangeNotifier {
   String selectedLocation = '';
   String selectedSalesman = '';
 
+  // ~:New:~
+  String selectedStatus = 'Aktif';
+  // ~:New:~
+
   String get getSelectedBranch => selectedBranch;
   String get getSelectedShop => selectedShop;
   String get getSelectedLocation => selectedLocation;
   String get getSelectedSalesman => selectedSalesman;
+
+  // ~:New:~
+  String get getSelectedStatus => selectedStatus;
+  // ~:New:~
 
   void setSelectedBranch(String value) {
     selectedBranch = value;
@@ -1306,6 +1424,12 @@ class MenuState with ChangeNotifier {
     notifyListeners();
   }
 
+  void setSelectedStatus(String value) {
+    selectedStatus = value;
+    searchTriggerNotifier.value = false;
+    notifyListeners();
+  }
+
   List<SipSalesBranchesModel> sipBranchList = [];
   List<SipSalesBranchesModel> get getSipBranchList => sipBranchList;
   List<String> sipBranchNameList = [];
@@ -1321,18 +1445,30 @@ class MenuState with ChangeNotifier {
     }
 
     sipBranchNameList.addAll(prefs.getStringList('sipBranches') ?? []);
-    // log('SIP Branch Name List (after): ${getSipBranchNameList.length}');
     notifyListeners();
+    log('SIP Branch Name List: ${getSipBranchNameList.length}');
   }
 
-  Future<void> fetchSipSalesBranches() async {
+  Future<void> fetchSipSalesBranches(String companyCode) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('UserID') ?? '';
-    // print('SIP Branches User Id: $userId');
+    print('User Id: $userId');
+    print('Company Code: $companyCode');
 
     sipBranchList.clear();
-    sipBranchList.addAll(await GlobalAPI.getSipSalesBranches(userId));
+    sipBranchList.addAll(await GlobalAPI.getSipSalesBranches(
+      companyCode,
+      userId,
+    ));
     print('SIP Branch List: ${sipBranchList.length}');
+    for (var i in sipBranchList) {
+      print(i.branchName);
+    }
+
+    // await prefs.setStringList(
+    //   'sipBranches',
+    //   sipBranchList.map((e) => e.branchName).toList(),
+    // );
 
     if (prefs.getStringList('sipBranches') == null ||
         prefs.getStringList('sipBranches')!.isEmpty) {
@@ -1344,6 +1480,8 @@ class MenuState with ChangeNotifier {
     } else {
       log('SIP Branch Name List is not empty');
     }
+
+    await loadSipBranches();
   }
 
   List<SipSalesShopsModel> sipShopList = [];
@@ -1370,11 +1508,15 @@ class MenuState with ChangeNotifier {
   Future<List<SipSalesShopsModel>> fetchSipSalesShops(String branch) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('UserID') ?? '';
+    final companyCode = prefs.getString('CompanyCode') ?? '';
     // print('User ID: $userId');
 
     if (sipBranchList.isEmpty) {
       // print('SIP Branch List is empty');
-      sipBranchList.addAll(await GlobalAPI.getSipSalesBranches(userId));
+      sipBranchList.addAll(await GlobalAPI.getSipSalesBranches(
+        companyCode,
+        userId,
+      ));
     }
 
     sipShopList.clear();
@@ -1414,11 +1556,15 @@ class MenuState with ChangeNotifier {
   ) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('UserID') ?? '';
+    final companyCode = prefs.getString('CompanyCode') ?? '';
     // print('User ID: $userId');
 
     if (sipBranchList.isEmpty) {
       // print('SIP Branch List is empty');
-      sipBranchList.addAll(await GlobalAPI.getSipSalesBranches(userId));
+      sipBranchList.addAll(await GlobalAPI.getSipSalesBranches(
+        companyCode,
+        userId,
+      ));
     }
 
     sipLocationList.clear();
@@ -1495,6 +1641,11 @@ class MenuState with ChangeNotifier {
   List<SipSalesmanHistoryModel> get getSipSalesmanHistoryList =>
       sipSalesmanHistoryList;
 
+  void setSipSalesmanHistoryList(List<SipSalesmanHistoryModel> value) {
+    sipSalesmanHistoryList = value;
+    notifyListeners();
+  }
+
   Future<Map<String, dynamic>> fetchSipSalesmanHistory(
     String branch,
     String shop,
@@ -1505,9 +1656,11 @@ class MenuState with ChangeNotifier {
   ) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('UserID') ?? '';
+    final companyCode = prefs.getString('CompanyName') ?? '';
 
     print('Fetch Sip Salesman History Parameters');
     print('UserID: $userId');
+    print('Company Code: $companyCode');
 
     String branchCode = '';
     if (branch.isNotEmpty) {
@@ -1538,6 +1691,7 @@ class MenuState with ChangeNotifier {
     try {
       sipSalesmanHistoryList.clear();
       sipSalesmanHistoryList.addAll(await GlobalAPI.getSipSalesmanHistory(
+        companyCode,
         userId,
         branchCode,
         shopCode,
@@ -1613,11 +1767,121 @@ class MenuState with ChangeNotifier {
     }
   }
 
+  List<MBrowseSalesman> browseSalesmanList = [];
+
+  List<MBrowseSalesman> get getBrowseSalesmanList => browseSalesmanList;
+
+  void setBrowseSalesmanList(List<MBrowseSalesman> value) {
+    browseSalesmanList = value;
+    notifyListeners();
+  }
+
+  Future<Map<String, dynamic>> fetchBrowseSalesman(
+    String branch,
+    String shop,
+    String location,
+    String employee,
+    String isActive,
+  ) async {
+    // "PT":"",
+    // "UserID":"ANA ISMALIA",
+    // "Branch":"",
+    // "Shop":"",
+    // "LocationID":"",
+    // "EmployeeID":"",
+    // "Active":"1" // OPTIONAL : 1 - AKTIF , 0 - TIDAK AKTIF, kalau tidak dipasingkan, default = AKTIF
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('UserID') ?? '';
+    final companyCode = prefs.getString('CompanyName') ?? '';
+
+    print('Fetch Browse Salesman Parameters');
+    print('UserID: $userId');
+    print('Company Code: $companyCode');
+
+    String branchCode = '';
+    if (branch.isNotEmpty) {
+      branchCode =
+          sipBranchList.where((e) => e.branchName == branch).first.branchCode;
+      print('Branch: $branchCode');
+    }
+
+    String shopCode = '';
+    if (shop.isNotEmpty) {
+      shopCode = sipShopList.where((e) => e.shopName == shop).first.shopCode;
+      print('Shop: $shopCode');
+    }
+
+    String locationCode = '';
+    if (location.isNotEmpty) {
+      locationCode = sipLocationList
+          .where((e) => e.locationName == location)
+          .first
+          .locationId;
+      print('Location: $locationCode');
+    }
+
+    try {
+      String fetchState = '';
+      browseSalesmanList.clear();
+      await GlobalAPI.fetchBrowseSalesman(
+        companyCode,
+        userId,
+        branchCode,
+        shopCode,
+        locationCode,
+        employee,
+        isActive,
+      ).then((value) {
+        fetchState = value['status'];
+        if (value['status'] == 'success') {
+          browseSalesmanList.addAll(value['data']);
+          print('Browse Salesman List length: ${browseSalesmanList.length}');
+        }
+      });
+      // print('Salesman History length: ${sipSalesmanHistoryList.length}');
+
+      if (browseSalesmanList.isNotEmpty && fetchState == 'success') {
+        print('Browse Salesman length: ${browseSalesmanList.length}');
+        return {
+          'status': 'success',
+          'data': browseSalesmanList,
+        };
+      } else {
+        print('Browse Salesman is empty');
+        return {
+          'status': 'failed',
+          'data': [],
+        };
+      }
+    } catch (e) {
+      print('FetchSipSalesmanHistory Error: $e');
+      return {
+        'status': 'error',
+        'data': [],
+      };
+    }
+  }
+
   // ====================================================================
   // ======================== Picking & Packing =========================
   // ====================================================================
+  ValueNotifier<List<String>> pickingPicListNotifier =
+      ValueNotifier<List<String>>([]);
+  ValueNotifier<List<String>> get getPickingPicListNotifier =>
+      pickingPicListNotifier;
+
+  void setPickingPicListNotifier(List<String> value) {
+    pickingPicListNotifier.value = value;
+    notifyListeners();
+  }
+
   List<String> pickingPicList = [];
   List<String> get getPickingPicList => pickingPicList;
+
+  void setPickingPicList(List<String> value) {
+    pickingPicList = value;
+    notifyListeners();
+  }
 
   Future<void> fetchPickingPIC(String branchName) async {
     await GlobalAPI.fetchPickingPIC(
@@ -1626,13 +1890,20 @@ class MenuState with ChangeNotifier {
     ).then((res) {
       if (res['status'] == 'success') {
         pickingPicList.clear();
+        pickingPicList.add('');
         pickingPicList.addAll(res['data']);
-        print('PIC List length: ${pickingPicList.length}');
+        setPickingPicListNotifier(res['data']);
+        print('Picking PIC List length: ${pickingPicList.length}');
+
+        // for (String name in pickingPicList) {
+        //   print(name);
+        // }
       } else {
         pickingPicList.clear();
-        print('PIC List is empty');
+        print('Picking PIC List is empty');
       }
     });
+    notifyListeners();
   }
 
   String ppBranchName = '';
@@ -1645,6 +1916,11 @@ class MenuState with ChangeNotifier {
 
   List<PickPackModel> pickingList = [];
   List<PickPackModel> get getPickingList => pickingList;
+
+  void setPackingPicList(List<String> value) {
+    packingPicList = value;
+    notifyListeners();
+  }
 
   Future<Map<String, dynamic>> fetchPickingData(
     String date,
@@ -1723,6 +1999,16 @@ class MenuState with ChangeNotifier {
     return res;
   }
 
+  ValueNotifier<List<String>> packingPicListNotifier =
+      ValueNotifier<List<String>>([]);
+  ValueNotifier<List<String>> get getPackingPicListNotifier =>
+      packingPicListNotifier;
+
+  void setPackingPicListNotifier(List<String> value) {
+    packingPicListNotifier.value = value;
+    notifyListeners();
+  }
+
   List<String> packingPicList = [];
   List<String> get getPackingPicList => packingPicList;
 
@@ -1733,13 +2019,20 @@ class MenuState with ChangeNotifier {
     ).then((res) {
       if (res['status'] == 'success') {
         packingPicList.clear();
+        packingPicList.add('');
         packingPicList.addAll(res['data']);
-        print('PIC List length: ${packingPicList.length}');
+        setPackingPicListNotifier(res['data']);
+        print('Packing PIC List length: ${packingPicList.length}');
+
+        // for (String name in packingPicList) {
+        //   print(name);
+        // }
       } else {
         packingPicList.clear();
-        print('PIC List is empty');
+        print('Packing PIC List is empty');
       }
     });
+    notifyListeners();
   }
 
   List<PickPackModel> packingList = [];

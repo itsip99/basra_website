@@ -33,6 +33,27 @@ v1.0.8
 - Company authentication bug and performance fixes
 - Absent History - Absent History's branch filter section bug and performance fixes
 
+v1.0.9
+- New menu! Browse salesman page.
+
+v1.0.10
+- Report bug and performance fixes!
+- New layout of Browse Salesman table.
+
+v1.0.11
+- New layout for selecting driver name in delivery page.
+- Delivery page bugs and performance fixes.
+
+v1.0.12
+- New layout for Picking and Packing page.
+- New way of how to view Picking and Packing details.
+- Apply some sort method on Delivery list.
+
+v1.0.13
+- New Page of FixUp Moto Dashboard Informations!.
+- FixUp Moto Dashboard can only be accessed by user with specific access permission.
+- Delivery, Picking and Packing's Filter bug and performance fixes.
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.

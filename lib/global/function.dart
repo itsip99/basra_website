@@ -2,12 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:stsj/core/models/Dashboard/delivery_memo.dart';
-import 'package:stsj/core/models/Dashboard/picking_packing.dart';
 import 'package:stsj/core/providers/Provider.dart';
 import 'package:stsj/global/font.dart';
 import 'package:stsj/global/widget/gridtable/delivery_data_source.dart';
-import 'package:stsj/global/widget/gridtable/picking_packing_data_source.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class GlobalFunction {
   static tampilkanDialog(
@@ -15,6 +14,8 @@ class GlobalFunction {
     bool isDismissible,
     Widget widget, {
     bool isBackgroundDisable = false,
+    bool isCustomizable = false,
+    Color color = Colors.white,
   }) {
     showDialog(
       context: context,
@@ -24,8 +25,11 @@ class GlobalFunction {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          backgroundColor:
-              isBackgroundDisable ? Colors.transparent : Colors.blue.shade50,
+          backgroundColor: isCustomizable
+              ? color
+              : isBackgroundDisable
+                  ? Colors.transparent
+                  : Colors.blue.shade50,
           elevation: 16,
           child: widget,
         );
@@ -236,8 +240,29 @@ class GlobalFunction {
                                                 child: Text('Koordinat toko')),
                                             Expanded(
                                               flex: 2,
-                                              child: Text(
-                                                '${shopLat.toString()}, ${shopLng.toString()}',
+                                              child: InkWell(
+                                                onTap: () async {
+                                                  Uri uri = Uri.parse(
+                                                    'https://maps.google.com/?q=$shopLat,$shopLng',
+                                                  );
+
+                                                  if (await canLaunchUrl(uri)) {
+                                                    await launchUrl(uri);
+                                                  } else {
+                                                    if (context.mounted) {
+                                                      GlobalFunction
+                                                          .showSnackbar(
+                                                        context,
+                                                        'Gagal membuka Google Maps.',
+                                                      );
+                                                    }
+                                                  }
+                                                },
+                                                child: Text(
+                                                  '${shopLat.toString()}, ${shopLng.toString()}',
+                                                  style: GlobalFont
+                                                      .mediumbigfontRUnderlinedBlue,
+                                                ),
                                               ),
                                             ),
                                           ],
@@ -245,13 +270,35 @@ class GlobalFunction {
                                         Row(
                                           children: [
                                             Expanded(
-                                              child:
-                                                  Text('Koordinat pengiriman'),
+                                              child: Text(
+                                                'Koordinat pengiriman',
+                                              ),
                                             ),
                                             Expanded(
                                               flex: 2,
-                                              child: Text(
-                                                '${deliveryLat.toString()}, ${deliveryLng.toString()}',
+                                              child: InkWell(
+                                                onTap: () async {
+                                                  Uri uri = Uri.parse(
+                                                    'https://maps.google.com/?q=$deliveryLat,$deliveryLng',
+                                                  );
+
+                                                  if (await canLaunchUrl(uri)) {
+                                                    await launchUrl(uri);
+                                                  } else {
+                                                    if (context.mounted) {
+                                                      GlobalFunction
+                                                          .showSnackbar(
+                                                        context,
+                                                        'Gagal membuka Google Maps.',
+                                                      );
+                                                    }
+                                                  }
+                                                },
+                                                child: Text(
+                                                  '${deliveryLat.toString()}, ${deliveryLng.toString()}',
+                                                  style: GlobalFont
+                                                      .mediumbigfontRUnderlinedBlue,
+                                                ),
                                               ),
                                             ),
                                           ],

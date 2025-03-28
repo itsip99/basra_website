@@ -1,4 +1,6 @@
 class PickPackModel {
+  String personInCharge;
+  int queueNumber;
   int tdu;
   int tLine;
   int tLeadTime;
@@ -12,6 +14,8 @@ class PickPackModel {
   String time;
 
   PickPackModel({
+    required this.personInCharge,
+    required this.queueNumber,
     required this.tdu,
     required this.tLine,
     required this.tLeadTime,
@@ -27,6 +31,8 @@ class PickPackModel {
 
   factory PickPackModel.fromJson(Map<String, dynamic> json) {
     return PickPackModel(
+      personInCharge: json['pic'],
+      queueNumber: json['urutan'],
       tdu: json['tdu'],
       tLine: json['tLine'],
       tLeadTime: json['tLeadTime'],

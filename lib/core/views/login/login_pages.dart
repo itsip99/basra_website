@@ -8,6 +8,7 @@ import 'package:stsj/core/controller/Login_controller.dart';
 import 'package:stsj/core/models/AuthModel/Auth_Model.dart';
 import 'package:stsj/core/models/AuthModel/DataAuth.dart';
 import 'package:stsj/core/providers/Provider.dart';
+import 'package:stsj/dashboard-fixup/utilities/utils.dart';
 import 'package:stsj/global/font.dart';
 
 import 'package:stsj/router/router_const.dart';
@@ -29,7 +30,7 @@ class _LoginPagesState extends State<LoginPages> {
 
   bool _passwordVisible = false; // Initialize _passwordVisible as a hook
 
-  bool isloading = false;
+  bool isLoading = false;
   int statuslogin = 0;
   bool canEntered = false;
 
@@ -57,7 +58,7 @@ class _LoginPagesState extends State<LoginPages> {
         state.companyName = prefs.getString('CompanyName') ?? '';
 
         // ~:Load All Static Data:~
-        await state.fetchSalesmanList();
+        // await state.fetchSalesmanList();
         await state.fetchSISDriver();
         await state.fetchProvinces();
         // Added before go to menu page too to make sure branch name changed
@@ -68,8 +69,8 @@ class _LoginPagesState extends State<LoginPages> {
           state.userAccessList.addAll(data);
 
           // SIP - Salesman
-          state.fetchSipSalesBranches();
-          state.fetchSipSalesman();
+          // await state.fetchSipSalesBranches(); --> moved after home menu pressed
+          await state.fetchSipSalesman();
 
           // ~:Header Privillage Preprocessing:~
           String category = '';
@@ -111,18 +112,6 @@ class _LoginPagesState extends State<LoginPages> {
             print(header);
           }
 
-          // state.headerStateList.addAll(data.map((e) {
-          //   if (e.isAllow == 1) {
-          //     return true;
-          //   } else {
-          //     return false;
-          //   }
-          // }).toList());
-
-          // ~:Subheader Privillage Preprocessing:~
-          // state.subHeaderList.clear();
-          // state.subHeaderList.addAll(data.map((e) => e.menuNumber).toList());
-          // await prefs.setStringList('subheader', state.subHeaderList);
           state.subHeaderList.clear();
           state.subHeaderList.addAll(data.map((e) {
             if (e.isAllow == 1) {
@@ -136,6 +125,27 @@ class _LoginPagesState extends State<LoginPages> {
           print('~:List of Sub Header:~');
           for (var value in state.getSubHeaderList) {
             print(value);
+          }
+
+          print('');
+          List<Map<String, String>> temp = [];
+          for (Map<String, String> e in dashboardList) {
+            if (state.getSubHeaderList.contains(e['acc']) &&
+                e['acc'] != '000') {
+              print('${e['acc']} added');
+              temp.add(e);
+            } else if (e['acc'] == '000') {
+              print('${e['acc']} added');
+              temp.add(e);
+            } else {
+              // do nothing
+            }
+          }
+          state.setFilteredDashboardList(temp);
+
+          print('~:Filtered FPM Dashboard Access Result:~');
+          for (var value in state.getFilteredDashboardList) {
+            print('${value['text']}');
           }
         });
       } else {
@@ -157,7 +167,7 @@ class _LoginPagesState extends State<LoginPages> {
 
     setState(() {
       statuslogin = 1;
-      isloading = true;
+      isLoading = true;
     });
 
     try {
@@ -183,10 +193,6 @@ class _LoginPagesState extends State<LoginPages> {
         canEntered = true;
 
         if (canEntered) {
-          setState(() {
-            isloading = false;
-          });
-
           // loginModel.setUser([
           //   listdatalogin[0].userID,
           //   listdatalogin[0].entryLevelID,
@@ -194,6 +200,10 @@ class _LoginPagesState extends State<LoginPages> {
           // ]);
 
           await fetchData(state);
+
+          setState(() {
+            isLoading = false;
+          });
 
           if (context.mounted) {
             print('Current route: ${GoRouterState.of(context).name}');
@@ -204,7 +214,7 @@ class _LoginPagesState extends State<LoginPages> {
         // ~:Login failed:~
         setState(() {
           canEntered = false;
-          isloading = false;
+          isLoading = false;
           statuslogin = -1;
         });
 
@@ -232,7 +242,7 @@ class _LoginPagesState extends State<LoginPages> {
 
       setState(() {
         statuslogin = -1;
-        isloading = false;
+        isLoading = false;
       });
 
       // debugPrint('loginData: $error');
@@ -401,7 +411,7 @@ class _LoginPagesState extends State<LoginPages> {
                         width: MediaQuery.of(context).size.width,
                         child: Builder(
                           builder: (context) {
-                            if (isloading) {
+                            if (isLoading) {
                               return Center(
                                 heightFactor: 1,
                                 widthFactor: 1,
@@ -444,7 +454,7 @@ class _LoginPagesState extends State<LoginPages> {
                 height: 25,
                 alignment: Alignment.center,
                 child: Text(
-                  'v1.0.8',
+                  'v1.0.13',
                   style: GlobalFont.mediumbigfontR,
                 ),
               ),

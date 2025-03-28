@@ -21,6 +21,7 @@ import 'package:stsj/core/models/Dashboard/delivery_memo.dart';
 import 'package:stsj/core/models/Dashboard/driver.dart';
 import 'package:stsj/core/models/Dashboard/picking_packing.dart';
 import 'package:stsj/core/models/Report/absent_history.dart';
+import 'package:stsj/core/models/Report/mbrowse_salesman.dart';
 
 class GlobalAPI {
   static Future<List<ModelUserAccess>> fetchUserAccess(
@@ -160,6 +161,7 @@ class GlobalAPI {
 
   // ~:NEW:~
   static Future<List<SipSalesBranchesModel>> getSipSalesBranches(
+    String companyCode,
     String userId,
   ) async {
     var url = Uri.https(
@@ -167,7 +169,10 @@ class GlobalAPI {
       '/api/SIPSales/SIPSalesBranch',
     );
 
-    Map mapGetSipSalesBranches = {"UserID": userId};
+    Map mapGetSipSalesBranches = {
+      "PT": companyCode,
+      "UserID": userId,
+    };
 
     List<SipSalesBranchesModel> branchesList = [];
 
@@ -353,6 +358,7 @@ class GlobalAPI {
   }
 
   static Future<List<SipSalesmanHistoryModel>> getSipSalesmanHistory(
+    String companyCode,
     String userId,
     String branchCode,
     String shopCode,
@@ -367,6 +373,7 @@ class GlobalAPI {
     );
 
     Map mapGetSipSalesmanHistory = {
+      'PT': companyCode,
       "UserID": userId,
       "Branch": branchCode,
       "Shop": shopCode,
@@ -405,6 +412,74 @@ class GlobalAPI {
     } catch (e) {
       print('Error: ${e.toString()}');
       return salesmanHistoryList;
+    }
+  }
+
+  static Future<Map<String, dynamic>> fetchBrowseSalesman(
+    String companyId,
+    String userId,
+    String branchId,
+    String shopId,
+    String locationId,
+    String employeeId,
+    String isActive,
+  ) async {
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/api/SIPSales/SIPSalesman',
+    );
+
+    Map mapBrowseSalesman = {
+      'PT': companyId,
+      'UserID': userId,
+      'Branch': branchId,
+      'Shop': shopId,
+      'LocationID': locationId,
+      'EmployeeID': employeeId,
+      // OPTIONAL : 1 - AKTIF , 0 - TIDAK AKTIF, kalau tidak dipasingkan, default = AKTIF
+      'Active': isActive,
+    };
+
+    print(mapBrowseSalesman);
+
+    List<MBrowseSalesman> browseSalesmanList = [];
+
+    try {
+      final response =
+          await http.post(url, body: jsonEncode(mapBrowseSalesman), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      // print(response.body);
+
+      if (response.statusCode <= 200) {
+        var jsonBranches = jsonDecode(response.body);
+        if (jsonBranches['code'] == '100' && jsonBranches['msg'] == 'Sukses') {
+          browseSalesmanList.addAll((jsonBranches['data'] as List)
+              .map<MBrowseSalesman>((list) => MBrowseSalesman.fromJson(list))
+              .toList());
+
+          return {
+            'status': 'success',
+            'data': browseSalesmanList,
+          };
+        } else {
+          return {
+            'status': 'success',
+            'data': browseSalesmanList,
+          };
+        }
+      }
+      return {
+        'status': 'success',
+        'data': browseSalesmanList,
+      };
+    } catch (e) {
+      print('Error: ${e.toString()}');
+      return {
+        'status': 'success',
+        'data': browseSalesmanList,
+      };
     }
   }
 
@@ -830,6 +905,11 @@ class GlobalAPI {
               .map<DeliveryModel>((list) => DeliveryModel.fromJson(list))
               .toSet()
               .toList());
+
+          // ~:Sort Delivery Detail by Delivery Time:~
+          deliveryList[0].deliveryDetail.sort((a, b) {
+            return b.deliveryTime.compareTo(a.deliveryTime);
+          });
 
           log('Fetch data succeed');
           return deliveryList;

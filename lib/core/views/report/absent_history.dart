@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:stsj/core/models/Report/absent_history.dart';
 import 'package:stsj/core/providers/Provider.dart';
@@ -7,10 +6,10 @@ import 'package:stsj/global/font.dart';
 import 'package:stsj/global/function.dart';
 import 'package:stsj/global/widget/app_bar.dart';
 import 'package:stsj/global/widget/autocomplete/salesman.dart';
-import 'package:stsj/global/widget/card/absent_card.dart';
 import 'package:stsj/global/widget/dropdown/sip_branch_dropdown.dart';
 import 'package:stsj/global/widget/dropdown/sip_location_dropdown.dart';
 import 'package:stsj/global/widget/dropdown/sip_shop_dropdown.dart';
+import 'package:stsj/global/widget/list/absent_list.dart';
 import 'package:stsj/global/widget/static/days_converter.dart';
 import 'package:stsj/global/widget/static/month_converter.dart';
 import 'package:stsj/router/router_const.dart';
@@ -220,7 +219,6 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
     // TODO: implement initState
     super.initState();
 
-    Provider.of<MenuState>(context, listen: false).loadSipBranches();
     preprocessingDate();
   }
 
@@ -353,7 +351,7 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
                                     ),
                                     child: SipBranchDropdown(
                                       listData: value.getSipBranchNameList,
-                                      inputan: value.getSelectedBranch,
+                                      inputan: value.selectedBranch,
                                       hint: 'Cabang',
                                       handle: state.setSelectedBranch,
                                       disable: false,
@@ -420,7 +418,7 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
                                     ),
                                     child: SipShopDropdown(
                                       listData: value.getSipShopNameList,
-                                      inputan: value.getSelectedShop,
+                                      inputan: value.selectedShop,
                                       hint: 'Toko',
                                       handle: state.setSelectedShop,
                                       branch: state.getSelectedBranch,
@@ -487,7 +485,7 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
                                     ),
                                     child: SipLocationDropdown(
                                       listData: value.getSipLocationNameList,
-                                      inputan: value.getSelectedLocation,
+                                      inputan: value.selectedLocation,
                                       hint: 'Lokasi',
                                       handle: state.setSelectedLocation,
                                       disable: false,
@@ -561,6 +559,9 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
                               ),
                             ),
 
+                            // ~:Devider:~
+                            SizedBox(width: 10.0),
+
                             // ~:Reset Button is Under Development:~
                             // InkWell(
                             //   onTap: () => state.resetAbsentHistory(),
@@ -579,22 +580,13 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
                             //     ),
                             //   ),
                             // ),
-
+                            //
                             // ~:Devider:~
-                            SizedBox(width: 10.0),
+                            // SizedBox(width: 10.0),
 
                             // ~:Export to Download Button:~
                             InkWell(
                               onTap: () => showFloatingWidget(context, state),
-                              // onTap: () => exportHistory(
-                              //   state,
-                              //   branch,
-                              //   shop,
-                              //   location,
-                              //   employee,
-                              //   startDate,
-                              //   endDate,
-                              // ),
                               child: AnimatedContainer(
                                 duration: Duration(seconds: 1),
                                 height:
@@ -630,8 +622,9 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
               // ========================== Content ==============================
               // =================================================================
               Expanded(
-                child: SizedBox(
+                child: Container(
                   width: MediaQuery.of(context).size.width,
+                  alignment: Alignment.center,
                   child: ValueListenableBuilder(
                     valueListenable: state.getSearchTriggerNotifier,
                     builder: (context, value, _) {
@@ -643,23 +636,7 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
                           List<SipSalesmanHistoryModel> history =
                               state.getSipSalesmanHistoryList;
 
-                          return GridView.count(
-                            crossAxisCount: 4,
-                            childAspectRatio: 1.6,
-                            children: history.asMap().entries.map(
-                              (details) {
-                                SipSalesmanHistoryModel detail = details.value;
-                                var temp = DateFormat("dd MMMM yyyy").format(
-                                  DateTime.parse(detail.date),
-                                );
-                                var slice = temp.split(' ');
-                                final date =
-                                    '${slice[0]} ${MonthConverter.getMonthAbbrFromString(slice[1])} ${slice[2]}';
-
-                                return AbsentCard(detail, date);
-                              },
-                            ).toList(),
-                          );
+                          return AbsentList(history);
                         } else {
                           // print('Data not available, fetching data');
                           isLoading = true;
@@ -705,25 +682,7 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
                                   List<SipSalesmanHistoryModel> history =
                                       snapshot.data!['data'];
 
-                                  return GridView.count(
-                                    crossAxisCount: 4,
-                                    childAspectRatio: 1.6,
-                                    children: history.asMap().entries.map(
-                                      (details) {
-                                        SipSalesmanHistoryModel detail =
-                                            details.value;
-                                        var temp =
-                                            DateFormat("dd MMMM yyyy").format(
-                                          DateTime.parse(detail.date),
-                                        );
-                                        var slice = temp.split(' ');
-                                        final date =
-                                            '${slice[0]} ${MonthConverter.getMonthAbbrFromString(slice[1])} ${slice[2]}';
-
-                                        return AbsentCard(detail, date);
-                                      },
-                                    ).toList(),
-                                  );
+                                  return AbsentList(history);
                                 } else {
                                   if (snapshot.data!['status'] == 'failed') {
                                     return Center(
@@ -747,23 +706,7 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
                           List<SipSalesmanHistoryModel> history =
                               state.getSipSalesmanHistoryList;
 
-                          return GridView.count(
-                            crossAxisCount: 4,
-                            childAspectRatio: 1.6,
-                            children: history.asMap().entries.map(
-                              (details) {
-                                SipSalesmanHistoryModel detail = details.value;
-                                var temp = DateFormat("dd MMMM yyyy").format(
-                                  DateTime.parse(detail.date),
-                                );
-                                var slice = temp.split(' ');
-                                final date =
-                                    '${slice[0]} ${MonthConverter.getMonthAbbrFromString(slice[1])} ${slice[2]}';
-
-                                return AbsentCard(detail, date);
-                              },
-                            ).toList(),
-                          );
+                          return AbsentList(history);
                         } else {
                           return Center(
                             child: Text('Data tidak tersedia.'),

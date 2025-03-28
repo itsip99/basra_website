@@ -83,7 +83,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(
-                'v1.0.8',
+                'v1.0.13',
                 style: GlobalFont.smallfontR,
               ),
             ],
@@ -122,7 +122,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
 
                           final SharedPreferences prefs =
                               await SharedPreferences.getInstance();
-                          prefs.clear();
+                          await prefs.clear();
 
                           context.go(RoutesConstant.login);
 
@@ -171,7 +171,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(
-                'v1.0.8',
+                'v1.0.13',
                 style: GlobalFont.smallfontR,
               ),
             ],

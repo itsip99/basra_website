@@ -98,12 +98,20 @@ class _SisBranchShopDropdownState extends State<SisBranchShopDropdown> {
               state.setBranchNameNotifier(value);
 
               if (widget.isDriver) {
-                state.filterDriver(newValues.toString());
+                await state.filterDriver(newValues.toString());
+                state.setFilteredDriverNameList(
+                  state.getFilteredDriverList
+                      .map((e) => e.employeeName)
+                      .toList(),
+                );
+                state.setFilteredDriverNameListNotifier(
+                  state.getFilteredDriverNameList,
+                );
               } else {
                 if (widget.isPicking) {
-                  state.fetchPickingPIC(newValues.toString());
+                  await state.fetchPickingPIC(newValues.toString());
                 } else {
-                  state.fetchPackingPIC(newValues.toString());
+                  await state.fetchPackingPIC(newValues.toString());
                 }
               }
 
@@ -154,6 +162,11 @@ class _SisBranchShopDropdownState extends State<SisBranchShopDropdown> {
 
               if (widget.isDriver) {
                 state.filterDriver(newValues.toString());
+                state.setFilteredDriverNameList(
+                  state.getFilteredDriverList
+                      .map((e) => e.employeeName)
+                      .toList(),
+                );
               } else {
                 if (widget.isPicking) {
                   state.fetchPickingPIC(newValues.toString());

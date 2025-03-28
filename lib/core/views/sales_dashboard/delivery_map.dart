@@ -74,17 +74,23 @@ class _DeliveryMapState extends State<DeliveryMap> {
               },
             );
           } else {
-            List<CheckListDetailsModel> detail = delivery[0].deliveryDetail;
+            if (history.isEmpty) {
+              return const Center(
+                child: Text('Data tidak tersedia'),
+              );
+            } else {
+              List<CheckListDetailsModel> detail = delivery[0].deliveryDetail;
 
-            return TruckLiveMap(
-              detail,
-              double.parse(
-                history[menuState.getDeliveryHistoryList.length - 1].lat,
-              ),
-              double.parse(
-                history[menuState.getDeliveryHistoryList.length - 1].lng,
-              ),
-            );
+              return TruckLiveMap(
+                detail,
+                double.parse(
+                  history[menuState.getDeliveryHistoryList.length - 1].lat,
+                ),
+                double.parse(
+                  history[menuState.getDeliveryHistoryList.length - 1].lng,
+                ),
+              );
+            }
           }
         },
       ),

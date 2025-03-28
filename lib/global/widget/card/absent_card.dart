@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:stsj/core/models/Report/absent_history.dart';
 import 'package:stsj/global/font.dart';
 

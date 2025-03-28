@@ -29,8 +29,16 @@ class RoutesConstant {
   // ~:Dashboard:~
   static String picking = 'picking';
   static String packing = 'packing';
+  static String fpmDashboard = 'fpmDashboard';
+  static String fpmImportExcel = 'fpmImportExcel';
+  static String fpm1stDashboard = 'fpm1stDashboard';
+  static String fpm2ndDashboard = 'fpm2ndDashboard';
+  static String fpm3rdDashboard = 'fpm3rdDashboard';
+  static String fpm4thDashboard = 'fpm4thDashboard';
+  static String fpm5thDashboard = 'fpm5thDashboard';
   // ~:Information Section:~
   static String absentHistory = 'absentHistory';
+  static String browseSalesman = 'browseSalesman';
   static String bikesHistory = 'bikesHistory';
   static String serviceHistory = 'serviceHistory';
   static String mdsSparepartStock = 'mdsSparepartStock';

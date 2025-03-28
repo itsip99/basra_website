@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:stsj/core/cleanArc/dashboard_service/pages/dialog_filter.dart';
+import 'package:stsj/core/cleanArc/dashboard_service/pages/service_dialog_filter.dart';
 import 'package:stsj/core/providers/Provider.dart';
 import 'package:stsj/router/router_const.dart';
 
@@ -32,6 +32,7 @@ class ReportMenuComponent extends HookWidget {
                           'assets/images/progress-report.png',
                           'Report',
                           RoutesConstant.report,
+                          'report',
                         ),
                         const Text('Report'),
                       ],
@@ -56,8 +57,34 @@ class ReportMenuComponent extends HookWidget {
                           'assets/images/img_dailytask.png',
                           'Report',
                           RoutesConstant.absentHistory,
+                          'attendance',
                         ),
                         const Text('Riwayat Absensi'),
+                      ],
+                    ),
+                  );
+                } else {
+                  return const SizedBox();
+                }
+              },
+            ),
+
+            // Browse Salesman
+            Builder(
+              builder: (context) {
+                if (state.getSubHeaderList.contains('305')) {
+                  return Container(
+                    margin: EdgeInsets.only(right: 50.0),
+                    child: Column(
+                      children: [
+                        _buildMenuIcon(
+                          context,
+                          'assets/images/salesman.png',
+                          'Report',
+                          RoutesConstant.browseSalesman,
+                          'salesman list',
+                        ),
+                        const Text('Cari Salesman'),
                       ],
                     ),
                   );
@@ -150,6 +177,7 @@ class ReportMenuComponent extends HookWidget {
     String imagePath,
     String tooltip,
     String route,
+    String menuName,
   ) {
     final isHovered = ValueNotifier<bool>(false);
     final tooltipNull = ValueNotifier<bool>(false);
@@ -170,18 +198,24 @@ class ReportMenuComponent extends HookWidget {
             duration: Duration(milliseconds: 100),
             padding: EdgeInsets.all(hovered ? 10.0 : 0.0),
             child: IconButton(
-              onPressed: () {
+              onPressed: () async {
+                final state = Provider.of<MenuState>(context, listen: false);
                 tooltipNull.value = true;
                 if (tooltip == 'Dashboard Service') {
                   showDialog(
                     context: context,
-                    builder: (BuildContext context) => DialogFilter(),
+                    builder: (BuildContext context) => ServiceDialogFilter(),
                   );
-                } else {
-                  context.goNamed(route);
+                } else if (tooltip == 'attendance') {
+                  await state.resetAbsentHistory();
+                } else if (tooltip == 'salesman list') {
+                  await state.resetAbsentHistory();
+                  state.setSearchTriggerNotifier(false);
                 }
 
-                // context.goNamed(route);
+                if (context.mounted) {
+                  context.goNamed(route);
+                }
               },
               icon: Image.asset(imagePath),
             ),

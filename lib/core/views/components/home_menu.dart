@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stsj/core/providers/Provider.dart';
 import 'package:stsj/core/models/AuthModel/Auth_Model.dart';
+import 'package:stsj/dashboard-fixup/utilities/utils.dart';
 import 'package:stsj/global/function.dart';
 import 'package:stsj/router/router_const.dart';
 
@@ -164,20 +165,19 @@ class HomeMenuComponent extends HookWidget {
     PtModel loginpt,
     MenuState state,
     String route,
-    String companyName,
+    String companyCode,
   ) async {
     state.setStaticMenuNotifier('');
-    loginpt.setPT(companyName);
+    loginpt.setPT(companyCode);
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('CompanyName', companyName);
-    print('Company Name: ${prefs.getString('CompanyName')}');
+    // print('Company Name: ${prefs.getString('CompanyName')}');
     for (var data in state.getUserCompanyAccList) {
-      print('${data.pt} - $companyName');
-      if (data.pt == companyName) {
+      print('${data.pt} - $companyCode');
+      if (data.pt == companyCode) {
         state.entryLevelId = data.accessId;
         prefs.setString('EntryLevelID', data.accessId);
         prefs.setString('EntryLevelName', data.accessName);
-        prefs.setString('CompanyName', companyName);
+        prefs.setString('CompanyName', companyCode);
       }
     }
 
@@ -186,8 +186,12 @@ class HomeMenuComponent extends HookWidget {
     state.companyName = prefs.getString('CompanyName') ?? '';
 
     state
-        .fetchUserAccess(companyName, state.getEntryLevelId)
+        .fetchUserAccess(companyCode, state.getEntryLevelId)
         .then((access) async {
+      print('Access length: ${access.length}');
+
+      // ~:Get Branches:~
+      await state.fetchSipSalesBranches(companyCode);
       if (access.isNotEmpty) {
         state.userAccessList.addAll(access);
 
@@ -229,17 +233,6 @@ class HomeMenuComponent extends HookWidget {
         }
         await prefs.setStringList('header', state.headerList);
 
-        // state.headerStateList.addAll(access.map((e) {
-        //   if (e.isAllow == 1) {
-        //     return true;
-        //   } else {
-        //     return false;
-        //   }
-        // }).toList());
-
-        // state.subHeaderList.clear();
-        // state.subHeaderList.addAll(access.map((e) => e.menuNumber).toList());
-        // await prefs.setStringList('subheader', state.subHeaderList);
         state.subHeaderList.clear();
         state.subHeaderList.addAll(access.map((e) {
           if (e.isAllow == 1) {
@@ -249,6 +242,31 @@ class HomeMenuComponent extends HookWidget {
           }
         }));
         await prefs.setStringList('subheader', state.subHeaderList);
+
+        print('~:List of Sub Header:~');
+        for (var value in state.getSubHeaderList) {
+          print(value);
+        }
+
+        print('');
+        List<Map<String, String>> temp = [];
+        for (Map<String, String> e in dashboardList) {
+          if (state.getSubHeaderList.contains(e['acc']) && e['acc'] != '000') {
+            print('${e['acc']} added');
+            temp.add(e);
+          } else if (e['acc'] == '000') {
+            print('${e['acc']} added');
+            temp.add(e);
+          } else {
+            // do nothing
+          }
+        }
+        state.setFilteredDashboardList(temp);
+
+        print('~:Filtered FPM Dashboard Access Result:~');
+        for (var value in state.getFilteredDashboardList) {
+          print('${value['text']}');
+        }
 
         if (context.mounted) context.goNamed(route);
       } else {

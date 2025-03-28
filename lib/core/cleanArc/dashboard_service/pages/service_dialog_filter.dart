@@ -13,14 +13,14 @@ import 'package:stsj/core/cleanArc/dashboard_service/widgets/datepicker_custom.d
 import 'package:stsj/core/cleanArc/dashboard_service/widgets/dropdown_custom.dart';
 import 'package:stsj/core/cleanArc/dashboard_service/widgets/snackbar_info.dart';
 
-class DialogFilter extends StatefulWidget {
-  const DialogFilter({super.key});
+class ServiceDialogFilter extends StatefulWidget {
+  const ServiceDialogFilter({super.key});
 
   @override
-  State<DialogFilter> createState() => _DialogFilterState();
+  State<ServiceDialogFilter> createState() => _ServiceDialogFilterState();
 }
 
-class _DialogFilterState extends State<DialogFilter> {
+class _ServiceDialogFilterState extends State<ServiceDialogFilter> {
   late bool loading;
   late String dashboard;
   late String teritory;

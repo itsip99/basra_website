@@ -57,7 +57,7 @@ class _HomePagesState extends State<HomePages>
         state.companyName = prefs.getString('CompanyName') ?? '';
 
         // Check for null values and provide default values if needed
-        await state.fetchSalesmanList();
+        // await state.fetchSalesmanList();
         // print('Salesman List length: ${state.getSalesmanList.length}');
         await state.fetchSISDriver();
         await state.fetchProvinces();
@@ -108,17 +108,6 @@ class _HomePagesState extends State<HomePages>
           }
           await prefs.setStringList('header', state.headerList);
 
-          // state.headerStateList.addAll(data.map((e) {
-          //   if (e.isAllow == 1) {
-          //     return true;
-          //   } else {
-          //     return false;
-          //   }
-          // }).toList());
-
-          // state.subHeaderList.clear();
-          // state.subHeaderList.addAll(data.map((e) => e.menuNumber).toList());
-          // await prefs.setStringList('subheader', state.subHeaderList);
           state.subHeaderList.clear();
           state.subHeaderList.addAll(data.map((e) {
             if (e.isAllow == 1) {
@@ -128,9 +117,6 @@ class _HomePagesState extends State<HomePages>
             }
           }));
           await prefs.setStringList('subheader', state.subHeaderList);
-
-          // print('Menu Initialization Value: ${state.staticMenuNotifier.value}');
-          // print('Header length: ${state.headerList.length}');
         });
       } else {
         // Handle the case where "Status" is not true or data is missing

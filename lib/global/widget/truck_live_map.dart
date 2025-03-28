@@ -125,7 +125,9 @@ class _TruckLiveMapState extends State<TruckLiveMap> {
         MarkerLayer(
           markers: widget.detail.asMap().entries.map(
             (e) {
+              int index = e.key;
               CheckListDetailsModel detail = e.value;
+              print('Delivery Time: ${detail.deliveryTime}');
 
               if (detail.deliveryStatus == 0) {
                 if (detail.deliveryTime.isNotEmpty) {
@@ -139,9 +141,10 @@ class _TruckLiveMapState extends State<TruckLiveMap> {
                     child: deliveryMapButton(
                       detail.customerName,
                       0,
-                      counter: detail.deliveryOrder != 99
-                          ? detail.deliveryOrder.toString()
-                          : '0',
+                      // counter: detail.deliveryOrder != 99
+                      //     ? detail.deliveryOrder.toString()
+                      //     : '0',
+                      counter: (index + 1).toString(),
                     ),
                   );
                 } else {
@@ -155,9 +158,10 @@ class _TruckLiveMapState extends State<TruckLiveMap> {
                     child: deliveryMapButton(
                       detail.customerName,
                       2,
-                      counter: detail.deliveryOrder != 99
-                          ? detail.deliveryOrder.toString()
-                          : '0',
+                      // counter: detail.deliveryOrder != 99
+                      //     ? detail.deliveryOrder.toString()
+                      //     : '0',
+                      counter: (index + 1).toString(),
                     ),
                   );
                 }
@@ -172,9 +176,10 @@ class _TruckLiveMapState extends State<TruckLiveMap> {
                   child: deliveryMapButton(
                     detail.customerName,
                     1,
-                    counter: detail.deliveryOrder != 99
-                        ? detail.deliveryOrder.toString()
-                        : '0',
+                    // counter: detail.deliveryOrder != 99
+                    //     ? detail.deliveryOrder.toString()
+                    //     : '0',
+                    counter: (index + 1).toString(),
                   ),
                 );
               }

@@ -19,12 +19,19 @@ import 'package:stsj/core/views/activities/route_details.dart';
 import 'package:stsj/core/views/activities/weekly_activities_report.dart';
 import 'package:stsj/core/views/report/absent_history.dart';
 import 'package:stsj/core/views/report/bike_history.dart';
+import 'package:stsj/core/views/report/browse_salesman.dart';
 import 'package:stsj/core/views/report/mds_sparepart_stock.dart';
 import 'package:stsj/core/views/report/service_history.dart';
 import 'package:stsj/core/views/sales_dashboard/delivery.dart';
 import 'package:stsj/core/views/sales_dashboard/delivery_map.dart';
 import 'package:stsj/core/views/sales_dashboard/packing.dart';
 import 'package:stsj/core/views/sales_dashboard/picking.dart';
+import 'package:stsj/dashboard-fixup/pages/dashboard1_page.dart';
+import 'package:stsj/dashboard-fixup/pages/dashboard2_page.dart';
+import 'package:stsj/dashboard-fixup/pages/dashboard3_page.dart';
+import 'package:stsj/dashboard-fixup/pages/dashboard4_page.dart';
+import 'package:stsj/dashboard-fixup/pages/dashboard5_page.dart';
+import 'package:stsj/dashboard-fixup/pages/import_excel.dart';
 import 'package:stsj/global/globalVar.dart';
 import 'package:stsj/global/widget/open_map.dart';
 
@@ -94,10 +101,59 @@ class RouterSettings {
           ),
           // ~:NEW:~
           GoRoute(
+            name: RoutesConstant.fpm1stDashboard,
+            path: 'dashboard',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: Dashboard1Page());
+            },
+          ),
+          GoRoute(
+            name: RoutesConstant.fpm2ndDashboard,
+            path: 'dailyBengkel',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: Dashboard2Page());
+            },
+          ),
+          GoRoute(
+            name: RoutesConstant.fpm3rdDashboard,
+            path: 'dailyMekanik',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: Dashboard3Page());
+            },
+          ),
+          GoRoute(
+            name: RoutesConstant.fpm4thDashboard,
+            path: 'bengkelBulanan',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: Dashboard4Page());
+            },
+          ),
+          GoRoute(
+            name: RoutesConstant.fpmImportExcel,
+            path: 'importExcel',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: ImportExcel());
+            },
+          ),
+          GoRoute(
+            name: RoutesConstant.fpm5thDashboard,
+            path: 'memberReport',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: Dashboard5Page());
+            },
+          ),
+          GoRoute(
             name: RoutesConstant.absentHistory,
             path: 'absentHistory',
             pageBuilder: (context, state) {
               return MaterialPage(child: AbsentHistoryPage());
+            },
+          ),
+          GoRoute(
+            name: RoutesConstant.browseSalesman,
+            path: 'browseSalesman',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: BrowseSalesmanPage());
             },
           ),
           GoRoute(

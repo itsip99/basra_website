@@ -367,8 +367,18 @@ class _DeliveryCardState extends State<DeliveryCard> {
                                           flex: 2,
                                           child: Builder(
                                             builder: (context) {
-                                              if (widget
-                                                  .destinationTime.isNotEmpty) {
+                                              print(
+                                                'Delivery Time: ${widget.deliveryDetails.deliveryTime}',
+                                              );
+                                              print(
+                                                'Destination Time: ${widget.destinationTime}',
+                                              );
+                                              if (widget.destinationTime
+                                                      .isNotEmpty &&
+                                                  widget
+                                                      .deliveryDetails
+                                                      .deliveryTime
+                                                      .isNotEmpty) {
                                                 return Text(
                                                   timeDiffCalculation(
                                                     widget.deliveryDetails

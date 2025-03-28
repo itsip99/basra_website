@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:stsj/core/cleanArc/dashboard_service/pages/dialog_filter.dart';
+import 'package:stsj/core/cleanArc/dashboard_service/pages/service_dialog_filter.dart';
 import 'package:stsj/core/providers/Provider.dart';
 import 'package:stsj/router/router_const.dart';
 
@@ -79,7 +79,7 @@ class AuthorizationMenuComponent extends HookWidget {
                 if (tooltip == 'Dashboard Service') {
                   showDialog(
                     context: context,
-                    builder: (BuildContext context) => DialogFilter(),
+                    builder: (BuildContext context) => ServiceDialogFilter(),
                   );
                 } else {
                   context.goNamed(route);

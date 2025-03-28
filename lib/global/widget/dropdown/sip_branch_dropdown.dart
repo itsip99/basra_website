@@ -6,7 +6,7 @@ import 'package:stsj/core/providers/Provider.dart';
 import 'package:stsj/global/font.dart';
 
 class SipBranchDropdown extends StatefulWidget {
-  const SipBranchDropdown({
+  SipBranchDropdown({
     required this.listData,
     required this.inputan,
     required this.hint,
@@ -17,7 +17,7 @@ class SipBranchDropdown extends StatefulWidget {
   });
 
   final List<dynamic> listData;
-  final String inputan;
+  String inputan;
   final String hint;
   final Function handle;
   final bool disable;
@@ -31,8 +31,26 @@ class _SipBranchDropdownState extends State<SipBranchDropdown> {
   String teksDisable = '';
   String value = '';
 
+  void loadBranchList(MenuState state) async {
+    if (state.getSipBranchNameList.isEmpty) {
+      await state.loadSipBranches();
+    }
+
+    if (state.getSipShopNameList.isNotEmpty) {
+      state.getSipShopNameList.clear();
+    }
+
+    if (state.getSipLocationNameList.isNotEmpty) {
+      state.getSipLocationNameList.clear();
+    }
+  }
+
   @override
   void initState() {
+    loadBranchList(Provider.of<MenuState>(context, listen: false));
+    if (widget.inputan.isNotEmpty) {
+      widget.inputan = '';
+    }
     value = widget.inputan;
     print('Value: $value');
     // TODO: implement initState

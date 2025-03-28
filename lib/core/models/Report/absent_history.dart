@@ -15,6 +15,16 @@ class SipSalesmanHistoryModel {
   String checkOut;
   double cLat;
   double cLng;
+  // "EventName": "",
+  // "EventPhoto": "",
+  // "EventPhotoThumb": "",
+  // "EventPhotoUrl": "",
+  // "GMapUrl": "https://maps.google.com/?q=-8.3440925,113.6069649"
+  String eventName;
+  String eventPhoto;
+  String eventPhotoThumb;
+  String eventPhotoUrl;
+  String gMapUrl;
 
   SipSalesmanHistoryModel({
     required this.employeeID,
@@ -33,6 +43,11 @@ class SipSalesmanHistoryModel {
     required this.checkOut,
     required this.cLat,
     required this.cLng,
+    required this.eventName,
+    required this.eventPhoto,
+    required this.eventPhotoThumb,
+    required this.eventPhotoUrl,
+    required this.gMapUrl,
   });
 
   factory SipSalesmanHistoryModel.fromJson(Map<String, dynamic> json) {
@@ -53,6 +68,11 @@ class SipSalesmanHistoryModel {
       checkOut: json['CheckOut'],
       cLat: json['CLat'],
       cLng: json['CLng'],
+      eventName: json['EventName'],
+      eventPhoto: json['EventPhoto'],
+      eventPhotoThumb: json['EventPhotoThumb'],
+      eventPhotoUrl: json['EventPhotoUrl'],
+      gMapUrl: json['GMapUrl'],
     );
   }
 }

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:stsj/core/cleanArc/dashboard_service/pages/dialog_filter.dart';
+import 'package:stsj/core/cleanArc/dashboard_service/pages/service_dialog_filter.dart';
 import 'package:stsj/core/providers/Provider.dart';
+import 'package:stsj/dashboard-fixup/pages/fpm_dialog_filter.dart';
 import 'package:stsj/router/router_const.dart';
 
 class DashboardMenuComponent extends HookWidget {
@@ -144,6 +145,54 @@ class DashboardMenuComponent extends HookWidget {
                 }
               },
             ),
+
+            // ~:FPM Dashboard:~
+            Builder(
+              builder: (context) {
+                if (state.getCompanyAuthorization.contains('SAMP')) {
+                  return Container(
+                    margin: EdgeInsets.only(right: 50.0),
+                    child: Column(
+                      children: [
+                        _buildMenuIcon(
+                          context,
+                          'assets/images/dashboard-2.png',
+                          'FPM Dashboard',
+                          RoutesConstant.fpmDashboard,
+                        ),
+                        const Text('FPM Dashboard'),
+                      ],
+                    ),
+                  );
+                } else {
+                  return const SizedBox();
+                }
+              },
+            ),
+
+            // ~:FPM Import Excel:~
+            Builder(
+              builder: (context) {
+                if (state.getCompanyAuthorization.contains('SAMP')) {
+                  return Container(
+                    margin: EdgeInsets.only(right: 50.0),
+                    child: Column(
+                      children: [
+                        _buildMenuIcon(
+                          context,
+                          'assets/images/upload.png',
+                          'FPM Upload Excel',
+                          RoutesConstant.fpmImportExcel,
+                        ),
+                        const Text('FPM Import Excel'),
+                      ],
+                    ),
+                  );
+                } else {
+                  return const SizedBox();
+                }
+              },
+            ),
           ],
         ),
       ),
@@ -180,7 +229,12 @@ class DashboardMenuComponent extends HookWidget {
                 if (tooltip == 'Dashboard Service') {
                   showDialog(
                     context: context,
-                    builder: (BuildContext context) => DialogFilter(),
+                    builder: (BuildContext context) => ServiceDialogFilter(),
+                  );
+                } else if (tooltip == 'FPM Dashboard') {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) => FPMDialogFilter(),
                   );
                 } else {
                   context.goNamed(route);

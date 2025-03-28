@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stsj/core/providers/Provider.dart';
+import 'package:stsj/core/providers/refresh_detector.dart';
 import 'package:stsj/core/views/components/authorization_menu.dart';
 import 'package:stsj/core/views/components/dashboard_menu.dart';
 import 'package:stsj/core/views/components/report_menu.dart';
@@ -22,6 +23,8 @@ class MenuPages extends StatefulWidget {
 
 class _MenuPagesState extends State<MenuPages>
     with AutomaticKeepAliveClientMixin<MenuPages> {
+  late RefreshDetector refreshDetector;
+
   String staticMenu = '';
   // Note -> temporary variable to enable dashboard menu
   // bool isDeliveryEnable = true;
@@ -86,7 +89,7 @@ class _MenuPagesState extends State<MenuPages>
                     child: ListView(
                       scrollDirection: Axis.horizontal,
                       children: [
-                        // ======================= Sales Menu ========================
+                        // ===================== Dashboard Menu ======================
                         Container(
                           margin: EdgeInsets.only(right: 20.0),
                           child: Builder(
@@ -119,7 +122,8 @@ class _MenuPagesState extends State<MenuPages>
                                     ),
                                     child: Text(
                                       'Dashboard',
-                                      style: GlobalFont.mediumbigfontRBoldWhite,
+                                      style:
+                                          GlobalFont.mediumgiantfontRBoldWhite,
                                     ),
                                   ),
                                 );
@@ -1042,7 +1046,15 @@ class _MenuPagesState extends State<MenuPages>
 
     Provider.of<MenuState>(context, listen: false).loadHeader();
     Provider.of<MenuState>(context, listen: false).loadSubHeader();
+    Provider.of<MenuState>(context, listen: false).readDashboardList();
+    Provider.of<MenuState>(context, listen: false).readCompanyAuthorization();
     getCompany();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
   }
 
   @override

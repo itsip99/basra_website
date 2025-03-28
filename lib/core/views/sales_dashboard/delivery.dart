@@ -10,9 +10,9 @@ import 'package:stsj/core/providers/Provider.dart';
 import 'package:stsj/global/font.dart';
 import 'package:stsj/global/function.dart';
 import 'package:stsj/global/widget/app_bar.dart';
+import 'package:stsj/global/widget/dropdown/sip_driver_dropdown.dart';
 import 'package:stsj/global/widget/dropdown/sis_branch_shop_dropdown.dart';
 import 'package:stsj/global/widget/card/delivery_card.dart';
-import 'package:stsj/global/widget/autocomplete/driver.dart';
 import 'package:stsj/global/widget/text_display.dart';
 import 'package:stsj/router/router_const.dart';
 
@@ -28,6 +28,7 @@ class _DeliveryPageState extends State<DeliveryPage> {
   String employeeId = '';
   String date = '';
   String branchShop = '';
+  String driverName = ''; // ~:New:~
   // String branchId = '';
   // String shopId = '';
   ValueNotifier<bool> searchTriggerNotifier = ValueNotifier(false);
@@ -107,6 +108,11 @@ class _DeliveryPageState extends State<DeliveryPage> {
 
   void setBranchShop(String value) {
     branchShop = value;
+    searchTriggerNotifier.value = false;
+  }
+
+  void setDriver(String value) {
+    driverName = value;
     searchTriggerNotifier.value = false;
   }
 
@@ -236,14 +242,16 @@ class _DeliveryPageState extends State<DeliveryPage> {
   ) async {
     log('Employee ID: $employeeId');
     log('Branch Shop: $branchShop');
+    log('Driver: $driverName');
     log('isLoading: $isLoading');
+
     if (isLoading) {
       GlobalFunction.showSnackbar(
         context,
         'Mohon Tunggu.',
       );
     } else {
-      if (employeeId.isEmpty || branchShop.isEmpty) {
+      if (branchShop.isEmpty || driverName.isEmpty) {
         GlobalFunction.showSnackbar(
           context,
           'Mohon periksa kembali filter anda.',
@@ -272,28 +280,32 @@ class _DeliveryPageState extends State<DeliveryPage> {
     } else {
       print('Delivery List: ${menuState.getDeliveryList.length}');
 
-      if (searchTriggerNotifier.value) {
-        if (menuState.getDeliveryList.isNotEmpty &&
-            menuState.getDeliveryList[0].employeeId.isNotEmpty) {
-          if (!isRoute) {
-            context.goNamed(RoutesConstant.mapDelivery);
+      try {
+        if (searchTriggerNotifier.value) {
+          if (menuState.getDeliveryList.isNotEmpty &&
+              menuState.getDeliveryList[0].employeeId.isNotEmpty) {
+            if (!isRoute) {
+              context.goNamed(RoutesConstant.mapDelivery);
+            } else {
+              GlobalFunction.showSnackbar(
+                context,
+                'Coming Soon.',
+              );
+            }
           } else {
             GlobalFunction.showSnackbar(
               context,
-              'Coming Soon.',
+              'Data tidak ditemukan.',
             );
           }
         } else {
           GlobalFunction.showSnackbar(
             context,
-            'Data tidak ditemukan.',
+            'Gagal membuka peta, periksa kembali filter anda.',
           );
         }
-      } else {
-        GlobalFunction.showSnackbar(
-          context,
-          'Gagal membuka peta, periksa kembali filter anda.',
-        );
+      } catch (e) {
+        print('Error: $e');
       }
     }
   }
@@ -398,9 +410,11 @@ class _DeliveryPageState extends State<DeliveryPage> {
                         child: ListView(
                           scrollDirection: Axis.horizontal,
                           children: [
-                            Consumer<MenuState>(
+                            ValueListenableBuilder<List<String>>(
+                              valueListenable:
+                                  menuState.getBranchNameListNotifier,
                               builder: (context, value, _) {
-                                if (value.getBranchNameList.isEmpty) {
+                                if (value.isEmpty) {
                                   return AnimatedContainer(
                                     duration: const Duration(milliseconds: 500),
                                     width: MediaQuery.of(context).size.width *
@@ -450,7 +464,7 @@ class _DeliveryPageState extends State<DeliveryPage> {
                                               0.01,
                                     ),
                                     child: SisBranchShopDropdown(
-                                      listData: value.getBranchNameList,
+                                      listData: value,
                                       inputan: branchShop,
                                       hint: 'Cabang',
                                       handle: setBranchShop,
@@ -462,9 +476,75 @@ class _DeliveryPageState extends State<DeliveryPage> {
                               },
                             ),
                             SizedBox(width: 10.0),
-                            DriverAutoComplete(
-                              employeeId,
-                              setEmployeId,
+                            // ~:Driver Auto Complete:~
+                            // DriverAutoComplete(
+                            //   employeeId,
+                            //   setEmployeId,
+                            // ),
+
+                            // ~:Driver Dropdown:~
+                            ValueListenableBuilder<List<String>>(
+                              valueListenable:
+                                  menuState.getFilteredDriverNameListNotifier,
+                              builder: (context, value, _) {
+                                if (value.isEmpty) {
+                                  return AnimatedContainer(
+                                    duration: const Duration(milliseconds: 500),
+                                    width: MediaQuery.of(context).size.width *
+                                        0.15,
+                                    height: MediaQuery.of(context).size.height *
+                                        0.05,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey,
+                                      borderRadius: BorderRadius.circular(15.0),
+                                    ),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal:
+                                          MediaQuery.of(context).size.width *
+                                              0.01,
+                                      vertical:
+                                          MediaQuery.of(context).size.height *
+                                              0.01,
+                                    ),
+                                    child: SipDriverDropdown(
+                                      listData: const [],
+                                      inputan: '',
+                                      hint: 'Nama Driver',
+                                      handle: () {},
+                                      disable: true,
+                                    ),
+                                  );
+                                } else {
+                                  return AnimatedContainer(
+                                    duration: const Duration(milliseconds: 500),
+                                    width: MediaQuery.of(context).size.width *
+                                        0.15,
+                                    height: MediaQuery.of(context).size.height *
+                                        0.05,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[400],
+                                      borderRadius: BorderRadius.circular(15.0),
+                                    ),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal:
+                                          MediaQuery.of(context).size.width *
+                                              0.01,
+                                      vertical:
+                                          MediaQuery.of(context).size.height *
+                                              0.01,
+                                    ),
+                                    child: SipDriverDropdown(
+                                      listData: value,
+                                      inputan: driverName,
+                                      hint: 'Nama Driver',
+                                      handle: setDriver,
+                                      disable: false,
+                                    ),
+                                  );
+                                }
+                              },
                             ),
                             SizedBox(width: 10.0),
                             InkWell(
@@ -851,18 +931,31 @@ class _DeliveryPageState extends State<DeliveryPage> {
                                       CheckListDetailsModel detail =
                                           details.value;
 
-                                      if (deliveryDetail.length - 1 != index &&
-                                          deliveryDetail[index + 1]
-                                              .deliveryTime
-                                              .isNotEmpty) {
-                                        return DeliveryCard(
-                                          detail,
-                                          destinationTime:
-                                              deliveryDetail[index + 1]
-                                                  .deliveryTime,
-                                        );
+                                      if (deliveryDetail.length == index + 1) {
+                                        if (menuState.getDeliveryList[0].endTime
+                                            .isNotEmpty) {
+                                          return DeliveryCard(
+                                            detail,
+                                            destinationTime: menuState
+                                                .getDeliveryList[0].startTime,
+                                          );
+                                        } else {
+                                          return DeliveryCard(detail);
+                                        }
                                       } else {
-                                        return DeliveryCard(detail);
+                                        if (deliveryDetail[index + 1]
+                                                .deliveryTime
+                                                .isNotEmpty &&
+                                            deliveryDetail.length != index) {
+                                          return DeliveryCard(
+                                            detail,
+                                            destinationTime:
+                                                deliveryDetail[index + 1]
+                                                    .deliveryTime,
+                                          );
+                                        } else {
+                                          return DeliveryCard(detail);
+                                        }
                                       }
                                     },
                                   ).toList(),
@@ -877,7 +970,7 @@ class _DeliveryPageState extends State<DeliveryPage> {
                               companyId,
                               menuState.getBranchId,
                               menuState.getShopId,
-                              employeeId,
+                              driverName,
                               date,
                               onDeliveryPage: true,
                             ),
@@ -1202,19 +1295,34 @@ class _DeliveryPageState extends State<DeliveryPage> {
                                             CheckListDetailsModel detail =
                                                 details.value;
 
-                                            if (deliveryDetail.length - 1 !=
-                                                    index &&
-                                                deliveryDetail[index + 1]
-                                                    .deliveryTime
-                                                    .isNotEmpty) {
-                                              return DeliveryCard(
-                                                detail,
-                                                destinationTime:
-                                                    deliveryDetail[index + 1]
-                                                        .deliveryTime,
-                                              );
+                                            if (deliveryDetail.length ==
+                                                index + 1) {
+                                              if (menuState.getDeliveryList[0]
+                                                  .endTime.isNotEmpty) {
+                                                return DeliveryCard(
+                                                  detail,
+                                                  destinationTime: menuState
+                                                      .getDeliveryList[0]
+                                                      .startTime,
+                                                );
+                                              } else {
+                                                return DeliveryCard(detail);
+                                              }
                                             } else {
-                                              return DeliveryCard(detail);
+                                              if (deliveryDetail[index + 1]
+                                                      .deliveryTime
+                                                      .isNotEmpty &&
+                                                  deliveryDetail.length !=
+                                                      index) {
+                                                return DeliveryCard(
+                                                  detail,
+                                                  destinationTime:
+                                                      deliveryDetail[index + 1]
+                                                          .deliveryTime,
+                                                );
+                                              } else {
+                                                return DeliveryCard(detail);
+                                              }
                                             }
                                           },
                                         ).toList(),
@@ -1487,18 +1595,31 @@ class _DeliveryPageState extends State<DeliveryPage> {
                                       CheckListDetailsModel detail =
                                           details.value;
 
-                                      if (deliveryDetail.length - 1 != index &&
-                                          deliveryDetail[index + 1]
-                                              .deliveryTime
-                                              .isNotEmpty) {
-                                        return DeliveryCard(
-                                          detail,
-                                          destinationTime:
-                                              deliveryDetail[index + 1]
-                                                  .deliveryTime,
-                                        );
+                                      if (deliveryDetail.length == index + 1) {
+                                        if (menuState.getDeliveryList[0].endTime
+                                            .isNotEmpty) {
+                                          return DeliveryCard(
+                                            detail,
+                                            destinationTime: menuState
+                                                .getDeliveryList[0].startTime,
+                                          );
+                                        } else {
+                                          return DeliveryCard(detail);
+                                        }
                                       } else {
-                                        return DeliveryCard(detail);
+                                        if (deliveryDetail[index + 1]
+                                                .deliveryTime
+                                                .isNotEmpty &&
+                                            deliveryDetail.length != index) {
+                                          return DeliveryCard(
+                                            detail,
+                                            destinationTime:
+                                                deliveryDetail[index + 1]
+                                                    .deliveryTime,
+                                          );
+                                        } else {
+                                          return DeliveryCard(detail);
+                                        }
                                       }
                                     },
                                   ).toList(),
