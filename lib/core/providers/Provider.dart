@@ -29,7 +29,10 @@ import 'package:stsj/core/models/Dashboard/delivery_history.dart';
 import 'package:stsj/core/models/Dashboard/driver.dart';
 import 'package:stsj/core/models/Dashboard/picking_packing.dart';
 import 'package:stsj/core/models/Report/absent_history.dart';
+import 'package:stsj/core/models/Report/free_stock_modif.dart';
+import 'package:stsj/core/models/Report/free_stock_result.dart';
 import 'package:stsj/core/models/Report/mbrowse_salesman.dart';
+import 'package:stsj/core/models/SalesDashboardModel/free_stock_model.dart';
 import 'package:stsj/dashboard-fixup/utilities/utils.dart';
 import 'package:stsj/global/api.dart';
 import 'package:stsj/router/router_const.dart';
@@ -1870,8 +1873,15 @@ class MenuState with ChangeNotifier {
   ValueNotifier<List<String>> get getPickingPicListNotifier =>
       pickingPicListNotifier;
 
-  void setPickingPicListNotifier(List<String> value) {
-    pickingPicListNotifier.value = value;
+  void setPickingPicListNotifier(
+    List<String> value, {
+    bool isEmpty = false,
+  }) {
+    pickingPicListNotifier.value.clear();
+    if (!isEmpty) {
+      pickingPicListNotifier.value.add('');
+    }
+    pickingPicListNotifier.value.addAll(value);
     notifyListeners();
   }
 
@@ -1895,9 +1905,9 @@ class MenuState with ChangeNotifier {
         setPickingPicListNotifier(res['data']);
         print('Picking PIC List length: ${pickingPicList.length}');
 
-        // for (String name in pickingPicList) {
-        //   print(name);
-        // }
+        for (String name in pickingPicList) {
+          print(name);
+        }
       } else {
         pickingPicList.clear();
         print('Picking PIC List is empty');
@@ -2004,8 +2014,15 @@ class MenuState with ChangeNotifier {
   ValueNotifier<List<String>> get getPackingPicListNotifier =>
       packingPicListNotifier;
 
-  void setPackingPicListNotifier(List<String> value) {
-    packingPicListNotifier.value = value;
+  void setPackingPicListNotifier(
+    List<String> value, {
+    bool isEmpty = false,
+  }) {
+    packingPicListNotifier.value.clear();
+    if (!isEmpty) {
+      packingPicListNotifier.value.add('');
+    }
+    packingPicListNotifier.value.addAll(value);
     notifyListeners();
   }
 
@@ -2114,5 +2131,142 @@ class MenuState with ChangeNotifier {
 
     return res;
   }
+
+  // ~:Free Stock:~
+  String selectedFreeStockBranch = '';
+  String get getSelectedFreeStockBranch => selectedFreeStockBranch;
+
+  void setSelectedFreeStockBranch(String value) {
+    selectedFreeStockBranch = value;
+    notifyListeners();
+  }
+
+  List<FreeStockModel> freeStockList = [];
+  List<FreeStockModel> get getFreeStockList => freeStockList;
+
+  ValueNotifier<List<String>> freeStockBranchNameList =
+      (ValueNotifier<List<String>>([]));
+  ValueNotifier<List<String>> get getFreeStockBranchNameList =>
+      freeStockBranchNameList;
+
+  Future<Map<String, dynamic>> fetchBranchFreeStock() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    username = prefs.getString('UserID') ?? '';
+    Map<String, dynamic> temp = {};
+
+    await GlobalAPI.fetchFSBranchList(username).then((res) {
+      temp = res;
+      if (res['status'] == 'success') {
+        freeStockList.clear();
+        freeStockList.addAll(res['data']);
+        print('FS Branch List length: ${freeStockList.length}');
+
+        freeStockBranchNameList.value.clear();
+        freeStockBranchNameList.value.addAll(
+          freeStockList.map((e) => e.branchName).toList(),
+        );
+      }
+    });
+    notifyListeners();
+
+    return temp;
+  }
+
+  void resetFreeStockFilter() {
+    setFreeStockResult({
+      'status': '',
+      'data': <FreeStockResultModel>[],
+    });
+    setSelectedFreeStockBranch('');
+  }
+
+  ValueNotifier<bool> isValueChanged = ValueNotifier<bool>(false);
+  ValueNotifier<bool> get getIsValueChanged => isValueChanged;
+
+  void setIsValueChanged(bool value) {
+    isValueChanged.value = value;
+    // notifyListeners();
+  }
+
+  Map<String, dynamic> freeStockResult = {
+    'status': '',
+    'data': <FreeStockResultModel>[],
+  };
+  Map<String, dynamic> get getFreeStockResult => freeStockResult;
+
+  void setFreeStockResult(Map<String, dynamic> value) {
+    freeStockResult = value;
+    // notifyListeners();
+  }
+
+  Future<Map<String, dynamic>> fetchFreeStockResult() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    username = prefs.getString('UserID') ?? '';
+
+    Map<String, dynamic> temp = {};
+
+    print('Username: $username');
+    print(
+      'Branch Id: ${freeStockList.where((e) => e.branchName == getSelectedFreeStockBranch).first.branchId}',
+    );
+    print('Date: ${DateTime.now().toString().substring(0, 10)}');
+
+    await GlobalAPI.fetchFreeStockData(
+      username,
+      freeStockList
+          .where((e) => e.branchName == getSelectedFreeStockBranch)
+          .first
+          .branchId,
+      DateTime.now().toString().substring(0, 10),
+    ).then((res) {
+      temp = res;
+      if (res['status'] == 'success') {
+        freeStockResult.update('status', (_) => res['status']);
+        freeStockResult.update('data', (_) => res['data']);
+        print(
+          'FS Result List length: ${(freeStockResult['data'] as List).length}',
+        );
+        return temp;
+      } else {
+        freeStockResult.update('status', (_) => res['status']);
+      }
+    });
+    notifyListeners();
+
+    return temp;
+  }
+
+  List<FreeStockModifModel> stockModifList = [];
+  List<FreeStockModifModel> get getStockModifList => stockModifList;
+
+  void setStockModifList(List<FreeStockModifModel> value) {
+    stockModifList = value;
+    notifyListeners();
+  }
+
+  Future<String> modifyFreeStock() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    username = prefs.getString('UserID') ?? '';
+
+    List<Map<String, dynamic>> mapModifyStock =
+        (getFreeStockResult['data'] as List<FreeStockResultModel>).map((data) {
+      return {
+        'branchId': getSelectedFreeStockBranch,
+        'unitId': data.unitId,
+        'color': data.color,
+        'freeStock': data.freeStock,
+        'userId': username,
+      };
+    }).toList();
+
+    print('Converted Stock Modif List to Map');
+    for (var data in mapModifyStock) {
+      print(data);
+    }
+
+    return await GlobalAPI.modifyFreeStock(mapModifyStock);
+  }
+  // ~:Free Stock:~
+
   // ~:NEW:~
 }

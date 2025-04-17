@@ -93,9 +93,8 @@ class _Dashboard2PageState extends State<Dashboard2Page>
     return Scaffold(
       backgroundColor: Colors.blue[50]!.withAlpha(200),
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(
-          MediaQuery.of(context).size.height * 0.065,
-        ),
+        preferredSize:
+            Size.fromHeight(MediaQuery.of(context).size.height * 0.065),
         child: CustomAppBar(
           goBack: RoutesConstant.menu,
         ),

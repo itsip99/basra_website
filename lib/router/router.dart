@@ -24,6 +24,7 @@ import 'package:stsj/core/views/report/mds_sparepart_stock.dart';
 import 'package:stsj/core/views/report/service_history.dart';
 import 'package:stsj/core/views/sales_dashboard/delivery.dart';
 import 'package:stsj/core/views/sales_dashboard/delivery_map.dart';
+import 'package:stsj/core/views/report/branch_free_stock.dart';
 import 'package:stsj/core/views/sales_dashboard/packing.dart';
 import 'package:stsj/core/views/sales_dashboard/picking.dart';
 import 'package:stsj/dashboard-fixup/pages/dashboard1_page.dart';
@@ -133,6 +134,13 @@ class RouterSettings {
             path: 'importExcel',
             pageBuilder: (context, state) {
               return MaterialPage(child: ImportExcel());
+            },
+          ),
+          GoRoute(
+            name: RoutesConstant.branchFreeStock,
+            path: 'branchFreeStock',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: BranchFreeStockPage());
             },
           ),
           GoRoute(

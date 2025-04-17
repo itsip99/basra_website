@@ -244,6 +244,8 @@ class _PickingPageState extends State<PickingPage> {
     Provider.of<MenuState>(context, listen: false).loadSisBranches();
     Provider.of<MenuState>(context, listen: false).setPickingPicList([]);
     Provider.of<MenuState>(context, listen: false)
+        .setPickingPicListNotifier([], isEmpty: true);
+    Provider.of<MenuState>(context, listen: false)
         .setSearchTriggerNotifier(false);
   }
 
@@ -253,9 +255,8 @@ class _PickingPageState extends State<PickingPage> {
 
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(
-          MediaQuery.of(context).size.height * 0.065,
-        ),
+        preferredSize:
+            Size.fromHeight(MediaQuery.of(context).size.height * 0.065),
         child: CustomAppBar(
           goBack: RoutesConstant.menu,
         ),
@@ -391,7 +392,7 @@ class _PickingPageState extends State<PickingPage> {
                           // ~:PIC Autocomplete:~
                           // PicAutoComplete(pic, setPIC, isPicking: true),
                           ValueListenableBuilder<List<String>>(
-                            valueListenable: state.getPickingPicListNotifier,
+                            valueListenable: state.pickingPicListNotifier,
                             builder: (context, value, _) {
                               if (value.isEmpty) {
                                 return AnimatedContainer(

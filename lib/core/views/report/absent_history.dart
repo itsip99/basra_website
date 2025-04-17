@@ -228,9 +228,8 @@ class _AbsentHistoryPageState extends State<AbsentHistoryPage> {
 
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(
-          MediaQuery.of(context).size.height * 0.065,
-        ),
+        preferredSize:
+            Size.fromHeight(MediaQuery.of(context).size.height * 0.065),
         child: CustomAppBar(
           goBack: RoutesConstant.menu,
         ),

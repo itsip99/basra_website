@@ -283,166 +283,181 @@ class _LoginPagesState extends State<LoginPages> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.5,
-                child: Wrap(
-                  runAlignment: WrapAlignment.center,
+              Expanded(
+                child: Column(
                   children: [
                     // Company Logo
-                    Container(
-                      height: MediaQuery.of(context).size.height * 0.15,
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage('assets/images/stsj.png'),
-                        ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        vertical: MediaQuery.of(context).size.height * 0.03,
+                      ),
+                      child: Image.asset(
+                        'assets/images/stsj.png',
+                        fit: BoxFit.contain,
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height * 0.175,
                       ),
                     ),
 
-                    // User Text Fields
-                    Container(
-                      height: MediaQuery.of(context).size.height * 0.2,
-                      padding: EdgeInsets.only(
-                        top: MediaQuery.of(context).size.height * 0.01,
-                      ),
-                      child: Form(
-                        key: formKey,
-                        child: Column(
-                          children: <Widget>[
-                            // Username Text Field
-                            Expanded(
-                              child: TextFormField(
-                                textAlignVertical: TextAlignVertical.center,
-                                controller: idController,
-                                autofocus: true,
-                                inputFormatters: [
-                                  UppercaseTextInputFormatter()
-                                ],
-                                decoration: InputDecoration(
-                                  filled: true, //<-- SEE HERE
-                                  fillColor: Colors.white70,
-                                  labelText: "Username", //babel text
-                                  hintText: 'Masukan username perusahaan',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    borderSide: BorderSide(width: 0.5),
-                                  ),
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter userid';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-
-                            // Password Text Field
-                            Expanded(
-                              child: TextFormField(
-                                inputFormatters: [
-                                  UppercaseTextInputFormatter()
-                                ],
-                                controller: passwordController,
-                                obscureText: !_passwordVisible,
-                                decoration: InputDecoration(
-                                  labelText: "Password", //babel text
-                                  hintText: 'Masukan password perusahaan',
-
-                                  filled: true, //<-- SEE HERE
-                                  fillColor: Colors.white70,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    borderSide: BorderSide(width: 0.5),
-                                  ),
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      // Based on passwordVisible state choose the icon
-                                      _passwordVisible
-                                          ? Icons.visibility
-                                          : Icons.visibility_off,
-                                      color: Theme.of(context).primaryColorDark,
+                    Wrap(
+                      runSpacing: MediaQuery.of(context).size.height * 0.025,
+                      children: [
+                        // User Text Fields
+                        Container(
+                          height: MediaQuery.of(context).size.height * 0.15,
+                          alignment: Alignment.center,
+                          padding: EdgeInsets.only(
+                            top: MediaQuery.of(context).size.height * 0.01,
+                          ),
+                          child: Form(
+                            key: formKey,
+                            child: Column(
+                              children: <Widget>[
+                                // Username Text Field
+                                Expanded(
+                                  child: TextFormField(
+                                    textAlignVertical: TextAlignVertical.center,
+                                    controller: idController,
+                                    autofocus: true,
+                                    inputFormatters: [
+                                      UppercaseTextInputFormatter()
+                                    ],
+                                    decoration: InputDecoration(
+                                      filled: true, //<-- SEE HERE
+                                      fillColor: Colors.white70,
+                                      labelText: "Username", //babel text
+                                      hintText: 'Masukan username perusahaan',
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                        borderSide: BorderSide(width: 0.5),
+                                      ),
                                     ),
-                                    onPressed: () {
-                                      // Update the state i.e. toogle the state of passwordVisible variable
-                                      setState(() {
-                                        _passwordVisible = !_passwordVisible;
-                                      });
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please enter userid';
+                                      }
+                                      return null;
                                     },
                                   ),
                                 ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter password';
-                                  }
 
-                                  return null;
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                                SizedBox(
+                                  height: MediaQuery.of(context).size.height *
+                                      0.015,
+                                ),
 
-                    // Login Button
-                    ElevatedButton(
-                      style: ButtonStyle(
-                        padding: WidgetStateProperty.all(
-                          EdgeInsets.symmetric(
-                            horizontal:
-                                MediaQuery.of(context).size.width * 0.05,
-                            vertical:
-                                MediaQuery.of(context).size.height * 0.025,
-                          ),
-                        ),
-                        backgroundColor: WidgetStateProperty.all(
-                          Theme.of(context).primaryColorLight,
-                        ),
-                      ),
-                      onPressed: () {
-                        // if (formKey.currentState!.validate()) {
-                        //   formKey.currentState!.save();
-                        //   loginHandler(context, state);
-                        // }
-                        loginHandler(context, state);
-                      },
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width,
-                        child: Builder(
-                          builder: (context) {
-                            if (isLoading) {
-                              return Center(
-                                heightFactor: 1,
-                                widthFactor: 1,
-                                child: SizedBox(
-                                  width: 25,
-                                  height: 25,
-                                  child: CircularProgressIndicator(
-                                    backgroundColor:
-                                        Color.fromARGB(255, 4, 101, 237),
-                                    strokeWidth: 5,
+                                // Password Text Field
+                                Expanded(
+                                  child: TextFormField(
+                                    inputFormatters: [
+                                      UppercaseTextInputFormatter()
+                                    ],
+                                    controller: passwordController,
+                                    obscureText: !_passwordVisible,
+                                    decoration: InputDecoration(
+                                      labelText: "Password", //babel text
+                                      hintText: 'Masukan password perusahaan',
+
+                                      filled: true, //<-- SEE HERE
+                                      fillColor: Colors.white70,
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                        borderSide: BorderSide(width: 0.5),
+                                      ),
+                                      suffixIcon: IconButton(
+                                        icon: Icon(
+                                          // Based on passwordVisible state choose the icon
+                                          _passwordVisible
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
+                                          color: Theme.of(context)
+                                              .primaryColorDark,
+                                        ),
+                                        onPressed: () {
+                                          // Update the state i.e. toogle the state of passwordVisible variable
+                                          setState(() {
+                                            _passwordVisible =
+                                                !_passwordVisible;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please enter password';
+                                      }
+
+                                      return null;
+                                    },
                                   ),
                                 ),
-                              );
-                            } else {
-                              return Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: const [
-                                  Icon(Icons.login, color: Colors.black),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text(
-                                    'Login',
-                                    style: TextStyle(color: Colors.black),
-                                  )
-                                ],
-                              );
-                            }
-                          },
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
+
+                        // Login Button
+                        ElevatedButton(
+                          style: ButtonStyle(
+                            padding: WidgetStateProperty.all(
+                              EdgeInsets.symmetric(
+                                horizontal:
+                                    MediaQuery.of(context).size.width * 0.05,
+                                vertical:
+                                    MediaQuery.of(context).size.height * 0.025,
+                              ),
+                            ),
+                            backgroundColor: WidgetStateProperty.all(
+                              Theme.of(context).primaryColorLight,
+                            ),
+                          ),
+                          onPressed: () {
+                            // if (formKey.currentState!.validate()) {
+                            //   formKey.currentState!.save();
+                            //   loginHandler(context, state);
+                            // }
+                            loginHandler(context, state);
+                          },
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width,
+                            child: Builder(
+                              builder: (context) {
+                                if (isLoading) {
+                                  return Center(
+                                    heightFactor: 1,
+                                    widthFactor: 1,
+                                    child: SizedBox(
+                                      width: 25,
+                                      height: 25,
+                                      child: CircularProgressIndicator(
+                                        backgroundColor:
+                                            Color.fromARGB(255, 4, 101, 237),
+                                        strokeWidth: 5,
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  return Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: const [
+                                      Icon(Icons.login, color: Colors.black),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Text(
+                                        'Login',
+                                        style: TextStyle(color: Colors.black),
+                                      )
+                                    ],
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -451,10 +466,9 @@ class _LoginPagesState extends State<LoginPages> {
               // ~:Website Version:~
               Container(
                 width: MediaQuery.of(context).size.width,
-                height: 25,
                 alignment: Alignment.center,
                 child: Text(
-                  'v1.0.13',
+                  'v1.0.14',
                   style: GlobalFont.mediumbigfontR,
                 ),
               ),

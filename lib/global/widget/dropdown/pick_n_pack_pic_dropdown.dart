@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:stsj/core/providers/Provider.dart';
 import 'package:stsj/global/font.dart';
 
 class PickPackPICDropdown extends StatefulWidget {
@@ -33,20 +31,16 @@ class _PickPackPICDropdownState extends State<PickPackPICDropdown> {
   void initState() {
     value = widget.inputan;
     print('Value: $value');
-    // TODO: implement initState
     super.initState();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final state = Provider.of<MenuState>(context);
-
     if (!widget.isMobile) {
       return DropdownButtonHideUnderline(
         child: DropdownButton(
@@ -72,7 +66,6 @@ class _PickPackPICDropdownState extends State<PickPackPICDropdown> {
           items: widget.disable == true
               ? null
               : widget.listData.asMap().entries.map((entry) {
-                  // final index = entry.key;
                   final picName = entry.value;
 
                   return DropdownMenuItem(
@@ -88,8 +81,6 @@ class _PickPackPICDropdownState extends State<PickPackPICDropdown> {
           onChanged: (newValues) async {
             if (value != newValues) {
               setState(() => value = newValues.toString());
-              // print('Province Dropdown value: $value');
-              state.setBranchNameNotifier(value);
 
               await widget.handle(newValues);
             }
@@ -117,7 +108,6 @@ class _PickPackPICDropdownState extends State<PickPackPICDropdown> {
           items: widget.disable == true
               ? null
               : widget.listData.asMap().entries.map((entry) {
-                  // final int index = entry.key;
                   final picName = entry.value;
 
                   return DropdownMenuItem(
@@ -133,8 +123,6 @@ class _PickPackPICDropdownState extends State<PickPackPICDropdown> {
           onChanged: (newValues) async {
             if (value != newValues) {
               setState(() => value = newValues.toString());
-              // print('Province Dropdown value: $value');
-              state.setBranchNameNotifier(value);
 
               await widget.handle(newValues);
             }

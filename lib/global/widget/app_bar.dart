@@ -53,6 +53,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
       return AppBar(
         centerTitle: true, // this is all you need
         backgroundColor: const Color(0xFF9EDDFF),
+        toolbarHeight: MediaQuery.of(context).size.height * 0.065,
         leading:
             router != RoutesConstant.homepage && router != RoutesConstant.report
                 ? IconButton(
@@ -83,7 +84,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(
-                'v1.0.13',
+                'v1.0.14',
                 style: GlobalFont.smallfontR,
               ),
             ],
@@ -150,6 +151,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
       return AppBar(
         centerTitle: true, // this is all you need
         backgroundColor: const Color(0xFF9EDDFF),
+        toolbarHeight: MediaQuery.of(context).size.height * 0.065,
         leading: IconButton(
           onPressed: () => Navigator.of(context).pop(),
           icon: Icon(
@@ -171,7 +173,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(
-                'v1.0.13',
+                'v1.0.14',
                 style: GlobalFont.smallfontR,
               ),
             ],

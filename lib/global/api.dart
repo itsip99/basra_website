@@ -21,7 +21,9 @@ import 'package:stsj/core/models/Dashboard/delivery_memo.dart';
 import 'package:stsj/core/models/Dashboard/driver.dart';
 import 'package:stsj/core/models/Dashboard/picking_packing.dart';
 import 'package:stsj/core/models/Report/absent_history.dart';
+import 'package:stsj/core/models/Report/free_stock_result.dart';
 import 'package:stsj/core/models/Report/mbrowse_salesman.dart';
+import 'package:stsj/core/models/SalesDashboardModel/free_stock_model.dart';
 
 class GlobalAPI {
   static Future<List<ModelUserAccess>> fetchUserAccess(
@@ -862,6 +864,172 @@ class GlobalAPI {
         'status': 'error',
         'data': list,
       };
+    }
+  }
+
+  static Future<Map<String, dynamic>> fetchFSBranchList(
+    String userId,
+  ) async {
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/api/AdjustFS/BrowseBranch',
+    );
+
+    Map mapFSBranch = {
+      "UserID": userId,
+    };
+
+    print(mapFSBranch);
+
+    List<FreeStockModel> list = [];
+
+    try {
+      final response =
+          await http.post(url, body: jsonEncode(mapFSBranch), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      // print(response.body);
+
+      if (response.statusCode <= 200) {
+        var jsonBranches = jsonDecode(response.body);
+        if (jsonBranches['code'] == '100' && jsonBranches['msg'] == 'Sukses') {
+          list.addAll((jsonBranches['data'] as List)
+              .map<FreeStockModel>((list) => FreeStockModel.fromJson(list))
+              .toList());
+
+          print('success');
+          return {
+            'status': 'success',
+            'data': list,
+          };
+        } else {
+          print('failed');
+          return {
+            'status': 'failed',
+            'data': list,
+          };
+        }
+      }
+
+      print('Not found');
+      return {
+        'status': 'not found',
+        'data': list,
+      };
+    } catch (e) {
+      print('Error: ${e.toString()}');
+      return {
+        'status': 'error',
+        'data': list,
+      };
+    }
+  }
+
+  static Future<Map<String, dynamic>> fetchFreeStockData(
+    String userId,
+    String branchId,
+    String date,
+  ) async {
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/api/AdjustFS/Browse',
+    );
+
+    Map mapFreeStockData = {
+      'UserID': userId,
+      'Branch': branchId,
+      'EndDate': date,
+    };
+
+    print(mapFreeStockData);
+
+    List<FreeStockResultModel> list = [];
+
+    try {
+      final response =
+          await http.post(url, body: jsonEncode(mapFreeStockData), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      // print(response.body);
+
+      if (response.statusCode <= 200) {
+        var jsonBranches = jsonDecode(response.body);
+        if (jsonBranches['code'] == '100' && jsonBranches['msg'] == 'Sukses') {
+          list.addAll((jsonBranches['data'] as List)
+              .map<FreeStockResultModel>(
+                  (list) => FreeStockResultModel.fromJson(list))
+              .toList());
+
+          print('success');
+          return {
+            'status': 'success',
+            'data': list,
+          };
+        } else {
+          print('failed');
+          return {
+            'status': 'failed',
+            'data': list,
+          };
+        }
+      }
+
+      print('Not found');
+      return {
+        'status': 'not found',
+        'data': list,
+      };
+    } catch (e) {
+      print('Error: ${e.toString()}');
+      return {
+        'status': 'error',
+        'data': list,
+      };
+    }
+  }
+
+  static Future<String> modifyFreeStock(
+    List<Map<String, dynamic>> mapStockModify,
+  ) async {
+    var url = Uri.https(
+      'wsip.yamaha-jatim.co.id:2448',
+      '/api/AdjustFS/Modify',
+    );
+
+    print(mapStockModify);
+
+    try {
+      final response =
+          await http.post(url, body: jsonEncode(mapStockModify), headers: {
+        'Content-Type': 'application/json',
+      }).timeout(const Duration(seconds: 60));
+
+      // print(response.body);
+
+      if (response.statusCode <= 200) {
+        var jsonModifyStock = jsonDecode(response.body);
+        if (jsonModifyStock['code'] == '100' &&
+            jsonModifyStock['msg'] == 'Sukses') {
+          if (jsonModifyStock['data'][0]['resultMessage'] == 'SUKSES') {
+            print('success');
+            return 'success';
+          } else {
+            print('success');
+            return 'failed';
+          }
+        } else {
+          print('failed');
+          return jsonModifyStock['code'];
+        }
+      }
+
+      print('Not found');
+      return 'not found';
+    } catch (e) {
+      print('Error: ${e.toString()}');
+      return 'error';
     }
   }
   // ~:NEW:~

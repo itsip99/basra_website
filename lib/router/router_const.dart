@@ -27,6 +27,7 @@ class RoutesConstant {
   static String activitiesPoint = 'activitiesPoint';
   static String editActivitiesPoint = 'editActivitiesPoint';
   // ~:Dashboard:~
+  static String branchFreeStock = 'branchFreeStock';
   static String picking = 'picking';
   static String packing = 'packing';
   static String fpmDashboard = 'fpmDashboard';

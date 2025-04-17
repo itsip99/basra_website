@@ -40,9 +40,8 @@ class _CarouselRouteDetailsPageState extends State<CarouselRouteDetailsPage> {
 
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(
-          MediaQuery.of(context).size.height * 0.065,
-        ),
+        preferredSize:
+            Size.fromHeight(MediaQuery.of(context).size.height * 0.065),
         child: CustomAppBar(
           goBack: RoutesConstant.map,
         ),

@@ -50,9 +50,13 @@ v1.0.12
 - Apply some sort method on Delivery list.
 
 v1.0.13
-- New Page of FixUp Moto Dashboard Informations!.
-- FixUp Moto Dashboard can only be accessed by user with specific access permission.
+- New Page of FiXup Moto Dashboard Informations!.
+- FiXup Moto Dashboard can only be accessed by user with specific access permission.
 - Delivery, Picking and Packing's Filter bug and performance fixes.
+
+v1.0.14
+- New Page! Adjust Free Stock.
+- Free Stock Adjustment bug and performance fixes.
 
 ## Getting Started
 

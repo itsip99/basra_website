@@ -23,9 +23,8 @@ class _AkunPageState extends State<AkunPage> {
     const double hintSize = 12.0;
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(
-          MediaQuery.of(context).size.height * 0.065,
-        ),
+        preferredSize:
+            Size.fromHeight(MediaQuery.of(context).size.height * 0.065),
         child: CustomAppBar(goBack: '/menu'),
       ),
       body: Center(

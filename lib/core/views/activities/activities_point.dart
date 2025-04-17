@@ -172,14 +172,14 @@ class _ActivitiesPointState extends State<ActivitiesPoint> {
     });
   }
 
-  Widget computerView(BuildContext context) {
+  Widget computerView(BuildContext context, double deviceWidth) {
     final state = Provider.of<MenuState>(context);
+    print('Device Width: $deviceWidth');
 
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(
-          MediaQuery.of(context).size.height * 0.065,
-        ),
+        preferredSize:
+            Size.fromHeight(MediaQuery.of(context).size.height * 0.065),
         child: CustomAppBar(
           goBack: RoutesConstant.menu,
         ),
@@ -659,11 +659,11 @@ class _ActivitiesPointState extends State<ActivitiesPoint> {
 
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(
-          (deviceWidth <= 450)
-              ? MediaQuery.of(context).size.height * 0.055
-              : MediaQuery.of(context).size.height * 0.085,
-        ),
+        preferredSize: Size.fromHeight(0
+            // (deviceWidth <= 450)
+            //     ? MediaQuery.of(context).size.height * 0.055
+            //     : MediaQuery.of(context).size.height * 0.085,
+            ),
         child: CustomAppBar(
           goBack: RoutesConstant.menu,
           imageSize: 35,
@@ -1220,7 +1220,7 @@ class _ActivitiesPointState extends State<ActivitiesPoint> {
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth >= 1024) {
-          return computerView(context);
+          return computerView(context, constraints.maxWidth);
         } else {
           return mobileView(context, constraints.maxWidth);
         }

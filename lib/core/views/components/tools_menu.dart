@@ -42,6 +42,30 @@ class ToolsMenuComponent extends HookWidget {
                 }
               },
             ),
+
+            // ~:FS Branch:~
+            Builder(
+              builder: (context) {
+                if (provider.getSubHeaderList.contains('401')) {
+                  return Container(
+                    margin: EdgeInsets.only(right: 50.0),
+                    child: Column(
+                      children: [
+                        _buildMenuIcon(
+                          context,
+                          'assets/images/stock.png',
+                          'Free Stock',
+                          RoutesConstant.branchFreeStock,
+                        ),
+                        const Text('Free Stock'),
+                      ],
+                    ),
+                  );
+                } else {
+                  return const SizedBox();
+                }
+              },
+            ),
           ],
         ),
       ),
@@ -73,18 +97,21 @@ class ToolsMenuComponent extends HookWidget {
             duration: Duration(milliseconds: 100),
             padding: EdgeInsets.all(hovered ? 10.0 : 0.0),
             child: IconButton(
-              onPressed: () {
+              onPressed: () async {
                 tooltipNull.value = true;
                 if (tooltip == 'Dashboard Service') {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) => ServiceDialogFilter(),
                   );
-                } else {
-                  context.goNamed(route);
+                } else if (tooltip == 'Free Stock') {
+                  await Provider.of<MenuState>(context).fetchBranchFreeStock();
                 }
+                // else {
+                //   context.goNamed(route);
+                // }
 
-                // context.goNamed(route);
+                if (context.mounted) context.goNamed(route);
               },
               icon: Image.asset(imagePath),
             ),

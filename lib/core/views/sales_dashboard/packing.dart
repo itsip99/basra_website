@@ -245,6 +245,8 @@ class _PackingPageState extends State<PackingPage> {
     Provider.of<MenuState>(context, listen: false).loadSisBranches();
     Provider.of<MenuState>(context, listen: false).setPackingPicList([]);
     Provider.of<MenuState>(context, listen: false)
+        .setPackingPicListNotifier([], isEmpty: true);
+    Provider.of<MenuState>(context, listen: false)
         .setSearchTriggerNotifier(false);
   }
 
@@ -254,9 +256,8 @@ class _PackingPageState extends State<PackingPage> {
 
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(
-          MediaQuery.of(context).size.height * 0.065,
-        ),
+        preferredSize:
+            Size.fromHeight(MediaQuery.of(context).size.height * 0.065),
         child: CustomAppBar(
           goBack: RoutesConstant.menu,
         ),
