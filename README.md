@@ -56,7 +56,11 @@ v1.0.13
 
 v1.0.14
 - New Page! Adjust Free Stock.
-- Free Stock Adjustment bug and performance fixes.
+- (1) Free Stock Adjustment bug and performance fixes.
+- (2) Bug and Performance Fixes for parameter passed from save button in Free Stock Adjustment page.
+
+v1.0.15
+- Preview data in table of Workshop Daily report, Mechanic Daily report, and Workshop Monthly report removed and changed into export button.
 
 ## Getting Started
 

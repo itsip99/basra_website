@@ -2207,7 +2207,7 @@ class MenuState with ChangeNotifier {
 
     print('Username: $username');
     print(
-      'Branch Id: ${freeStockList.where((e) => e.branchName == getSelectedFreeStockBranch).first.branchId}',
+      'Branch Id: ${getFreeStockList.where((e) => e.branchName == getSelectedFreeStockBranch).first.branchId}',
     );
     print('Date: ${DateTime.now().toString().substring(0, 10)}');
 
@@ -2251,11 +2251,14 @@ class MenuState with ChangeNotifier {
     List<Map<String, dynamic>> mapModifyStock =
         (getFreeStockResult['data'] as List<FreeStockResultModel>).map((data) {
       return {
-        'branchId': getSelectedFreeStockBranch,
-        'unitId': data.unitId,
-        'color': data.color,
-        'freeStock': data.freeStock,
-        'userId': username,
+        'Branch': getFreeStockList
+            .where((e) => e.branchName == getSelectedFreeStockBranch)
+            .first
+            .branchId,
+        'UnitID': data.unitId,
+        'Color': data.color,
+        'Qty': data.adjustStock,
+        'UserID': username,
       };
     }).toList();
 

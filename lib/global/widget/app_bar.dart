@@ -84,7 +84,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(
-                'v1.0.14',
+                'v1.0.15',
                 style: GlobalFont.smallfontR,
               ),
             ],
@@ -173,7 +173,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(
-                'v1.0.14',
+                'v1.0.15',
                 style: GlobalFont.smallfontR,
               ),
             ],
