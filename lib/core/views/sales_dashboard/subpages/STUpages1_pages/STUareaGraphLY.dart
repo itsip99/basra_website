@@ -66,33 +66,36 @@ class _BarChartState extends State<BarChartAreaLY> {
         color: Colors.white,
         child: Column(
           children: [
-            Container(
-              child: Text('STU BY LAST YEAR',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontFamily: "fontdashboard",
-                      color: Colors.blueGrey,
-                      fontSize: 14)),
+            Text(
+              'STU BY LAST YEAR',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontFamily: "fontdashboard",
+                  color: Colors.blueGrey,
+                  fontSize: 14),
             ),
             SfCartesianChart(
-                primaryXAxis: CategoryAxis(),
-                primaryYAxis:
-                    NumericAxis(minimum: 0, maximum: 4000, interval: 10),
-                tooltipBehavior: _tooltip,
-                series: <ChartSeries<dynamic, String>>[
-                  ColumnSeries<_ChartData1, String>(
-                      dataSource: data1,
-                      xValueMapper: (_ChartData1 data, _) => data.x,
-                      yValueMapper: (_ChartData1 data, _) => data.y,
-                      name: 'LAST YEAR',
-                      color: Color.fromRGBO(105, 4, 246, 1)),
-                  ColumnSeries<_ChartData2, String>(
-                      dataSource: data2,
-                      xValueMapper: (_ChartData2 data, _) => data.x,
-                      yValueMapper: (_ChartData2 data, _) => data.y,
-                      name: 'THIS YEAR',
-                      color: Color.fromRGBO(4, 246, 145, 1)),
-                ]),
+              primaryXAxis: CategoryAxis(),
+              primaryYAxis:
+                  NumericAxis(minimum: 0, maximum: 4000, interval: 10),
+              tooltipBehavior: _tooltip,
+              series: <CartesianSeries<dynamic, String>>[
+                ColumnSeries<_ChartData1, String>(
+                  dataSource: data1,
+                  xValueMapper: (_ChartData1 data, _) => data.x,
+                  yValueMapper: (_ChartData1 data, _) => data.y,
+                  name: 'LAST YEAR',
+                  color: Color.fromRGBO(105, 4, 246, 1),
+                ),
+                ColumnSeries<_ChartData2, String>(
+                  dataSource: data2,
+                  xValueMapper: (_ChartData2 data, _) => data.x,
+                  yValueMapper: (_ChartData2 data, _) => data.y,
+                  name: 'THIS YEAR',
+                  color: Color.fromRGBO(4, 246, 145, 1),
+                ),
+              ],
+            ),
           ],
         ),
       ),

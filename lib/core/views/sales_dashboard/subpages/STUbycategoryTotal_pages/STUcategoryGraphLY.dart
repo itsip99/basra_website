@@ -72,38 +72,42 @@ class _BarChartState extends State<BarChartCategoryLY> {
         color: Colors.white,
         child: Column(
           children: [
-            Container(
-              child: Text('STU BY THIS YEAR & LAST YEAR',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontFamily: "fontdashboard",
-                      color: Colors.blueGrey,
-                      fontSize: 14)),
+            Text(
+              'STU BY THIS YEAR & LAST YEAR',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontFamily: "fontdashboard",
+                  color: Colors.blueGrey,
+                  fontSize: 14),
             ),
             SfCartesianChart(
-                primaryXAxis: CategoryAxis(),
-                legend: Legend(),
-                primaryYAxis:
-                    NumericAxis(minimum: 0, maximum: 16000, interval: 10),
-                tooltipBehavior: _tooltip,
-                series: <ChartSeries<dynamic, String>>[
-                  ColumnSeries<_ChartData1, String>(
-                      dataSource: data1,
-                      xValueMapper: (_ChartData1 data, _) => data.x,
-                      yValueMapper: (_ChartData1 data, _) => data.y,
-                      name: ServiceReusable.cekbulan(
-                          ServiceReusable.bulan2BeforeCheck(
-                              int.parse(STUbyPages1.bulan))),
-                      color: Color.fromRGBO(96, 228, 1, 1)),
-                  ColumnSeries<_ChartData2, String>(
-                      dataSource: data2,
-                      xValueMapper: (_ChartData2 data, _) => data.x,
-                      yValueMapper: (_ChartData2 data, _) => data.y,
-                      name: ServiceReusable.cekbulan(
-                          ServiceReusable.bulanBeforeCheck(
-                              int.parse(STUbyPages1.bulan))),
-                      color: Color.fromRGBO(27, 4, 234, 1)),
-                ]),
+              primaryXAxis: CategoryAxis(),
+              legend: Legend(),
+              primaryYAxis:
+                  NumericAxis(minimum: 0, maximum: 16000, interval: 10),
+              tooltipBehavior: _tooltip,
+              series: <CartesianSeries<dynamic, dynamic>>[
+                ColumnSeries<_ChartData1, String>(
+                  dataSource: data1,
+                  xValueMapper: (_ChartData1 data, _) => data.x,
+                  yValueMapper: (_ChartData1 data, _) => data.y,
+                  name: ServiceReusable.cekbulan(
+                    ServiceReusable.bulan2BeforeCheck(
+                        int.parse(STUbyPages1.bulan)),
+                  ),
+                  color: Color.fromRGBO(96, 228, 1, 1),
+                ),
+                ColumnSeries<_ChartData2, String>(
+                  dataSource: data2,
+                  xValueMapper: (_ChartData2 data, _) => data.x,
+                  yValueMapper: (_ChartData2 data, _) => data.y,
+                  name: ServiceReusable.cekbulan(
+                      ServiceReusable.bulanBeforeCheck(
+                          int.parse(STUbyPages1.bulan))),
+                  color: Color.fromRGBO(27, 4, 234, 1),
+                ),
+              ],
+            ),
           ],
         ),
       ),
