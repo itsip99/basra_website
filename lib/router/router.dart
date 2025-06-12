@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:stsj/alokasi-bm/pages/p_koreksi_alokasi_bm.dart';
 import 'package:stsj/core/cleanArc/dashboard_service/dashboardmain.dart';
 import 'package:stsj/core/cleanArc/dashboard_service/models/dashboard.dart';
 import 'package:stsj/core/cleanArc/dashboard_service/pages/dashboard01.dart';
@@ -35,6 +36,7 @@ import 'package:stsj/dashboard-fixup/pages/dashboard5_page.dart';
 import 'package:stsj/dashboard-fixup/pages/import_excel.dart';
 import 'package:stsj/global/globalVar.dart';
 import 'package:stsj/global/widget/open_map.dart';
+import 'package:stsj/alokasi-bm/pages/p_import_alokasi_bm.dart';
 
 import 'package:stsj/router/not_found_page.dart';
 import 'package:stsj/router/router_const.dart';
@@ -402,6 +404,20 @@ class RouterSettings {
                 },
               ),
             ],
+          ),
+          GoRoute(
+            name: RoutesConstant.importAlokasiBM,
+            path: 'importAlokasiBM',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: PImportAlokasiBM());
+            },
+          ),
+          GoRoute(
+            name: RoutesConstant.koreksiAlokasiBM,
+            path: 'koreksiAlokasiBM',
+            pageBuilder: (context, state) {
+              return MaterialPage(child: PKoreksiAlokasiBM());
+            },
           ),
           // ~:NEW:~
         ],

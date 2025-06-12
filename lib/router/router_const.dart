@@ -57,4 +57,8 @@ class RoutesConstant {
 
   static String salesDashboardtipeDaily = "Daily";
   static String salesDashboardtipe = "tipe";
+
+  //Punya Haryono -> Jangan Di Ganggu
+  static String importAlokasiBM = "importAlokasiBM";
+  static String koreksiAlokasiBM = "koreksiAlokasiBM";
 }
