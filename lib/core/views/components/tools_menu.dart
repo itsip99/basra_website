@@ -66,6 +66,50 @@ class ToolsMenuComponent extends HookWidget {
                 }
               },
             ),
+            Builder(
+              builder: (context) {
+                if (provider.getSubHeaderList.contains('402')) {
+                  return Container(
+                    margin: EdgeInsets.only(right: 50.0),
+                    child: Column(
+                      children: [
+                        _buildMenuIcon(
+                          context,
+                          'assets/images/import.png',
+                          'Import Alokasi Per BM',
+                          RoutesConstant.importAlokasiBM,
+                        ),
+                        const Text('Import Alokasi Per BM'),
+                      ],
+                    ),
+                  );
+                } else {
+                  return const SizedBox();
+                }
+              },
+            ),
+            Builder(
+              builder: (context) {
+                if (provider.getSubHeaderList.contains('403')) {
+                  return Container(
+                    margin: EdgeInsets.only(right: 50.0),
+                    child: Column(
+                      children: [
+                        _buildMenuIcon(
+                          context,
+                          'assets/images/edit.png',
+                          'Koreksi Alokasi Per BM',
+                          RoutesConstant.koreksiAlokasiBM,
+                        ),
+                        const Text('Koreksi Alokasi Per BM'),
+                      ],
+                    ),
+                  );
+                } else {
+                  return const SizedBox();
+                }
+              },
+            ),
           ],
         ),
       ),

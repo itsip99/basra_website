@@ -468,7 +468,7 @@ class _LoginPagesState extends State<LoginPages> {
                 width: MediaQuery.of(context).size.width,
                 alignment: Alignment.center,
                 child: Text(
-                  'v1.0.15',
+                  'v1.0.16',
                   style: GlobalFont.mediumbigfontR,
                 ),
               ),

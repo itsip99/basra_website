@@ -62,6 +62,9 @@ v1.0.14
 v1.0.15
 - Preview data in table of Workshop Daily report, Mechanic Daily report, and Workshop Monthly report removed and changed into export button.
 
+v1.0.16
+- New option for Tools menu, import alokasi BM & koreksi alokasi BM for the Marketing division 
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
