@@ -193,12 +193,6 @@ class _LoginPagesState extends State<LoginPages> {
         canEntered = true;
 
         if (canEntered) {
-          // loginModel.setUser([
-          //   listdatalogin[0].userID,
-          //   listdatalogin[0].entryLevelID,
-          //   listdatalogin[0].entryLevelName,
-          // ]);
-
           await fetchData(state);
 
           setState(() {
