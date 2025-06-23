@@ -2,13 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stsj/alokasi-bm/helper/api_alokasi_bm.dart';
+<<<<<<< HEAD
 import 'package:stsj/alokasi-bm/helper/model_alokasi_bm.dart';
+=======
+>>>>>>> e2ad1b9320f3b05c583ab3a7e2379b6341145bae
 import 'package:stsj/alokasi-bm/pages/p_koreksi_alokasi_bm.dart';
 import 'package:stsj/alokasi-bm/widget/w_alertdialog_info.dart';
 import 'package:stsj/alokasi-bm/widget/w_input_number.dart';
 import 'package:stsj/alokasi-bm/widget/w_kolom_detail.dart';
 import 'package:stsj/alokasi-bm/widget/w_kolom_header.dart';
+<<<<<<< HEAD
 import 'package:stsj/alokasi-bm/widget/w_input_search.dart';
+=======
+>>>>>>> e2ad1b9320f3b05c583ab3a7e2379b6341145bae
 import 'package:stsj/alokasi-bm/widget/w_tombol_panjang_ikon.dart';
 
 class PKoreksiAlokasiBMDetail extends StatefulWidget {
@@ -21,16 +27,20 @@ class PKoreksiAlokasiBMDetail extends StatefulWidget {
 
 class _MyPageState extends State<PKoreksiAlokasiBMDetail> {
   bool waitAPI = false;
+<<<<<<< HEAD
   List<ModelBrowseAlokasi> filter = [];
   TextEditingController searchController = TextEditingController();
 
   void setSearch(dynamic value) => setState(() =>
       filter = daftarAlokasi.where((x) => x.itemname.contains(value)).toList());
+=======
+>>>>>>> e2ad1b9320f3b05c583ab3a7e2379b6341145bae
 
   void simpan() async {
     setState(() => waitAPI = true);
 
     List<Map> detail = [];
+<<<<<<< HEAD
     for (var x in daftarAlokasi) {
       if (x.freestokADJ1.text != '0' ||
           x.freestokADJ2.text != '0' ||
@@ -56,6 +66,26 @@ class _MyPageState extends State<PKoreksiAlokasiBMDetail> {
           'Qty1': x.freestokADJ1.text,
           'Qty2': x.freestokADJ2.text,
           'Qty3': x.freestokADJ3.text
+=======
+    for (var data in daftarAlokasi) {
+      var calculateFS = data.freestokbagi1 +
+          data.freestokbagi2 +
+          data.freestokbagi3 +
+          data.freestokbisabagi +
+          int.parse(data.freestokADJ1.text) +
+          int.parse(data.freestokADJ2.text) +
+          int.parse(data.freestokADJ3.text);
+
+      calculateFS > data.sisastok ? data.isvalid = false : data.isvalid = true;
+
+      if (data.isvalid) {
+        detail.add({
+          'UnitID': data.unitid,
+          'Color': data.color,
+          'Qty1': data.freestokADJ1.text,
+          'Qty2': data.freestokADJ2.text,
+          'Qty3': data.freestokADJ3.text
+>>>>>>> e2ad1b9320f3b05c583ab3a7e2379b6341145bae
         });
       }
     }
@@ -86,17 +116,23 @@ class _MyPageState extends State<PKoreksiAlokasiBMDetail> {
           data.freestokADJ1.text = '0';
           data.freestokADJ2.text = '0';
           data.freestokADJ3.text = '0';
+<<<<<<< HEAD
           data.isvalid = true;
+=======
+>>>>>>> e2ad1b9320f3b05c583ab3a7e2379b6341145bae
         }
       });
 
   @override
+<<<<<<< HEAD
   void initState() {
     super.initState();
     filter.addAll(daftarAlokasi);
   }
 
   @override
+=======
+>>>>>>> e2ad1b9320f3b05c583ab3a7e2379b6341145bae
   Widget build(BuildContext context) {
     if (waitAPI) {
       return Center(child: SpinKitDualRing(color: Colors.blue[900]!));
@@ -105,11 +141,15 @@ class _MyPageState extends State<PKoreksiAlokasiBMDetail> {
         child: daftarAlokasi.isEmpty
             ? Container()
             : PaginatedDataTable(
+<<<<<<< HEAD
                 key: UniqueKey(),
                 header:
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   Expanded(child: WInputSearch(searchController, setSearch)),
                 ]),
+=======
+                header: Container(),
+>>>>>>> e2ad1b9320f3b05c583ab3a7e2379b6341145bae
                 actions: [
                   WTombolPanjangIkon('SIMPAN', Icons.save, Colors.white,
                       Colors.green[900]!, simpan),
@@ -117,7 +157,11 @@ class _MyPageState extends State<PKoreksiAlokasiBMDetail> {
                       Colors.white, Colors.blue[900]!, reset),
                 ],
                 rowsPerPage: 15,
+<<<<<<< HEAD
                 source: MyData(list: filter),
+=======
+                source: MyData(),
+>>>>>>> e2ad1b9320f3b05c583ab3a7e2379b6341145bae
                 headingRowColor:
                     WidgetStatePropertyAll(Colors.blueGrey.shade300),
                 headingRowHeight: 30,
@@ -162,6 +206,7 @@ class _MyPageState extends State<PKoreksiAlokasiBMDetail> {
 }
 
 class MyData extends DataTableSource {
+<<<<<<< HEAD
   MyData({required this.list});
   final List<ModelBrowseAlokasi> list;
 
@@ -184,12 +229,25 @@ class MyData extends DataTableSource {
       list[index].freestokADJ3 = TextEditingController(text: value);
       daftarAlokasi[posisi].freestokADJ3 = TextEditingController(text: value);
     }
+=======
+  var row = daftarAlokasi;
+
+  @override
+  DataRow? getRow(int index) {
+    void setADJCity(dynamic value) =>
+        row[index].freestokADJ1 = TextEditingController(text: value);
+    void setADJOut(dynamic value) =>
+        row[index].freestokADJ2 = TextEditingController(text: value);
+    void setADJNTT(dynamic value) =>
+        row[index].freestokADJ3 = TextEditingController(text: value);
+>>>>>>> e2ad1b9320f3b05c583ab3a7e2379b6341145bae
 
     return DataRow(
       color: index % 2 == 0
           ? WidgetStatePropertyAll(Colors.blue.shade50)
           : WidgetStatePropertyAll(Colors.white),
       cells: [
+<<<<<<< HEAD
         DataCell(list[index].isvalid
             ? Container()
             : Icon(Icons.info, color: Colors.red)),
@@ -212,6 +270,30 @@ class MyData extends DataTableSource {
         DataCell(WInputNumber('', list[index].freestokADJ1, setADJCity)),
         DataCell(WInputNumber('', list[index].freestokADJ2, setADJOut)),
         DataCell(WInputNumber('', list[index].freestokADJ3, setADJNTT)),
+=======
+        DataCell(row[index].isvalid
+            ? Container()
+            : Icon(Icons.info, color: Colors.red)),
+        wKolomDetail(row[index].unitid, Alignment.centerLeft),
+        wKolomDetail(row[index].colorname, Alignment.centerLeft),
+        wKolomDetail(row[index].fsn1.toString(), Alignment.centerRight),
+        wKolomDetail(row[index].nota110.toString(), Alignment.centerRight),
+        wKolomDetail(row[index].sisastok.toString(), Alignment.centerRight),
+        wKolomDetail(
+            row[index].freestokbagi1.toString(), Alignment.centerRight),
+        wKolomDetail(
+            row[index].freestokbagi2.toString(), Alignment.centerRight),
+        wKolomDetail(
+            row[index].freestokbagi3.toString(), Alignment.centerRight),
+        wKolomDetail(row[index].freestok1.toString(), Alignment.centerRight),
+        wKolomDetail(row[index].freestok2.toString(), Alignment.centerRight),
+        wKolomDetail(row[index].freestok3.toString(), Alignment.centerRight),
+        wKolomDetail(
+            row[index].freestokbisabagi.toString(), Alignment.centerRight),
+        DataCell(WInputNumber('', row[index].freestokADJ1, setADJCity)),
+        DataCell(WInputNumber('', row[index].freestokADJ2, setADJOut)),
+        DataCell(WInputNumber('', row[index].freestokADJ3, setADJNTT)),
+>>>>>>> e2ad1b9320f3b05c583ab3a7e2379b6341145bae
       ],
     );
   }
@@ -220,7 +302,11 @@ class MyData extends DataTableSource {
   bool get isRowCountApproximate => false;
 
   @override
+<<<<<<< HEAD
   int get rowCount => list.length;
+=======
+  int get rowCount => row.length;
+>>>>>>> e2ad1b9320f3b05c583ab3a7e2379b6341145bae
 
   @override
   int get selectedRowCount => 0;

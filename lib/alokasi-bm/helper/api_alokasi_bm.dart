@@ -99,6 +99,11 @@ class ApiAlokasiBM {
         msg = json['msg'];
         code = json['code'];
 
+<<<<<<< HEAD
+=======
+        print(response.body);
+
+>>>>>>> e2ad1b9320f3b05c583ab3a7e2379b6341145bae
         list = (json['data'] as List)
             .map<ModelModify>((data) => ModelModify.fromJson(data))
             .toList();
