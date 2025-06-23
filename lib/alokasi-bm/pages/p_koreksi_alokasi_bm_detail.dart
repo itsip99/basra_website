@@ -44,7 +44,7 @@ class _MyPageState extends State<PKoreksiAlokasiBMDetail> {
         var sisaBagi =
             (x.freestokbisabagi - fsADJ) < 0 ? 0 : (x.freestokbisabagi - fsADJ);
 
-        ((fsBagi + fsADJ) + sisaBagi) > x.sisastok
+        ((fsBagi + fsADJ) + sisaBagi) > (x.sisastok + x.nota110)
             ? x.isvalid = false
             : x.isvalid = true;
       }
